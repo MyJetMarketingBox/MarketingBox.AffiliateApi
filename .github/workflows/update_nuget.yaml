@@ -28,7 +28,6 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release /p:AssemblyVersion=0.0.0
       
-      
     - name: update nugets
       run: dotnet outdated -u
       
