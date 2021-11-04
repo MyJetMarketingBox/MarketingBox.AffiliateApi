@@ -15,5 +15,6 @@ namespace MarketingBox.AffiliateApi.Models.CampaignBoxes
         public ActivityHours[] ActivityHours { get; set; }
         public string Information { get; set; }
         public bool EnableTraffic { get; set; }
+        public long Sequence { get; set; }
     }
 }

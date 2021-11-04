@@ -202,7 +202,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 EnableTraffic = campaignBox.EnableTraffic,
                 Information =   campaignBox.Information,
                 Priority =      campaignBox.Priority,
-                Weight = campaignBox.Weight
+                Weight = campaignBox.Weight,
+                Sequence = campaignBox.Sequence
             };
         }
 
