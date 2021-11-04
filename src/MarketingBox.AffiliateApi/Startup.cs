@@ -24,6 +24,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Prometheus;
 using SimpleTrading.ServiceStatusReporterConnector;
+using SimpleTrading.Telemetry;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MarketingBox.AffiliateApi
@@ -52,7 +53,7 @@ namespace MarketingBox.AffiliateApi
                 .AddAuthentication(ConfigureAuthenticationOptions)
                 .AddJwtBearer(ConfigureJwtBearerOptions);
 
-            services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);
+            services.BindTelemetry("AffiliateApi", "MB-", Program.Settings.JaegerUrl);
         }
 
         protected virtual void ConfigureJwtBearerOptions(JwtBearerOptions options)

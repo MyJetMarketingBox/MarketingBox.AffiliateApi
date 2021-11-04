@@ -13,7 +13,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
     <PackageReference Include="MarketingBox.Affiliate.Service.Client" Version="1.0.14" />
     <PackageReference Include="MarketingBox.Registration.Service.Client" Version="1.0.31" />
-    <PackageReference Include="MarketingBox.Reporting.Service.Client" Version="1.0.11" />
+    <PackageReference Include="MarketingBox.Reporting.Service.Client" Version="1.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -31,6 +31,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.14.0" />
+    <PackageReference Include="SimpleTrading.Telemetry" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

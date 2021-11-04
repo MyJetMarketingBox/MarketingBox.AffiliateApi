@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -64,16 +65,62 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             return Ok(
                 response.Reports.Select(x => new ReportModel()
-                    {
-                        AffiliateId = x.AffiliateId,
-                        Ctr = x.Ctr,
-                        FtdCount = x.FtdCount ,
-                        LeadCount = x.LeadCount,
-                        Payout = x.Payout,
-                        Revenue = x.Revenue,
-                    })
+                {
+                    AffiliateId = x.AffiliateId,
+                    Ctr = x.Ctr,
+                    FtdCount = x.FtdCount,
+                    LeadCount = x.LeadCount,
+                    Payout = x.Payout,
+                    Revenue = x.Revenue,
+                })
                     .ToArray()
                     .Paginate(request, Url, x => x.AffiliateId));
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        [HttpGet("by-days")]
+        [ProducesResponseType(typeof(ItemsContainer<ReportByDaysModel>), StatusCodes.Status200OK)]
+
+        public async Task<ActionResult<ItemsContainer<ReportByDaysModel>>> SearchByDaysAsync()
+        {
+            var tenantId = this.GetTenantId();
+            var now = DateTime.UtcNow;
+            var days = System.DateTime.DaysInMonth(now.Year, now.Month);
+            var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0);
+            var endOfMonth = new DateTime(now.Year, now.Month, days, 23, 59, 59);
+            var response = await _reportService.SearchByDayAsync(new ReportByDaySearchRequest()
+            {
+                Asc = true,
+                Cursor = null,
+                FromDate = startOfMonth,
+                ToDate = endOfMonth,
+                Take = days,
+                TenantId = tenantId
+            });
+
+            if (response.Error != null)
+            {
+                ModelState.AddModelError("", response.Error.Message);
+
+                return BadRequest(ModelState);
+            }
+
+            if (response.Reports == null)
+                return NotFound();
+
+            return Ok(new ItemsContainer<ReportByDaysModel>()
+            {
+                Items = response.Reports.Select(x => new ReportByDaysModel()
+                    {
+                        CreatedAt = x.CreatedAt,
+                        FtdCount = x.FtdCount,
+                        LeadCount = x.LeadCount,
+                    })
+                    .ToArray()
+            });
         }
     }
 }

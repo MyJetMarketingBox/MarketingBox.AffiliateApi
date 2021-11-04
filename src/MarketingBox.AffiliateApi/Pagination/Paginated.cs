@@ -24,4 +24,9 @@ namespace MarketingBox.AffiliateApi.Pagination
         public Pagination<TId> Pagination { get; set; }
         public IReadOnlyCollection<TItem> Items { get; set; }
     }
+
+    public class ItemsContainer<TItem>
+    {
+        public IReadOnlyCollection<TItem> Items { get; set; }
+    }
 }

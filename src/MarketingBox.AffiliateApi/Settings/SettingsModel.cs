@@ -28,5 +28,8 @@ namespace MarketingBox.AffiliateApi.Settings
 
         [YamlProperty("MarketingBoxAffiliateApi.JwtSecret")]
         public string JwtSecret { get; set; }
+
+        [YamlProperty("MarketingBoxAffiliateApi.JaegerUrl")]
+        public string JaegerUrl { get; internal set; }
     }
 }
