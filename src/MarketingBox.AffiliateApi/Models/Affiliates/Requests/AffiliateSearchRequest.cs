@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Models.Partners.Requests
 {
-    public class PartnersSearchRequest : PaginationRequest<long?>
+    public class AffiliateSearchRequest : PaginationRequest<long?>
     {
         [FromQuery(Name = "id")]
         public long? Id { get; set; }
@@ -16,7 +16,7 @@ namespace MarketingBox.AffiliateApi.Models.Partners.Requests
         public string Name { get; set; }
 
         [FromQuery(Name = "role")]
-        public PartnerRole? Role { get; set; }
+        public AffiliateRole? Role { get; set; }
 
         [FromQuery(Name = "email")]
         public string Email { get; set; }

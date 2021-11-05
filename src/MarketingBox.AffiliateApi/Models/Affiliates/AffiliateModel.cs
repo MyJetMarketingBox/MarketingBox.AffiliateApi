@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 
 namespace MarketingBox.AffiliateApi.Models.Partners
 {
-    public class PartnerModel
+    public class AffiliateModel
     {
         public long AffiliateId { get; set; }
 
-        public PartnerGeneralInfo GeneralInfo { get; set; }
+        public AffiliateGeneralInfo GeneralInfo { get; set; }
 
-        public PartnerCompany Company { get; set; }
+        public AffiliateCompany Company { get; set; }
 
-        public PartnerBank Bank { get; set; }
+        public AffiliateBank Bank { get; set; }
         public long Sequence { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Brands
 {
-    public class BrandModel
+    public class IntegrationModel
     {
         public long Id { get; set; }
 

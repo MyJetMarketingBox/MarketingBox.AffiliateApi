@@ -1,24 +1,20 @@
+using MarketingBox.Affiliate.Service.Grpc;
+using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.Boxes;
+using MarketingBox.AffiliateApi.Models.Boxes.Requests;
 using MarketingBox.AffiliateApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Models.Campaigns.Requests;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Campaigns;
-using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
-using MarketingBox.AffiliateApi.Models.Partners;
-using Microsoft.AspNetCore.Authorization;
-using CampaignCreateRequest = MarketingBox.AffiliateApi.Models.Campaigns.Requests.CampaignCreateRequest;
-using CampaignUpdateRequest = MarketingBox.AffiliateApi.Models.Campaigns.Requests.CampaignUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/campaigns")]
+    [Route("/api/boxes")]
     public class CampaignController : ControllerBase
     {
         private readonly ICampaignService _campaignService;
@@ -36,32 +32,29 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(Paginated<CampaignModel, long>), StatusCodes.Status200OK)]
 
         public async Task<ActionResult<Paginated<CampaignModel, long>>> SearchAsync(
-            [FromQuery] CampaignsSearchRequest request)
+            [FromQuery] CampaignSearchRequest request)
         {
             if (request.Limit < 1 || request.Limit > 1000)
             {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should not be in the range 1..1000");
+                ModelState.AddModelError($"{nameof(request.Limit)}", "Should be in the range 1..1000");
 
                 return BadRequest();
             }
 
             var tenantId = this.GetTenantId();
-            var status = request.Status?.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.CampaignStatus>();
 
-            var response = await _campaignService.SearchAsync(new CampaignSearchRequest()
+            var response = await _campaignService.SearchAsync(new ()
             {
                 Asc = request.Order == PaginationOrder.Asc,
-                Cursor = request.Cursor,
                 CampaignId = request.Id,
-                BrandId = request.BrandId,
+                Cursor = request.Cursor,
                 Name = request.Name,
-                Status = status,
                 Take = request.Limit,
                 TenantId = tenantId
             });
 
             return Ok(
-                response.Campaigns.Select(Map)
+                response.Boxes.Select(Map)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
         }
@@ -73,11 +66,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet("{campaignId}")]
         [ProducesResponseType(typeof(CampaignModel), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<CampaignModel>> GetAsync(
-            [FromRoute, Required] long campaignId)
+        public async Task<ActionResult<Paginated<CampaignModel, long>>> SearchAsync(
+            [Required, FromRoute] long campaignId)
         {
-            var tenantId = this.GetTenantId();
-            var response =await _campaignService.GetAsync(new CampaignGetRequest() {CampaignId = campaignId});
+            var response = await _campaignService.GetAsync(new ()
+            {
+                CampaignId = campaignId
+            });
 
             return MapToResponse(response);
         }
@@ -92,25 +87,11 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] CampaignCreateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignService.CreateAsync(new Affiliate.Service.Grpc.Models.Campaigns.Requests.CampaignCreateRequest()
+
+            var response = await _campaignService.CreateAsync(new ()
             {
-                BrandId = request.BrandId,
                 Name = request.Name,
-                TenantId = tenantId,
-                Payout = new Affiliate.Service.Grpc.Models.Campaigns.Payout()
-                {
-                    Currency = request.Payout.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Amount = request.Payout.Amount,
-                    Plan = request.Payout.Plan.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Campaigns.Plan>()
-                },
-                Status = request.Status.MapEnum<  MarketingBox.Affiliate.Service.Domain.Models.Campaigns.CampaignStatus>(),
-                Privacy = request.Privacy.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Campaigns.CampaignPrivacy >(),
-                Revenue = new Affiliate.Service.Grpc.Models.Campaigns.Revenue()
-                {
-                    Currency = request.Revenue.Currency.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Amount = request.Revenue.Amount,
-                    Plan = request.Revenue.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.Plan>()
-                }
+                TenantId = tenantId
             });
 
             return MapToResponse(response);
@@ -127,27 +108,13 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] CampaignUpdateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignService.UpdateAsync(new Affiliate.Service.Grpc.Models.Campaigns.Requests.CampaignUpdateRequest()
+
+            var response = await _campaignService.UpdateAsync(new ()
             {
-                Id = campaignId,
-                Sequence = request.Sequence,
-                BrandId = request.BrandId,
                 Name = request.Name,
                 TenantId = tenantId,
-                Payout = new Affiliate.Service.Grpc.Models.Campaigns.Payout()
-                {
-                    Currency = request.Payout.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Amount = request.Payout.Amount,
-                    Plan = request.Payout.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.Plan>()
-                },
-                Status = request.Status.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.CampaignStatus>(),
-                Privacy = request.Privacy.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.CampaignPrivacy>(),
-                Revenue = new Affiliate.Service.Grpc.Models.Campaigns.Revenue()
-                {
-                    Currency = request.Revenue.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Amount = request.Revenue.Amount,
-                    Plan = request.Revenue.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Campaigns.Plan>()
-                }
+                CampaignId = campaignId,
+                Sequence = request.Sequence
             });
 
             return MapToResponse(response);
@@ -159,13 +126,14 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpDelete("{campaignId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> DeleteAsync(
+        public async Task<ActionResult> UpdateAsync(
             [Required, FromRoute] long campaignId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignService.DeleteAsync(new Affiliate.Service.Grpc.Models.Campaigns.Requests.CampaignDeleteRequest()
+
+            var response = await _campaignService.DeleteAsync(new ()
             {
-                CampaignId = campaignId
+                CampaignId = campaignId,
             });
 
             return MapToResponseEmpty(response);
@@ -186,28 +154,13 @@ namespace MarketingBox.AffiliateApi.Controllers
             return Ok(Map(response.Campaign));
         }
 
-        private static CampaignModel Map(Affiliate.Service.Grpc.Models.Campaigns.Campaign campaign)
+        private static CampaignModel Map(MarketingBox.Affiliate.Service.Grpc.Models.Campaigns.Campaign campaign)
         {
             return new CampaignModel()
             {
+                Sequence = campaign.Sequence,
                 Name = campaign.Name,
-                BrandId = campaign.BrandId,
-                Id = campaign.Id,
-                Payout = new Payout()
-                {
-                    Currency = campaign.Payout.Currency.MapEnum<Currency>(),
-                    Amount = campaign.Payout.Amount,
-                    Plan = campaign.Payout.Plan.MapEnum<Plan>()
-                },
-                Privacy = campaign.Privacy.MapEnum<CampaignPrivacy>(),
-                Revenue = new Revenue()
-                {
-                    Currency = campaign.Revenue.Currency.MapEnum<Currency>(),
-                    Amount = campaign.Revenue.Amount,
-                    Plan = campaign.Revenue.Plan.MapEnum<Plan>()
-                },
-                Status = campaign.Status.MapEnum<CampaignStatus>(),
-                Sequence = campaign.Sequence
+                Id = campaign.Id
             };
         }
 

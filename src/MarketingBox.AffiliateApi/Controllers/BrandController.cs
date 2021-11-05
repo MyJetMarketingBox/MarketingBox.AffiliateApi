@@ -1,17 +1,16 @@
-using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Models.Brands.Messages;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Brands;
-using MarketingBox.AffiliateApi.Models.Brands.Requests;
 using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.Affiliate.Service.Grpc;
+using MarketingBox.Affiliate.Service.Grpc.Models.Campaigns.Requests;
+using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.Campaigns;
+using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
+using MarketingBox.AffiliateApi.Models.Partners;
 using Microsoft.AspNetCore.Authorization;
-using BrandCreateRequest = MarketingBox.AffiliateApi.Models.Brands.Requests.BrandCreateRequest;
-using BrandUpdateRequest = MarketingBox.AffiliateApi.Models.Brands.Requests.BrandUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -45,33 +44,38 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
+            var status = request.Status?.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandStatus>();
 
-            var response = await _brandService.SearchAsync(new BrandSearchRequest()
+            var response = await _brandService.SearchAsync(new ()
             {
                 Asc = request.Order == PaginationOrder.Asc,
-                BoxId = request.Id,
                 Cursor = request.Cursor,
+                BrandId = request.Id,
+                IntegrationId = request.IntegrationId,
                 Name = request.Name,
+                Status = status,
                 Take = request.Limit,
                 TenantId = tenantId
             });
 
             return Ok(
-                response.Brands.Select(Map)
+                response.Campaigns.Select(Map)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
         }
 
+        /// <summary>
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
         [HttpGet("{brandId}")]
         [ProducesResponseType(typeof(BrandModel), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<BrandModel, long>>> GetAsync(
-            [FromRoute] long brandId)
+        public async Task<ActionResult<BrandModel>> GetAsync(
+            [FromRoute, Required] long brandId)
         {
-            var response = await _brandService.GetAsync(new BrandGetRequest()
-            {
-                 BrandId = brandId
-            });
+            var tenantId = this.GetTenantId();
+            var response =await _brandService.GetAsync(new () {BrandId = brandId});
 
             return MapToResponse(response);
         }
@@ -83,14 +87,28 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BrandModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<BrandModel>> CreateAsync(
-            
             [FromBody] BrandCreateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _brandService.CreateAsync(new Affiliate.Service.Grpc.Models.Brands.Messages.BrandCreateRequest()
+            var response = await _brandService.CreateAsync(new ()
             {
+                IntegrationId = request.IntegrationId,
                 Name = request.Name,
-                TenantId = tenantId
+                TenantId = tenantId,
+                Payout = new ()
+                {
+                    Currency = request.Payout.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
+                    Amount = request.Payout.Amount,
+                    Plan = request.Payout.Plan.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Brands.Plan>()
+                },
+                Status = request.Status.MapEnum<  MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandStatus>(),
+                Privacy = request.Privacy.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandPrivacy >(),
+                Revenue = new ()
+                {
+                    Currency = request.Revenue.Currency.MapEnum< MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
+                    Amount = request.Revenue.Amount,
+                    Plan = request.Revenue.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.Plan>()
+                }
             });
 
             return MapToResponse(response);
@@ -103,17 +121,31 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPut("{brandId}")]
         [ProducesResponseType(typeof(BrandModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<BrandModel>> UpdateAsync(
-            
             [Required, FromRoute] long brandId,
             [FromBody] BrandUpdateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _brandService.UpdateAsync(new Affiliate.Service.Grpc.Models.Brands.Messages.BrandUpdateRequest()
+            var response = await _brandService.UpdateAsync(new ()
             {
+                Id = brandId,
+                Sequence = request.Sequence,
+                IntegrationId = request.IntegrationId,
                 Name = request.Name,
                 TenantId = tenantId,
-                Sequence = request.Sequence,
-                BrandId = brandId
+                Payout = new ()
+                {
+                    Currency = request.Payout.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
+                    Amount = request.Payout.Amount,
+                    Plan = request.Payout.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.Plan>()
+                },
+                Status = request.Status.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandStatus>(),
+                Privacy = request.Privacy.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandPrivacy>(),
+                Revenue = new ()
+                {
+                    Currency = request.Revenue.Currency.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
+                    Amount = request.Revenue.Amount,
+                    Plan = request.Revenue.Plan.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.Plan>()
+                }
             });
 
             return MapToResponse(response);
@@ -125,17 +157,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpDelete("{brandId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> UpdateAsync(
-            
+        public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long brandId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _brandService.DeleteAsync(new Affiliate.Service.Grpc.Models.Brands.Messages.BrandDeleteRequest()
+            var response = await _brandService.DeleteAsync(new ()
             {
                 BrandId = brandId
             });
 
-            return MapToResponse(response);
+            return MapToResponseEmpty(response);
         }
 
         private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.Brands.BrandResponse response)
@@ -147,6 +178,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (response.Brand == null)
+                return NotFound();
+
             return Ok(Map(response.Brand));
         }
 
@@ -154,9 +188,24 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             return new BrandModel()
             {
-                Sequence = brand.Sequence,
                 Name = brand.Name,
-                Id = brand.Id
+                IntegrationId = brand.IntegrationId,
+                Id = brand.Id,
+                Payout = new Payout()
+                {
+                    Currency = brand.Payout.Currency.MapEnum<Currency>(),
+                    Amount = brand.Payout.Amount,
+                    Plan = brand.Payout.Plan.MapEnum<Plan>()
+                },
+                Privacy = brand.Privacy.MapEnum<BrandPrivacy>(),
+                Revenue = new Revenue()
+                {
+                    Currency = brand.Revenue.Currency.MapEnum<Currency>(),
+                    Amount = brand.Revenue.Amount,
+                    Plan = brand.Revenue.Plan.MapEnum<Plan>()
+                },
+                Status = brand.Status.MapEnum<BrandStatus>(),
+                Sequence = brand.Sequence
             };
         }
 

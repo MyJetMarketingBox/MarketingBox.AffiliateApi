@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Partners
 {
-    public enum PartnerState
+    public enum AffiliateState
     {
         Active,
         Banned,

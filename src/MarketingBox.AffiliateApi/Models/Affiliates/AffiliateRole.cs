@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Partners
 {
-    public enum PartnerRole
+    public enum AffiliateRole
     {
         Affiliate,
         AffiliateManager,

@@ -1,7 +1,7 @@
 ﻿using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MarketingBox.AffiliateApi.Models.Brands.Requests
+namespace MarketingBox.AffiliateApi.Models.Campaigns.Requests
 {
     public class BrandsSearchRequest : PaginationRequest<long?>
     {
@@ -10,5 +10,11 @@ namespace MarketingBox.AffiliateApi.Models.Brands.Requests
 
         [FromQuery(Name = "name")]
         public string Name { get; set; }
+
+        [FromQuery(Name = "integrationId")]
+        public long? IntegrationId { get; set; }
+
+        [FromQuery(Name = "status")]
+        public BrandStatus? Status { get; set; }
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Campaigns
 {
-    public enum CampaignStatus 
+    public enum BrandPrivacy
     {
-        Active,
-        Disabled
+        Private,
+        Public
     }
 }

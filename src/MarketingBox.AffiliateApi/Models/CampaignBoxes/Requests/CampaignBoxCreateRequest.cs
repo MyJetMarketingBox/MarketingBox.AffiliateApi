@@ -2,7 +2,7 @@
 {
     public class CampaignBoxCreateRequest
     {
-        public long BoxId { get; set; }
+        public long BrandId { get; set; }
         public long CampaignId { get; set; }
         public string CountryCode { get; set; }
         public int Priority { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Partners
 {
-    public class PartnerBank
+    public class AffiliateBank
     {
         public string BeneficiaryName { get; set; }
 

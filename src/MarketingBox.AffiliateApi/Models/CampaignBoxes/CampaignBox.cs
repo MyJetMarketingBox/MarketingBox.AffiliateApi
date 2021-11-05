@@ -1,10 +1,10 @@
 ﻿
 namespace MarketingBox.AffiliateApi.Models.CampaignBoxes
 {
-    public class CampaignBoxModel
+    public class CampaignRowModel
     {
-        public long CampaignBoxId { get; set; }
-        public long BoxId { get; set; }
+        public long CampaignRowId { get; set; }
+        public long BrandId { get; set; }
         public long CampaignId { get; set; }
         public string CountryCode { get; set; }
         public int Priority { get; set; }

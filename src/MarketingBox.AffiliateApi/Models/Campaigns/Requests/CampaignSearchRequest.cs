@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Models.Boxes.Requests
 {
-    public class BoxesSearchRequest : PaginationRequest<long?>
+    public class CampaignSearchRequest : PaginationRequest<long?>
     {
         [FromQuery(Name = "id")]
         public long? Id { get; set; }

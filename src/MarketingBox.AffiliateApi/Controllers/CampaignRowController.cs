@@ -1,17 +1,14 @@
+using MarketingBox.Affiliate.Service.Grpc;
+using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.CampaignBoxes;
+using MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests;
 using MarketingBox.AffiliateApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Models.CampaignBoxes.Requests;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.CampaignBoxes;
-using MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests;
-using MarketingBox.AffiliateApi.Models.Campaigns;
-using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
-using Microsoft.AspNetCore.Authorization;
 using CampaignBoxCreateRequest = MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests.CampaignBoxCreateRequest;
 using CampaignBoxUpdateRequest = MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests.CampaignBoxUpdateRequest;
 
@@ -20,11 +17,11 @@ namespace MarketingBox.AffiliateApi.Controllers
     [Authorize]
     [ApiController]
     [Route("/api/campaign-boxes")]
-    public class CampaignBoxController : ControllerBase
+    public class CampaignRowController : ControllerBase
     {
-        private readonly ICampaignBoxService _campaignBoxService;
+        private readonly ICampaignRowService _campaignBoxService;
 
-        public CampaignBoxController(ICampaignBoxService campaignBoxService)
+        public CampaignRowController(ICampaignRowService campaignBoxService)
         {
             _campaignBoxService = campaignBoxService;
         }
@@ -34,9 +31,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<CampaignBoxModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<CampaignRowModel, long>), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<CampaignBoxModel, long>>> SearchAsync(
+        public async Task<ActionResult<Paginated<CampaignRowModel, long>>> SearchAsync(
             [FromQuery] CampaignBoxesSearchRequest request)
         {
             if (request.Limit < 1 || request.Limit > 1000)
@@ -48,12 +45,12 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             var tenantId = this.GetTenantId();
 
-            var response = await _campaignBoxService.SearchAsync(new CampaignBoxSearchRequest()
+            var response = await _campaignBoxService.SearchAsync(new ()
             {
                 Asc = request.Order == PaginationOrder.Asc,
-                BoxId = request.BoxId,
+                BrandId= request.BrandId,
                 Cursor = request.Cursor,
-                CampaignBoxId = request.Id,
+                CampaignRowId = request.Id,
                 CampaignId = request.CampaignId,
                 Take = request.Limit,
                 TenantId = tenantId
@@ -62,21 +59,21 @@ namespace MarketingBox.AffiliateApi.Controllers
             return Ok(
                 response.CampaignBoxes.Select(Map)
                     .ToArray()
-                    .Paginate(request, Url, x => x.CampaignBoxId));
+                    .Paginate(request, Url, x => x.CampaignRowId));
         }
 
         /// <summary>
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpGet("{campaignBoxId}")]
-        [ProducesResponseType(typeof(CampaignBoxModel), StatusCodes.Status200OK)]
+        [HttpGet("{campaignRowId}")]
+        [ProducesResponseType(typeof(CampaignRowModel), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<CampaignBoxModel>> GetAsync(
-            [FromRoute, Required] long campaignBoxId)
+        public async Task<ActionResult<CampaignRowModel>> GetAsync(
+            [FromRoute, Required] long campaignRowId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.GetAsync(new CampaignBoxGetRequest() { CampaignBoxId = campaignBoxId });
+            var response = await _campaignBoxService.GetAsync(new () { CampaignRowId = campaignRowId });
 
             return MapToResponse(response);
         }
@@ -86,23 +83,23 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpPost]
-        [ProducesResponseType(typeof(CampaignBoxModel), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CampaignBoxModel>> CreateAsync(
+        [ProducesResponseType(typeof(CampaignRowModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CampaignRowModel>> CreateAsync(
             [FromBody] CampaignBoxCreateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.CreateAsync(new Affiliate.Service.Grpc.Models.CampaignBoxes.Requests.CampaignBoxCreateRequest()
+            var response = await _campaignBoxService.CreateAsync(new ()
             {
-                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignBoxes.ActivityHours()
+                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
                 {
                     Day = x.Day,
                     From = x.From,
                     IsActive = x.IsActive,
                     To = x.To
                 }).ToArray(),
-                BoxId = request.BoxId,
+                BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
-                CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignBoxes.CapType>(),
+                CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
                 CountryCode = request.CountryCode,
                 DailyCapValue = request.DailyCapValue,
                 EnableTraffic = request.EnableTraffic,
@@ -118,26 +115,26 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpPut("{campaignBoxId}")]
-        [ProducesResponseType(typeof(CampaignBoxModel), StatusCodes.Status200OK)]
-        public async Task<ActionResult<CampaignBoxModel>> UpdateAsync(
-            [Required, FromRoute] long campaignBoxId,
+        [HttpPut("{campaignRowId}")]
+        [ProducesResponseType(typeof(CampaignRowModel), StatusCodes.Status200OK)]
+        public async Task<ActionResult<CampaignRowModel>> UpdateAsync(
+            [Required, FromRoute] long campaignRowId,
             [FromBody] CampaignBoxUpdateRequest request)
         {
-            var response = await _campaignBoxService.UpdateAsync(new Affiliate.Service.Grpc.Models.CampaignBoxes.Requests.CampaignBoxUpdateRequest()
+            var response = await _campaignBoxService.UpdateAsync(new ()
             {
                 Sequence = request.Sequence,
-                CampaignBoxId = campaignBoxId,
-                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignBoxes.ActivityHours()
+                CampaignRowId = campaignRowId,
+                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
                 {
                     Day = x.Day,
                     From = x.From,
                     IsActive = x.IsActive,
                     To = x.To
                 }).ToArray(),
-                BoxId = request.BoxId,
+                BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
-                CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignBoxes.CapType>(),
+                CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
                 CountryCode = request.CountryCode,
                 DailyCapValue = request.DailyCapValue,
                 EnableTraffic = request.EnableTraffic,
@@ -153,21 +150,21 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpDelete("{campaignBoxId}")]
+        [HttpDelete("{campaignRowId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         public async Task<ActionResult> DeleteAsync(
-            [Required, FromRoute] long campaignBoxId)
+            [Required, FromRoute] long campaignRowId)
         {
             var response = await _campaignBoxService.DeleteAsync(
-                new Affiliate.Service.Grpc.Models.CampaignBoxes.Requests.CampaignBoxDeleteRequest()
+                new ()
                 {
-                    CampaignBoxId = campaignBoxId,
+                    CampaignRowId = campaignRowId,
                 });
 
             return MapToResponseEmpty(response);
         }
 
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.CampaignBoxes.CampaignBoxResponse response)
+        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRowResponse response)
         {
             if (response.Error != null)
             {
@@ -176,38 +173,38 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (response.CampaignBox == null)
+            if (response.CampaignRow == null)
                 return NotFound();
 
-            return Ok(Map(response.CampaignBox));
+            return Ok(Map(response.CampaignRow));
         }
 
-        private static CampaignBoxModel Map(Affiliate.Service.Grpc.Models.CampaignBoxes.CampaignBox campaignBox)
+        private static CampaignRowModel Map(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRow campaignRow)
         {
-            return new CampaignBoxModel()
+            return new CampaignRowModel()
             {
-                BoxId = campaignBox.BoxId,
-                CampaignId = campaignBox.CampaignId,
-                ActivityHours = campaignBox.ActivityHours.Select(x => new ActivityHours()
+                BrandId = campaignRow.BrandId,
+                CampaignId = campaignRow.CampaignId,
+                ActivityHours = campaignRow.ActivityHours.Select(x => new ActivityHours()
                 {
                     Day = x.Day,
                     From = x.From,
                     IsActive = x.IsActive,
                     To = x.To
                 }).ToArray(),
-                CampaignBoxId = campaignBox.CampaignBoxId,
-                CapType = campaignBox.CapType.MapEnum<CapType>(),
-                CountryCode =   campaignBox.CountryCode,
-                DailyCapValue = campaignBox.DailyCapValue,
-                EnableTraffic = campaignBox.EnableTraffic,
-                Information =   campaignBox.Information,
-                Priority =      campaignBox.Priority,
-                Weight = campaignBox.Weight,
-                Sequence = campaignBox.Sequence
+                CampaignRowId = campaignRow.CampaignRowId,
+                CapType = campaignRow.CapType.MapEnum<CapType>(),
+                CountryCode =   campaignRow.CountryCode,
+                DailyCapValue = campaignRow.DailyCapValue,
+                EnableTraffic = campaignRow.EnableTraffic,
+                Information =   campaignRow.Information,
+                Priority =      campaignRow.Priority,
+                Weight = campaignRow.Weight,
+                Sequence = campaignRow.Sequence
             };
         }
 
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.CampaignBoxes.CampaignBoxResponse response)
+        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRowResponse response)
         {
             if (response.Error != null)
             {

@@ -12,7 +12,7 @@ namespace MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests
         [FromQuery(Name = "campaignId")]
         public long? CampaignId { get; set; }
 
-        [Required, FromQuery(Name = "boxId")]
-        public long BoxId { get; set; }
+        [Required, FromQuery(Name = "brandId")]
+        public long BrandId { get; set; }
     }
 }

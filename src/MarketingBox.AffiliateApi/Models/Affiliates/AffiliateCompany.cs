@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Partners
 {
-    public class PartnerCompany
+    public class AffiliateCompany
     {
         public string Name { get; set; }
 

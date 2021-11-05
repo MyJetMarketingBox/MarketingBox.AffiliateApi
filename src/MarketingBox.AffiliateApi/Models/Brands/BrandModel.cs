@@ -1,7 +1,9 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Campaigns.Requests
+﻿namespace MarketingBox.AffiliateApi.Models.Campaigns
 {
-    public class BrandCreateRequest
+    public class BrandModel
     {
+        public long Id { get; set; }
+
         public string Name { get; set; }
 
         public long IntegrationId { get; set; }
@@ -13,5 +15,7 @@
         public BrandStatus Status { get; set; }
 
         public BrandPrivacy Privacy { get; set; }
+
+        public long Sequence { get; set; }
     }
 }
