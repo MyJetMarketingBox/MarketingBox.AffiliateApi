@@ -92,16 +92,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpPost("{leadId}")]
+        [HttpPost("{registrationId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
 
         public async Task<ActionResult<Paginated<DepositModel, long>>> ApproveAsync(
-            [FromRoute, Required] long leadId)
+            [FromRoute, Required] long registrationId)
         {
             var tenantId = this.GetTenantId();
             var response = await _registrationDepositService.ApproveDepositAsync(new DepositApproveRequest()
             {
-                LeadId = leadId,
+                RegistrationId = registrationId,
                 Mode = ApproveMode.ApproveManually,
                 TenantId = tenantId
             });

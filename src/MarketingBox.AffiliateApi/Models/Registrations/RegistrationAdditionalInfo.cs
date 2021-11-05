@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Leads
 {
-    public class LeadAdditionalInfo
+    public class RegistrationAdditionalInfo
     {
         public string So { get; set; }
 

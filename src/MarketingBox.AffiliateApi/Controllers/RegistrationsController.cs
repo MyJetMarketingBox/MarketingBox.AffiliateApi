@@ -1,8 +1,6 @@
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Pagination;
 using MarketingBox.Reporting.Service.Grpc;
-using MarketingBox.Reporting.Service.Grpc.Models.Leads;
-using MarketingBox.Reporting.Service.Grpc.Models.Reports.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,22 +8,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Models.Leads;
 using MarketingBox.AffiliateApi.Models.Leads.Requests;
-using LeadAdditionalInfo = MarketingBox.AffiliateApi.Models.Leads.LeadAdditionalInfo;
-using LeadGeneralInfo = MarketingBox.AffiliateApi.Models.Leads.LeadGeneralInfo;
-using LeadRouteInfo = MarketingBox.AffiliateApi.Models.Leads.LeadRouteInfo;
+using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationAdditionalInfo;
+using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationGeneralInfo;
+using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationRouteInfo;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/leads")]
-    public class LeadsController : ControllerBase
+    [Route("/api/registrations")]
+    public class RegistrationsController : ControllerBase
     {
-        private readonly ILeadService _leadService;
+        private readonly IRegistrationService _registrationService;
 
-        public LeadsController(ILeadService leadService)
+        public RegistrationsController(IRegistrationService registrationService)
         {
-            _leadService = leadService;
+            _registrationService = registrationService;
         }
 
         /// <summary>
@@ -33,10 +31,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<LeadModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<RegistrationModel, long>), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<LeadModel, long>>> SearchAsync(
-            [FromQuery] LeadSearchRequest request)
+        public async Task<ActionResult<Paginated<RegistrationModel, long>>> SearchAsync(
+            [FromQuery] RegistrationSearchRequest request)
         {
             if (request.Limit < 1 || request.Limit > 1000)
             {
@@ -46,7 +44,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
-            var response = await _leadService.SearchAsync(new ()
+            var response = await _registrationService.SearchAsync(new ()
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
@@ -63,9 +61,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             return Ok(
-                response.Leads.Select(x => new LeadModel()
+                response.Registrations.Select(x => new RegistrationModel()
                     {
-                        AdditionalInfo = new LeadAdditionalInfo()
+                        AdditionalInfo = new RegistrationAdditionalInfo()
                         {
                             So = x.AdditionalInfo.So,
                             Sub = x.AdditionalInfo.Sub,
@@ -81,7 +79,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                             Sub9 = x.AdditionalInfo.Sub9
                         },
                         Status = x.Status,
-                        GeneralInfo = new LeadGeneralInfo()
+                        GeneralInfo = new RegistrationGeneralInfo()
                         {
                             Email = x.GeneralInfo.Email,
                             CreatedAt = x.GeneralInfo.CreatedAt,
@@ -90,20 +88,20 @@ namespace MarketingBox.AffiliateApi.Controllers
                             LastName = x.GeneralInfo.LastName,
                             Phone = x.GeneralInfo.Phone
                         },
-                        LeadId = x.LeadId,
-                        RouteInfo = new LeadRouteInfo()
+                        RegistrationId = x.RegistrationId,
+                        RouteInfo = new RegistrationRouteInfo()
                         {
                             AffiliateId = x.RouteInfo.AffiliateId,
-                            BoxId = x.RouteInfo.BoxId,
-                            BrandId = x.RouteInfo.BrandId,
-                            CampaignId = x.RouteInfo.CampaignId
+                            CampaignId = x.RouteInfo.CampaignId,
+                            IntegrationIdId = x.RouteInfo.IntegrationId,
+                            BrandId = x.RouteInfo.BrandId
                         },
                         Sequence = x.Sequence,
                         //Type = x.,
                         UniqueId = x.UniqueId
                     })
                     .ToArray()
-                    .Paginate(request, Url, x => x.LeadId));
+                    .Paginate(request, Url, x => x.RegistrationId));
         }
     }
 }

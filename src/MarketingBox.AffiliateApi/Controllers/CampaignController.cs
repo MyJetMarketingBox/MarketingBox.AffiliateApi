@@ -14,7 +14,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/boxes")]
+    [Route("/api/campaigns")]
     public class CampaignController : ControllerBase
     {
         private readonly ICampaignService _campaignService;

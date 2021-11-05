@@ -3,7 +3,7 @@ using Destructurama.Attributed;
 
 namespace MarketingBox.AffiliateApi.Models.Leads
 {
-    public class LeadGeneralInfo
+    public class RegistrationGeneralInfo
     {
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string FirstName { get; set; }

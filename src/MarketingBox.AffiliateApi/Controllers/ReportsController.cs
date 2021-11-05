@@ -67,9 +67,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Reports.Select(x => new ReportModel()
                 {
                     AffiliateId = x.AffiliateId,
-                    Ctr = x.Ctr,
+                    Cr = x.Cr,
                     FtdCount = x.FtdCount,
-                    LeadCount = x.LeadCount,
+                    RegistrationsCount = x.RegistrationCount,
                     Payout = x.Payout,
                     Revenue = x.Revenue,
                 })
@@ -117,7 +117,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     {
                         CreatedAt = x.CreatedAt,
                         FtdCount = x.FtdCount,
-                        LeadCount = x.LeadCount,
+                        RegistrationsCount = x.RegistrationCount,
                     })
                     .ToArray()
             });
