@@ -16,9 +16,9 @@ namespace MarketingBox.AffiliateApi.Authorization
             return user.HasClaim("user-id");
         }
 
-        public static bool HasApiKeyId(this ClaimsPrincipal user)
+        public static bool HasUserRole(this ClaimsPrincipal user)
         {
-            return user.HasClaim("api-key-id");
+            return user.HasClaim("user-role");
         }
 
         public static string GetTenantId(this ClaimsPrincipal user)
@@ -31,9 +31,9 @@ namespace MarketingBox.AffiliateApi.Authorization
             return user.GetUserIdOrDefault() ?? throw new InvalidOperationException("There is no user-id claim");
         }
 
-        public static string GetApiKeyId(this ClaimsPrincipal user)
+        public static UserRole GetUserRole(this ClaimsPrincipal user)
         {
-            return user.GetApiKeyIdOrDefault() ?? throw new InvalidOperationException("There is no api-key-id claim");
+            return user.GetUserRoleOrDefault() ?? throw new InvalidOperationException("There is no api-key-id claim");
         }
 
         public static string GetTenantIdOrDefault(this ClaimsPrincipal user)
@@ -45,10 +45,21 @@ namespace MarketingBox.AffiliateApi.Authorization
         {
             return user.GetClaimOrDefault("user-id");
         }
-        
-        public static string GetApiKeyIdOrDefault(this ClaimsPrincipal user)
+
+        public static UserRole? GetUserRoleOrDefault(this ClaimsPrincipal user)
         {
-            return user.GetClaimOrDefault("api-key-id");
+            UserRole role;
+            var claim = user.GetClaimOrDefault("user-role");
+
+            if (string.IsNullOrEmpty(claim))
+                return null;
+
+            if (Enum.TryParse(claim, out role))
+            {
+                return role;
+            }
+
+            return null;
         }
 
         public static bool HasClaim(this ClaimsPrincipal user, string claim)

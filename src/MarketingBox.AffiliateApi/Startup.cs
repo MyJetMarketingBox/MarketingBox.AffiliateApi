@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using Autofac;
+using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Grpc;
 using MarketingBox.AffiliateApi.Modules;
 using MarketingBox.AffiliateApi.Services;
 using MarketingBox.AffiliateApi.Swagger;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +46,50 @@ namespace MarketingBox.AffiliateApi
         {
             services.BindCodeFirstGrpc();
 
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AuthorizationPolicies.AffiliateAndHigher, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role);
+                    policy.Requirements.Add(new RolesAuthorizationRequirement(new []
+                    {
+                        UserRole.Affiliate.ToString(),
+                        UserRole.AffiliateManager.ToString(),
+                        UserRole.MasterAffiliate.ToString(),
+                        UserRole.Admin.ToString()
+                    }));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.MasterAffiliateAndHigher, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role);
+                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
+                    {
+                        UserRole.AffiliateManager.ToString(),
+                        UserRole.MasterAffiliate.ToString(),
+                        UserRole.Admin.ToString()
+                    }));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.AffiliateManagerAndHigher, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role);
+                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
+                    {
+                        UserRole.AffiliateManager.ToString(),
+                        UserRole.Admin.ToString()
+                    }));
+                });
+
+                options.AddPolicy(AuthorizationPolicies.AdminOnly, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role);
+                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
+                    {
+                        UserRole.Admin.ToString()
+                    }));
+                });
+            });
             services.AddControllers().AddNewtonsoftJson(ConfigureMvcNewtonsoftJsonOptions);
             services.AddSwaggerGen(ConfigureSwaggerGenOptions);
             services.AddSwaggerGenNewtonsoftSupport();

@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [ApiController]
     [Route("/api/campaigns")]
     public class CampaignController : ControllerBase

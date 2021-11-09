@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Flurl.Util;
+using MarketingBox.AffiliateApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [ApiController]
     [Route("/api/integrations")]
     public class IntegrationController : ControllerBase

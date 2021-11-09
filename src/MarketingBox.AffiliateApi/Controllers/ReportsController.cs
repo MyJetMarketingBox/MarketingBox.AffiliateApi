@@ -10,10 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("/api/reports")]
     public class ReportsController : ControllerBase
@@ -29,6 +30,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<ReportModel, long>), StatusCodes.Status200OK)]
 
@@ -81,6 +83,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
         [HttpGet("by-days")]
         [ProducesResponseType(typeof(ItemsContainer<ReportByDaysModel>), StatusCodes.Status200OK)]
 

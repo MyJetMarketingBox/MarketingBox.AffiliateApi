@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Models.Leads;
 using MarketingBox.AffiliateApi.Models.Leads.Requests;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationAdditionalInfo;
@@ -14,7 +15,7 @@ using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Leads.Registratio
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
     [ApiController]
     [Route("/api/registrations")]
     public class RegistrationsController : ControllerBase

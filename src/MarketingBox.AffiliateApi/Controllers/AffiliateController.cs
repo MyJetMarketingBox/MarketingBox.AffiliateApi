@@ -10,13 +10,14 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using MarketingBox.AffiliateApi.Authorization;
 using AffiliateCreateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateCreateRequest;
 using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateSearchRequest;
 using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [ApiController]
     [Route("/api/affiliates")]
     public class AffiliateController : ControllerBase

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Models.Deposits;
 using MarketingBox.AffiliateApi.Models.Deposits.Requests;
 using MarketingBox.Registration.Service.Grpc.Models.Common;
@@ -16,7 +17,7 @@ using MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
     [ApiController]
     [Route("/api/deposits")]
     public class DepositsController : ControllerBase
