@@ -21,5 +21,16 @@ namespace MarketingBox.AffiliateApi.Models.Leads
         public string Ip { get; set; }
 
         public DateTime CreatedAt { get; set; }
+        public DateTime? DepositedAt { get; set; }
+        public DateTime? ConversionDate { get; set; }
+        public string Country { get; set; }
+    }
+
+    public class RegistrationGeneralInfoForAffiliate
+    {
+        public DateTime CreatedAt { get; set; }
+        public DateTime? DepositedAt { get; set; }
+        public DateTime? ConversionDate { get; set; }
+        public string Country { get; set; }
     }
 }

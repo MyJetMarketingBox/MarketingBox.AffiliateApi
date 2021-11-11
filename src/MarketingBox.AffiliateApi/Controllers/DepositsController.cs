@@ -1,19 +1,16 @@
-using System.ComponentModel.DataAnnotations;
+using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Reports.Requests;
+using MarketingBox.AffiliateApi.Models.Deposits;
+using MarketingBox.AffiliateApi.Models.Deposits.Requests;
 using MarketingBox.AffiliateApi.Pagination;
-using MarketingBox.Reporting.Service.Grpc;
-using MarketingBox.Reporting.Service.Grpc.Models.Leads;
+using MarketingBox.Registration.Service.Grpc.Models.Common;
+using MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Models.Deposits;
-using MarketingBox.AffiliateApi.Models.Deposits.Requests;
-using MarketingBox.Registration.Service.Grpc.Models.Common;
-using MarketingBox.Registration.Service.Grpc.Models.Deposits.Contracts;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {

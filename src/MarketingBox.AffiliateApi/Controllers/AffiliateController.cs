@@ -17,7 +17,7 @@ using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Request
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
     [ApiController]
     [Route("/api/affiliates")]
     public class AffiliateController : ControllerBase

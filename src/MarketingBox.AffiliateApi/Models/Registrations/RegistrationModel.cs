@@ -1,4 +1,5 @@
-﻿using MarketingBox.Reporting.Service.Domain.Models.Lead;
+﻿using System;
+using MarketingBox.Reporting.Service.Domain.Models.Lead;
 
 namespace MarketingBox.AffiliateApi.Models.Leads
 {
@@ -19,6 +20,23 @@ namespace MarketingBox.AffiliateApi.Models.Leads
         //public LeadType Type  { get; set; }
 
         public LeadStatus Status{ get; set; }
+
+    }
+
+    public class RegistrationModelForAffiliate
+    {
+        public long RegistrationId { get; set; }
+
+        public string UniqueId { get; set; }
+
+        public long Sequence { get; set; }
+
+        public RegistrationGeneralInfoForAffiliate GeneralInfo { get; set; }
+
+
+        //public LeadType Type  { get; set; }
+
+        public LeadStatus Status { get; set; }
 
     }
 }

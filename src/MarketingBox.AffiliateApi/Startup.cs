@@ -56,6 +56,7 @@ namespace MarketingBox.AffiliateApi
                         UserRole.Affiliate.ToString(),
                         UserRole.AffiliateManager.ToString(),
                         UserRole.MasterAffiliate.ToString(),
+                        UserRole.MasterAffiliateReferral.ToString(),
                         UserRole.Admin.ToString()
                     }));
                 });
@@ -67,6 +68,7 @@ namespace MarketingBox.AffiliateApi
                     {
                         UserRole.AffiliateManager.ToString(),
                         UserRole.MasterAffiliate.ToString(),
+                        UserRole.MasterAffiliateReferral.ToString(),
                         UserRole.Admin.ToString()
                     }));
                 });

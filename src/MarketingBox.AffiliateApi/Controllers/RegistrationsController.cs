@@ -15,7 +15,6 @@ using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Leads.Registratio
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
     [ApiController]
     [Route("/api/registrations")]
     public class RegistrationsController : ControllerBase
@@ -31,8 +30,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<RegistrationModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<RegistrationModelForAffiliate, long>), StatusCodes.Status200OK)]
 
         public async Task<ActionResult<Paginated<RegistrationModel, long>>> SearchAsync(
             [FromQuery] RegistrationSearchRequest request)
@@ -44,8 +45,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest();
             }
 
+            var role = this.GetRole();
             var tenantId = this.GetTenantId();
-            var response = await _registrationService.SearchAsync(new ()
+            var response = await _registrationService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
@@ -61,48 +63,70 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok(
-                response.Registrations.Select(x => new RegistrationModel()
+            if (role == UserRole.Affiliate)
+                return Ok(
+                response.Registrations.Select(x => new RegistrationModelForAffiliate()
+                {
+                    Status = x.Status,
+                    GeneralInfo = new RegistrationGeneralInfoForAffiliate()
                     {
-                        AdditionalInfo = new RegistrationAdditionalInfo()
-                        {
-                            So = x.AdditionalInfo.So,
-                            Sub = x.AdditionalInfo.Sub,
-                            Sub1 = x.AdditionalInfo.Sub1,
-                            Sub10 = x.AdditionalInfo.Sub10,
-                            Sub2 = x.AdditionalInfo.Sub2,
-                            Sub3 = x.AdditionalInfo.Sub3,
-                            Sub4 = x.AdditionalInfo.Sub4,
-                            Sub5 = x.AdditionalInfo.Sub5,
-                            Sub6 = x.AdditionalInfo.Sub6,
-                            Sub7 = x.AdditionalInfo.Sub7,
-                            Sub8 = x.AdditionalInfo.Sub8,
-                            Sub9 = x.AdditionalInfo.Sub9
-                        },
-                        Status = x.Status,
-                        GeneralInfo = new RegistrationGeneralInfo()
-                        {
-                            Email = x.GeneralInfo.Email,
-                            CreatedAt = x.GeneralInfo.CreatedAt,
-                            FirstName = x.GeneralInfo.FirstName,
-                            Ip = x.GeneralInfo.Ip,
-                            LastName = x.GeneralInfo.LastName,
-                            Phone = x.GeneralInfo.Phone
-                        },
-                        RegistrationId = x.RegistrationId,
-                        RouteInfo = new RegistrationRouteInfo()
-                        {
-                            AffiliateId = x.RouteInfo.AffiliateId,
-                            CampaignId = x.RouteInfo.CampaignId,
-                            IntegrationIdId = x.RouteInfo.IntegrationId,
-                            BrandId = x.RouteInfo.BrandId
-                        },
-                        Sequence = x.Sequence,
-                        //Type = x.,
-                        UniqueId = x.UniqueId
-                    })
+                        CreatedAt = x.GeneralInfo.CreatedAt,
+                        DepositedAt = x.GeneralInfo.DepositedAt,
+                        ConversionDate = x.GeneralInfo.ConversionDate,
+                        Country = x.GeneralInfo.Country,
+                    },
+                    RegistrationId = x.RegistrationId,
+                    Sequence = x.Sequence,
+                    UniqueId = x.UniqueId
+                })
                     .ToArray()
                     .Paginate(request, Url, x => x.RegistrationId));
+
+            return Ok(
+            response.Registrations.Select(x => new RegistrationModel()
+            {
+                AdditionalInfo = new RegistrationAdditionalInfo()
+                {
+                    So = x.AdditionalInfo.So,
+                    Sub = x.AdditionalInfo.Sub,
+                    Sub1 = x.AdditionalInfo.Sub1,
+                    Sub10 = x.AdditionalInfo.Sub10,
+                    Sub2 = x.AdditionalInfo.Sub2,
+                    Sub3 = x.AdditionalInfo.Sub3,
+                    Sub4 = x.AdditionalInfo.Sub4,
+                    Sub5 = x.AdditionalInfo.Sub5,
+                    Sub6 = x.AdditionalInfo.Sub6,
+                    Sub7 = x.AdditionalInfo.Sub7,
+                    Sub8 = x.AdditionalInfo.Sub8,
+                    Sub9 = x.AdditionalInfo.Sub9
+                },
+                Status = x.Status,
+                GeneralInfo = new RegistrationGeneralInfo()
+                {
+                    Email = x.GeneralInfo.Email,
+                    CreatedAt = x.GeneralInfo.CreatedAt,
+                    DepositedAt = x.GeneralInfo.DepositedAt,
+                    ConversionDate = x.GeneralInfo.ConversionDate,
+                    Country = x.GeneralInfo.Country,
+                    FirstName = x.GeneralInfo.FirstName,
+                    Ip = x.GeneralInfo.Ip,
+                    LastName = x.GeneralInfo.LastName,
+                    Phone = x.GeneralInfo.Phone
+                },
+                RegistrationId = x.RegistrationId,
+                RouteInfo = new RegistrationRouteInfo()
+                {
+                    AffiliateId = x.RouteInfo.AffiliateId,
+                    CampaignId = x.RouteInfo.CampaignId,
+                    IntegrationIdId = x.RouteInfo.IntegrationId,
+                    BrandId = x.RouteInfo.BrandId
+                },
+                Sequence = x.Sequence,
+                    //Type = x.,
+                    UniqueId = x.UniqueId
+            })
+                .ToArray()
+                .Paginate(request, Url, x => x.RegistrationId));
         }
     }
 }

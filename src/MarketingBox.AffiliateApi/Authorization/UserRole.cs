@@ -10,5 +10,6 @@ namespace MarketingBox.AffiliateApi.Authorization
         MasterAffiliate,
         AffiliateManager,
         Admin,
+        MasterAffiliateReferral,
     }
 }

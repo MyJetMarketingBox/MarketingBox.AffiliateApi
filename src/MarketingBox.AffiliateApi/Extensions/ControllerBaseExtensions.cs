@@ -9,5 +9,10 @@ namespace MarketingBox.AffiliateApi.Extensions
         {
             return controllerBase.User.GetTenantId();
         }
+
+        public static UserRole GetRole(this ControllerBase controllerBase)
+        {
+            return controllerBase.User.GetUserRole();
+        }
     }
 }
