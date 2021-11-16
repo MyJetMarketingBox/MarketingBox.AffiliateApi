@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
     [ApiController]
     [Route("/api/deposits")]
     public class DepositsController : ControllerBase
@@ -33,6 +32,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.MasterAffiliateAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<DepositModel, long>), StatusCodes.Status200OK)]
 
@@ -47,13 +47,20 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
+            var role = this.GetRole();
+            long? masterAffiliateId = null;
+
+            if (role.IsRestricted())
+                masterAffiliateId = this.GetAffiliateId();
+
             var response = await _depositsService.SearchAsync(new ()
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
                 Take = request.Limit,
                 TenantId = tenantId,
-                AffiliateId = request.AffiliateId
+                AffiliateId = request.AffiliateId,
+                MasterAffiliateId = masterAffiliateId
             });
 
             if (response.Error != null)
@@ -90,6 +97,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpPost("{registrationId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
 

@@ -90,10 +90,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<ItemsContainer<ReportByDaysModel>>> SearchByDaysAsync()
         {
             var tenantId = this.GetTenantId();
+            var role = this.GetRole();
             var now = DateTime.UtcNow;
             var days = System.DateTime.DaysInMonth(now.Year, now.Month);
             var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0);
             var endOfMonth = new DateTime(now.Year, now.Month, days, 23, 59, 59);
+            long? masterAffiliateId = null;
+
+            if (role.IsRestricted())
+                masterAffiliateId = this.GetAffiliateId();
+
             var response = await _reportService.SearchByDayAsync(new ReportByDaySearchRequest()
             {
                 Asc = true,
@@ -101,7 +107,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 FromDate = startOfMonth,
                 ToDate = endOfMonth,
                 Take = days,
-                TenantId = tenantId
+                TenantId = tenantId,
+                MasterAffiliateId = masterAffiliateId
             });
 
             if (response.Error != null)
@@ -117,11 +124,11 @@ namespace MarketingBox.AffiliateApi.Controllers
             return Ok(new ItemsContainer<ReportByDaysModel>()
             {
                 Items = response.Reports.Select(x => new ReportByDaysModel()
-                    {
-                        CreatedAt = x.CreatedAt,
-                        FtdCount = x.FtdCount,
-                        RegistrationsCount = x.RegistrationCount,
-                    })
+                {
+                    CreatedAt = x.CreatedAt,
+                    FtdCount = x.FtdCount,
+                    RegistrationsCount = x.RegistrationCount,
+                })
                     .ToArray()
             });
         }

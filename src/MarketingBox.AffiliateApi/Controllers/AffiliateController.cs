@@ -17,7 +17,6 @@ using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Request
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
     [ApiController]
     [Route("/api/affiliates")]
     public class AffiliateController : ControllerBase
@@ -33,6 +32,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.MasterAffiliateAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<AffiliateModel, long>), StatusCodes.Status200OK)]
 
@@ -47,7 +47,13 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
+            var userRole = this.GetRole();
             var role = request.Role?.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateRole>();
+
+            long? masterAffiliateId = null;
+
+            if (userRole.IsRestricted())
+                masterAffiliateId = this.GetAffiliateId();
 
             var response = await _affiliateService.SearchAsync(new ()
             {
@@ -60,7 +66,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Role = role,
                 Username = request.Username,
                 Take = request.Limit,
-                TenantId = tenantId
+                TenantId = tenantId,
+                MasterAffiliateId = masterAffiliateId
             });
 
             return Ok(
@@ -73,6 +80,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet("{affiliateId}")]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
 
@@ -92,6 +100,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpPost]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> CreateAsync(
@@ -141,6 +150,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpPut("{affiliateId}")]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> UpdateAsync(
@@ -194,6 +204,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpDelete("{affiliateId}")]
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long affiliateId)

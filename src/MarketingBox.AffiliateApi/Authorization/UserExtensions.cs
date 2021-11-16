@@ -49,7 +49,7 @@ namespace MarketingBox.AffiliateApi.Authorization
         public static UserRole? GetUserRoleOrDefault(this ClaimsPrincipal user)
         {
             UserRole role;
-            var claim = user.GetClaimOrDefault("user-role");
+            var claim = user.GetClaimOrDefault(ClaimTypes.Role);
 
             if (string.IsNullOrEmpty(claim))
                 return null;
