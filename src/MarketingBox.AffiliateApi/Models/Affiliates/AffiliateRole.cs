@@ -4,7 +4,7 @@
     {
         Affiliate,
         AffiliateManager,
-        BrandManager,
+        IntegrationManager,
         MasterAffiliate,
         MasterAffiliateReferral,
     }
