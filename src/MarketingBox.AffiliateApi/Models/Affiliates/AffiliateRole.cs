@@ -6,5 +6,6 @@
         AffiliateManager,
         BrandManager,
         MasterAffiliate,
+        MasterAffiliateReferral,
     }
 }
