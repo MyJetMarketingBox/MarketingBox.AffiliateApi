@@ -1,11 +1,9 @@
 using MarketingBox.AffiliateApi.Models.Partners;
-using MarketingBox.AffiliateApi.Models.Partners.Requests;
 using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using MarketingBox.Affiliate.Service.Client;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
