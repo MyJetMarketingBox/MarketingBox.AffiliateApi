@@ -31,5 +31,8 @@ namespace MarketingBox.AffiliateApi.Settings
 
         [YamlProperty("MarketingBoxAffiliateApi.JaegerUrl")]
         public string JaegerUrl { get; internal set; }
+
+        [YamlProperty("MarketingBoxAffiliateApi.MarketingBoxServiceBusHostPort")]
+        public string MarketingBoxServiceBusHostPort { get; set; }
     }
 }

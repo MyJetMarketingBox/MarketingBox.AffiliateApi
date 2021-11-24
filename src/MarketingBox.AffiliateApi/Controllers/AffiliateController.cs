@@ -1,3 +1,4 @@
+using System;
 using MarketingBox.AffiliateApi.Models.Partners;
 using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Http;
@@ -8,8 +9,14 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using MarketingBox.Affiliate.Service.Messages.Affiliates;
 using MarketingBox.AffiliateApi.Authorization;
+using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.ServiceBus;
+using AffiliateBank = MarketingBox.AffiliateApi.Models.Partners.AffiliateBank;
+using AffiliateCompany = MarketingBox.AffiliateApi.Models.Partners.AffiliateCompany;
 using AffiliateCreateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateCreateRequest;
+using AffiliateGeneralInfo = MarketingBox.AffiliateApi.Models.Partners.AffiliateGeneralInfo;
 using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateSearchRequest;
 using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateUpdateRequest;
 
@@ -19,11 +26,17 @@ namespace MarketingBox.AffiliateApi.Controllers
     [Route("/api/affiliates")]
     public class AffiliateController : ControllerBase
     {
+        private readonly ILogger<AffiliateController> _logger;
         private readonly IAffiliateService _affiliateService;
+        private readonly IServiceBusPublisher<AffiliateDeleteMessage> _serviceBusPublisher;
 
-        public AffiliateController(IAffiliateService affiliateService)
+        public AffiliateController(IAffiliateService affiliateService, 
+            IServiceBusPublisher<AffiliateDeleteMessage> serviceBusPublisher, 
+            ILogger<AffiliateController> logger)
         {
             _affiliateService = affiliateService;
+            _serviceBusPublisher = serviceBusPublisher;
+            _logger = logger;
         }
 
         /// <summary>
@@ -207,12 +220,19 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long affiliateId)
         {
-            var response = await _affiliateService.DeleteAsync(new ()
+            try
             {
-                AffiliateId = affiliateId,
-            });
-
-            return MapToResponseEmpty(response);
+                await _serviceBusPublisher.PublishAsync(new AffiliateDeleteMessage()
+                {
+                    AffiliateId = affiliateId
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new BadRequestResult();
+            }
+            return Ok();
         }
 
         private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.Affiliates.AffiliateResponse response)
