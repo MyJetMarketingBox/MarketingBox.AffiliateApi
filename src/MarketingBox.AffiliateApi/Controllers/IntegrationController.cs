@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Flurl.Util;
 using MarketingBox.AffiliateApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
@@ -124,7 +123,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpDelete("{integrationId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> UpdateAsync(
+        public async Task<ActionResult> DeleteAsync(
             
             [Required, FromRoute] long integrationId)
         {
@@ -146,12 +145,15 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok(Map(response.Integration));
+            if (response.Integration != null)
+                return Ok(Map(response.Integration));
+
+            return Ok();
         }
 
         private static IntegrationModel Map(Affiliate.Service.Grpc.Models.Integrations.Integration integration)
         {
-            return new IntegrationModel()
+            return new()
             {
                 Sequence = integration.Sequence,
                 Name = integration.Name,
