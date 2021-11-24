@@ -94,7 +94,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet("{affiliateId}")]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
-
         public async Task<ActionResult<AffiliateModel>> GetAsync(
             [FromRoute, Required] long affiliateId)
         {

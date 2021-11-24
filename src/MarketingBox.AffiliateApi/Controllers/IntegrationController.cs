@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.Affiliate.Service.Grpc.Models.Integrations;
 using MarketingBox.AffiliateApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
@@ -122,8 +123,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpDelete("{integrationId}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> DeleteAsync(
+        [ProducesResponseType(typeof(Integration), StatusCodes.Status200OK)]
+        public async Task<ActionResult<Integration>> DeleteAsync(
             
             [Required, FromRoute] long integrationId)
         {
