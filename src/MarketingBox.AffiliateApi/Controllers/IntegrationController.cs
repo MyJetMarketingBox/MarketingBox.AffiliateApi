@@ -145,10 +145,10 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (response.Integration != null)
-                return Ok(Map(response.Integration));
-
-            return Ok();
+            if (response.Integration == null)
+                return NotFound();
+            
+            return Ok(Map(response.Integration));
         }
 
         private static IntegrationModel Map(Affiliate.Service.Grpc.Models.Integrations.Integration integration)
