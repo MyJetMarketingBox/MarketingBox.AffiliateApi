@@ -102,7 +102,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 AffiliateId = affiliateId
             });
 
-
             return MapToResponse(response);
         }
 
