@@ -1,4 +1,6 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Campaigns.Requests
+﻿using MarketingBox.AffiliateApi.Models.Campaigns;
+
+namespace MarketingBox.AffiliateApi.Models.Brands.Requests
 {
     public class BrandCreateRequest
     {

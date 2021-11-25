@@ -8,6 +8,7 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Models.Campaigns.Requests;
 using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.Brands.Requests;
 using MarketingBox.AffiliateApi.Models.Campaigns;
 using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
 using MarketingBox.AffiliateApi.Models.Partners;
