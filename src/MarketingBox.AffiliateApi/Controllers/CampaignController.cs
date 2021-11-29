@@ -54,10 +54,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = tenantId
             });
 
-            return Ok(
-                response.Boxes.Select(Map)
+            if (response.Boxes.Any())
+                return Ok(response.Boxes.Select(Map)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
+            
+            return NotFound();
         }
 
         /// <summary>
