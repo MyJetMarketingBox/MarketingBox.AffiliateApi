@@ -81,10 +81,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 MasterAffiliateId = masterAffiliateId
             });
 
-            return Ok(
-                response.Affiliates.Select(Map)
-                    .ToArray()
-                    .Paginate(request, Url, x => x.AffiliateId));
+            if (response.Affiliates != null && response.Affiliates.Any())
+                return Ok(
+                    response.Affiliates.Select(Map)
+                        .ToArray()
+                        .Paginate(request, Url, x => x.AffiliateId));
+            
+            return NotFound();
         }
 
         /// <summary>
