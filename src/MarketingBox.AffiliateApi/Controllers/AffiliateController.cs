@@ -17,7 +17,7 @@ using AffiliateBank = MarketingBox.AffiliateApi.Models.Partners.AffiliateBank;
 using AffiliateCompany = MarketingBox.AffiliateApi.Models.Partners.AffiliateCompany;
 using AffiliateCreateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateCreateRequest;
 using AffiliateGeneralInfo = MarketingBox.AffiliateApi.Models.Partners.AffiliateGeneralInfo;
-using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateSearchRequest;
+using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Affiliates.Requests.AffiliateSearchRequest;
 using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
@@ -70,7 +70,6 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
-                Name = request.Name,
                 AffiliateId = request.Id,
                 CreatedAt = request.CreatedAt?.DateTime ?? default,
                 Email = request.Email,

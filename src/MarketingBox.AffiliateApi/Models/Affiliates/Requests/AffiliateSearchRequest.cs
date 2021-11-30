@@ -1,8 +1,9 @@
 ﻿using System;
+using MarketingBox.AffiliateApi.Models.Partners;
 using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MarketingBox.AffiliateApi.Models.Partners.Requests
+namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
 {
     public class AffiliateSearchRequest : PaginationRequest<long?>
     {
@@ -11,9 +12,6 @@ namespace MarketingBox.AffiliateApi.Models.Partners.Requests
 
         [FromQuery(Name = "username")]
         public string Username { get; set; }
-
-        [FromQuery(Name = "name")]
-        public string Name { get; set; }
 
         [FromQuery(Name = "role")]
         public AffiliateRole? Role { get; set; }
