@@ -40,6 +40,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _affiliateAccessService.SearchAsync(new ()
             {
                 MasterAffiliateId = request.MasterAffiliateId,
+                AffiliateId = request.AffiliateId,
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
                 Take = request.Limit,
