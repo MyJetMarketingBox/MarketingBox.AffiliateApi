@@ -45,10 +45,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 TenantId = tenantId
             });
-            return Ok(
-                response.AffiliateAccesses.Select(Map)
-                    .ToArray()
-                    .Paginate(request, Url, x => x.MasterAffiliateId));
+            
+            if (response.AffiliateAccesses != null && response.AffiliateAccesses.Any())
+                return Ok(
+                    response.AffiliateAccesses.Select(Map)
+                        .ToArray()
+                        .Paginate(request, Url, x => x.MasterAffiliateId));
+            return NotFound();
         }
         
         [HttpGet("{masterAffiliateId}/{affiliateId}")]
@@ -100,7 +103,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return MapToResponseEmpty(response);
         }
 
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.AffiliateAccesses.AffiliateAccessResponse response)
+        private ActionResult MapToResponse(AffiliateAccessResponse response)
         {
             if (response.Error != null)
             {
@@ -124,7 +127,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             };
         }
 
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.AffiliateAccesses.AffiliateAccessResponse response)
+        private ActionResult MapToResponseEmpty(AffiliateAccessResponse response)
         {
             if (response.Error != null)
             {
