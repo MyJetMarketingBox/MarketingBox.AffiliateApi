@@ -68,27 +68,29 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (response.Registrations == null || !response.Registrations.Any())
+                return NotFound();
+
             if (role == UserRole.Affiliate)
-                return Ok(
-                response.Registrations.Select(x => new RegistrationModelForAffiliate()
-                {
-                    Status = x.Status,
-                    GeneralInfo = new RegistrationGeneralInfoForAffiliate()
+                return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
                     {
-                        CreatedAt = x.GeneralInfo.CreatedAt,
-                        DepositedAt = x.GeneralInfo.DepositedAt,
-                        ConversionDate = x.GeneralInfo.ConversionDate,
-                        Country = x.GeneralInfo.Country,
-                    },
-                    RegistrationId = x.RegistrationId,
-                    Sequence = x.Sequence,
-                    UniqueId = x.UniqueId
-                })
+                        Status = x.Status,
+                        GeneralInfo = new RegistrationGeneralInfoForAffiliate()
+                        {
+                            CreatedAt = x.GeneralInfo.CreatedAt,
+                            DepositedAt = x.GeneralInfo.DepositedAt,
+                            ConversionDate = x.GeneralInfo.ConversionDate,
+                            Country = x.GeneralInfo.Country,
+                        },
+                        RegistrationId = x.RegistrationId,
+                        Sequence = x.Sequence,
+                        UniqueId = x.UniqueId
+                    })
                     .ToArray()
                     .Paginate(request, Url, x => x.RegistrationId));
 
-            return Ok(
-            response.Registrations.Select(x => new RegistrationModel()
+
+            return Ok(response.Registrations.Select(x => new RegistrationModel()
             {
                 AdditionalInfo = new RegistrationAdditionalInfo()
                 {
