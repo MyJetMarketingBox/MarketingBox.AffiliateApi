@@ -53,7 +53,7 @@ namespace MarketingBox.AffiliateApi
                  builder =>
                  {
                      builder
-                      .WithOrigins("http://localhost")
+                      .WithOrigins("http://localhost:3001")
                       .AllowCredentials()
                       .AllowAnyHeader()
                       .AllowAnyMethod();
