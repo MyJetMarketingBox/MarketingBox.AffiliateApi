@@ -35,6 +35,7 @@ namespace MarketingBox.AffiliateApi
 {
     public class Startup
     {
+        private readonly string _corsPolicy = "Develop";
         public Startup()
         {
             ModelStateDictionaryResponseCodes = new HashSet<int>();
@@ -45,6 +46,19 @@ namespace MarketingBox.AffiliateApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.BindCodeFirstGrpc();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(_corsPolicy,
+                 builder =>
+                 {
+                     builder
+                      .WithOrigins("http://localhost")
+                      .AllowCredentials()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+                 });
+            });
 
             services.AddAuthorization(options =>
             {
@@ -103,6 +117,8 @@ namespace MarketingBox.AffiliateApi
                 .AddJwtBearer(ConfigureJwtBearerOptions);
 
             services.BindTelemetry("AffiliateApi", "MB-", Program.Settings.JaegerUrl);
+
+
         }
 
         protected virtual void ConfigureJwtBearerOptions(JwtBearerOptions options)
@@ -135,7 +151,7 @@ namespace MarketingBox.AffiliateApi
 
             app.UseRouting();
 
-            //TODO turn on app.UseCors();
+            app.UseCors(_corsPolicy);
 
             app.UseAuthentication();
 
