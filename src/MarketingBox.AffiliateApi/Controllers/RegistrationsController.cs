@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Models.Leads;
-using MarketingBox.AffiliateApi.Models.Leads.Requests;
-using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationAdditionalInfo;
-using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationGeneralInfo;
-using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationRouteInfo;
+using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
+using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
+using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
+using MarketingBox.AffiliateApi.Models.Registrations;
+using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -74,7 +74,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             if (role == UserRole.Affiliate)
                 return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
                     {
-                        Status = x.Status,
+                        Status = x.Status.MapEnum<RegistrationStatus>(),
                         GeneralInfo = new RegistrationGeneralInfoForAffiliate()
                         {
                             CreatedAt = x.GeneralInfo.CreatedAt,
@@ -107,7 +107,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     Sub8 = x.AdditionalInfo.Sub8,
                     Sub9 = x.AdditionalInfo.Sub9
                 },
-                Status = x.Status,
+                Status = x.Status.MapEnum<RegistrationStatus>(),
                 GeneralInfo = new RegistrationGeneralInfo()
                 {
                     Email = x.GeneralInfo.Email,

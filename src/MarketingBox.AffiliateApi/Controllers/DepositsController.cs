@@ -81,7 +81,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                         Email = x.Email,
                         LeadId = x.LeadId,
                         Sequence = x.Sequence,
-                        BrandStatus = x.BrandStatus,
+                        CrmStatus = x.CrmStatus.MapEnum<CrmStatus>(),
                         ConversionDate = x.ConversionDate,
                         Country = x.Country,
                         CustomerId = x.CustomerId,

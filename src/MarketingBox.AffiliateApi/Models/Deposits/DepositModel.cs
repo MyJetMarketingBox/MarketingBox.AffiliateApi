@@ -18,7 +18,7 @@ namespace MarketingBox.AffiliateApi.Models.Deposits
         public DateTime CreatedAt { get; set; }
         public DateTime? ConversionDate { get; set; }
         public long Sequence { get; set; }
-        public string BrandStatus { get; set; }
+        public CrmStatus CrmStatus { get; set; }
 
     }
 }
