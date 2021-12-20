@@ -108,7 +108,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _registrationDepositService.ApproveDepositAsync(new DepositApproveRequest()
             {
                 RegistrationId = registrationId,
-                Mode = ApproveMode.ApproveManually,
+                Mode = RegistrationApprovedType.ApprovedManually,
                 TenantId = tenantId
             });
 

@@ -47,10 +47,8 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             var role = this.GetRole();
             var tenantId = this.GetTenantId();
-            long? masterAffiliateId = null;
-
-            if (role.IsRestricted())
-                masterAffiliateId = this.GetAffiliateId();
+            var masterAffiliateId = this.GetAffiliateId();
+            
             var response = await _registrationService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
