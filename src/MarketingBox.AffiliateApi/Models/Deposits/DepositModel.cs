@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarketingBox.AffiliateApi.Models.Registrations;
+using System;
 
 namespace MarketingBox.AffiliateApi.Models.Deposits
 {
@@ -13,12 +14,13 @@ namespace MarketingBox.AffiliateApi.Models.Deposits
         public long CampaignId { get; set; }
         public long BoxId { get; set; }
         public long BrandId { get; set; }
-        public ApprovedType Type { get; set; }
+        public DepositUpdateMode UpdateMode { get; set; }
         public DateTime RegisterDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ConversionDate { get; set; }
         public long Sequence { get; set; }
         public CrmStatus CrmStatus { get; set; }
+        public RegistrationStatus Status { get; set; }
 
     }
 }
