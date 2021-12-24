@@ -81,13 +81,14 @@ namespace MarketingBox.AffiliateApi.Controllers
                         Email = x.Email,
                         LeadId = x.LeadId,
                         Sequence = x.Sequence,
-                        BrandStatus = x.BrandStatus,
+                        CrmStatus = x.CrmStatus.MapEnum<CrmStatus>(),
                         ConversionDate = x.ConversionDate,
                         Country = x.Country,
                         CustomerId = x.CustomerId,
                         RegisterDate = x.RegisterDate,
-                        Type = x.Type.MapEnum<ApprovedType>(),
+                        UpdateMode = x.UpdateMode.MapEnum<MarketingBox.AffiliateApi.Models.Deposits.DepositUpdateMode>(),
                         UniqueId = x.UniqueId,
+                        Status = x.Status.MapEnum<MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus>(),
                     })
                     .ToArray()
                     .Paginate(request, Url, x => x.LeadId));
@@ -108,7 +109,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _registrationDepositService.ApproveDepositAsync(new DepositApproveRequest()
             {
                 RegistrationId = registrationId,
-                Mode = ApproveMode.ApproveManually,
+                Mode = Registration.Service.Grpc.Models.Common.DepositUpdateMode.Manually,
                 TenantId = tenantId
             });
 

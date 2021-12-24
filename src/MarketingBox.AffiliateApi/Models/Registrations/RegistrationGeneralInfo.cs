@@ -1,7 +1,7 @@
 ﻿using System;
 using Destructurama.Attributed;
 
-namespace MarketingBox.AffiliateApi.Models.Leads
+namespace MarketingBox.AffiliateApi.Models.Registrations
 {
     public class RegistrationGeneralInfo
     {
@@ -16,7 +16,7 @@ namespace MarketingBox.AffiliateApi.Models.Leads
 
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string Phone { get; set; }
-        
+
         [LogMasked(PreserveLength = true, ShowFirst = 2, ShowLast = 2)]
         public string Ip { get; set; }
 

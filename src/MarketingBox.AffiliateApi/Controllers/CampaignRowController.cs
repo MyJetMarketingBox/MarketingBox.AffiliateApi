@@ -100,7 +100,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     From = x.From,
                     IsActive = x.IsActive,
                     To = x.To
-                }).ToArray(),
+                }).ToList(),
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
@@ -135,7 +135,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     From = x.From,
                     IsActive = x.IsActive,
                     To = x.To
-                }).ToArray(),
+                }).ToList(),
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),

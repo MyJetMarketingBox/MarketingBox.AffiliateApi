@@ -1,7 +1,7 @@
 ﻿using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MarketingBox.AffiliateApi.Models.Leads.Requests
+namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
 {
     public class RegistrationSearchRequest : PaginationRequest<long?>
     {

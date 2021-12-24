@@ -1,14 +1,11 @@
-﻿using System;
-using MarketingBox.Reporting.Service.Domain.Models.Lead;
-
-namespace MarketingBox.AffiliateApi.Models.Leads
+﻿namespace MarketingBox.AffiliateApi.Models.Registrations
 {
     public class RegistrationModel
     {
         public long RegistrationId { get; set; }
 
         public string UniqueId { get; set; }
-        
+
         public long Sequence { get; set; }
 
         public RegistrationGeneralInfo GeneralInfo { get; set; }
@@ -17,9 +14,7 @@ namespace MarketingBox.AffiliateApi.Models.Leads
 
         public RegistrationAdditionalInfo AdditionalInfo { get; set; }
 
-        //public LeadType Type  { get; set; }
-
-        public LeadStatus Status{ get; set; }
+        public RegistrationStatus Status { get; set; }
 
     }
 
@@ -36,7 +31,7 @@ namespace MarketingBox.AffiliateApi.Models.Leads
 
         //public LeadType Type  { get; set; }
 
-        public LeadStatus Status { get; set; }
+        public RegistrationStatus Status { get; set; }
 
     }
 }

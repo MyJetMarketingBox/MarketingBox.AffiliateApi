@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Models.Leads;
-using MarketingBox.AffiliateApi.Models.Leads.Requests;
-using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationAdditionalInfo;
-using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationGeneralInfo;
-using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Leads.RegistrationRouteInfo;
+using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
+using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
+using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
+using MarketingBox.AffiliateApi.Models.Registrations;
+using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -47,10 +47,8 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             var role = this.GetRole();
             var tenantId = this.GetTenantId();
-            long? masterAffiliateId = null;
-
-            if (role.IsRestricted())
-                masterAffiliateId = this.GetAffiliateId();
+            var masterAffiliateId = this.GetAffiliateId();
+            
             var response = await _registrationService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
@@ -68,27 +66,29 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (response.Registrations == null || !response.Registrations.Any())
+                return NotFound();
+
             if (role == UserRole.Affiliate)
-                return Ok(
-                response.Registrations.Select(x => new RegistrationModelForAffiliate()
-                {
-                    Status = x.Status,
-                    GeneralInfo = new RegistrationGeneralInfoForAffiliate()
+                return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
                     {
-                        CreatedAt = x.GeneralInfo.CreatedAt,
-                        DepositedAt = x.GeneralInfo.DepositedAt,
-                        ConversionDate = x.GeneralInfo.ConversionDate,
-                        Country = x.GeneralInfo.Country,
-                    },
-                    RegistrationId = x.RegistrationId,
-                    Sequence = x.Sequence,
-                    UniqueId = x.UniqueId
-                })
+                        Status = x.Status.MapEnum<RegistrationStatus>(),
+                        GeneralInfo = new RegistrationGeneralInfoForAffiliate()
+                        {
+                            CreatedAt = x.GeneralInfo.CreatedAt,
+                            DepositedAt = x.GeneralInfo.DepositedAt,
+                            ConversionDate = x.GeneralInfo.ConversionDate,
+                            Country = x.GeneralInfo.Country,
+                        },
+                        RegistrationId = x.RegistrationId,
+                        Sequence = x.Sequence,
+                        UniqueId = x.UniqueId
+                    })
                     .ToArray()
                     .Paginate(request, Url, x => x.RegistrationId));
 
-            return Ok(
-            response.Registrations.Select(x => new RegistrationModel()
+
+            return Ok(response.Registrations.Select(x => new RegistrationModel()
             {
                 AdditionalInfo = new RegistrationAdditionalInfo()
                 {
@@ -105,7 +105,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     Sub8 = x.AdditionalInfo.Sub8,
                     Sub9 = x.AdditionalInfo.Sub9
                 },
-                Status = x.Status,
+                Status = x.Status.MapEnum<RegistrationStatus>(),
                 GeneralInfo = new RegistrationGeneralInfo()
                 {
                     Email = x.GeneralInfo.Email,

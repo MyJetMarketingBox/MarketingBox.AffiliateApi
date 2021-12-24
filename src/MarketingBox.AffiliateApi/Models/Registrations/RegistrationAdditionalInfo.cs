@@ -1,4 +1,4 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Leads
+﻿namespace MarketingBox.AffiliateApi.Models.Registrations
 {
     public class RegistrationAdditionalInfo
     {
