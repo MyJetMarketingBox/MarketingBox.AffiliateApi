@@ -8,7 +8,6 @@ using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Grpc;
 using MarketingBox.AffiliateApi.Modules;
 using MarketingBox.AffiliateApi.Services;
-using MarketingBox.AffiliateApi.Swagger;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -20,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
@@ -29,7 +27,6 @@ using Newtonsoft.Json.Serialization;
 using Prometheus;
 using SimpleTrading.ServiceStatusReporterConnector;
 using SimpleTrading.Telemetry;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MarketingBox.AffiliateApi
 {
@@ -106,9 +103,8 @@ namespace MarketingBox.AffiliateApi
                     }));
                 });
             });
-            services.AddControllers().AddNewtonsoftJson(ConfigureMvcNewtonsoftJsonOptions);
-            services.AddSwaggerGen(ConfigureSwaggerGenOptions);
-            services.AddSwaggerGenNewtonsoftSupport();
+            services.AddControllers();
+            services.SetupSwaggerDocumentation();
 
             services.AddHostedService<ApplicationLifetimeManager>();
 
@@ -177,13 +173,18 @@ namespace MarketingBox.AffiliateApi
                 });
             });
 
-            app.UseSwagger(c => c.RouteTemplate = "api/{documentName}/swagger.json");
-            app.UseSwaggerUI(c =>
+            app.UseOpenApi(settings =>
             {
-                c.SwaggerEndpoint("../../api/v1/swagger.json", "API V1");
-                c.RoutePrefix = "swagger/ui";
+                settings.Path = $"/swagger/api/swagger.json";
             });
-        }
+
+            app.UseSwaggerUi3(settings =>
+            {
+                settings.EnableTryItOut = true;
+                settings.Path = $"/swagger/api";
+                settings.DocumentPath = $"/swagger/api/swagger.json";
+
+            });        }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
@@ -191,34 +192,5 @@ namespace MarketingBox.AffiliateApi
             builder.RegisterModule<ServiceModule>();
         }
         public ISet<int> ModelStateDictionaryResponseCodes { get; }
-        protected virtual void ConfigureSwaggerGenOptions(SwaggerGenOptions options)
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "MarketingBox.AffiliateApi", Version = "v1" });
-            options.EnableXmsEnumExtension();
-            options.MakeResponseValueTypesRequired();
-
-            foreach (var code in ModelStateDictionaryResponseCodes)
-            {
-                options.AddModelStateDictionaryResponse(code);
-            }
-
-            options.AddJwtBearerAuthorization();
-        }
-
-        protected virtual void ConfigureMvcNewtonsoftJsonOptions(MvcNewtonsoftJsonOptions options)
-        {
-            var namingStrategy = new CamelCaseNamingStrategy();
-
-            options.SerializerSettings.Converters.Add(new StringEnumConverter(namingStrategy));
-            options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
-            options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            options.SerializerSettings.Culture = CultureInfo.InvariantCulture;
-            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-            options.SerializerSettings.MissingMemberHandling = MissingMemberHandling.Error;
-            options.SerializerSettings.ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = namingStrategy
-            };
-        }
     }
 }
