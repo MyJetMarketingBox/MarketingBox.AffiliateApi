@@ -25,6 +25,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             _affiliateAccessService = affiliateAccessService;
         }
         
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<AffiliateAccessModel, long>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<AffiliateAccessModel, long>>> SearchAsync(
@@ -55,6 +56,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return NotFound();
         }
         
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet("{masterAffiliateId}/{affiliateId}")]
         [ProducesResponseType(typeof(AffiliateAccessModel), StatusCodes.Status200OK)]
 
@@ -72,6 +74,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return MapToResponse(response);
         }
         
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpPost]
         [ProducesResponseType(typeof(AffiliateAccessModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateAccessModel>> CreateAsync(
@@ -87,6 +90,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return MapToResponse(response);
         }
 
+        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpDelete("{masterAffiliateId}/{affiliateId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         public async Task<ActionResult> DeleteAsync(
