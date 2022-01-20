@@ -75,7 +75,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     {
                         AffiliateId = x.AffiliateId,
                         CampaignId = x.CampaignId,
-                        BoxId = x.BoxId,
+                        BoxId = x.CampaignId,
                         BrandId = x.BrandId,
                         CreatedAt = x.CreatedAt,
                         Email = x.Email,
