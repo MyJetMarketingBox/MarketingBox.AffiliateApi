@@ -114,7 +114,7 @@ namespace MarketingBox.AffiliateApi
 
             services.BindTelemetry("AffiliateApi", "MB-", Program.Settings.JaegerUrl);
 
-
+            services.AddAutoMapper(typeof(Startup));
         }
 
         protected virtual void ConfigureJwtBearerOptions(JwtBearerOptions options)
@@ -189,6 +189,7 @@ namespace MarketingBox.AffiliateApi
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule<SettingsModule>();
+            builder.RegisterModule<ClientModule>();
             builder.RegisterModule<ServiceModule>();
         }
         public ISet<int> ModelStateDictionaryResponseCodes { get; }
