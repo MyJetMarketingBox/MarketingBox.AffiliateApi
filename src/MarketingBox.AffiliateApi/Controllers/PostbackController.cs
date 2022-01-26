@@ -31,7 +31,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] long affiliateId)
         {
             var result = await _postbackService.GetReferenceAsync(
-                new ReferenceByAffiliateRequest { AffiliateId = affiliateId });
+                new ByAffiliateIdRequest { AffiliateId = affiliateId });
             if (!result.Success)
             {
                 ModelState.AddModelError("Error", result.ErrorMessage);
@@ -81,7 +81,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] long affiliateId)
         {
             var result = await _postbackService.DeleteReferenceAsync(
-                new ReferenceByAffiliateRequest { AffiliateId = affiliateId });
+                new ByAffiliateIdRequest { AffiliateId = affiliateId });
             if (!result.Success)
             {
                 ModelState.AddModelError("Error", result.ErrorMessage);
