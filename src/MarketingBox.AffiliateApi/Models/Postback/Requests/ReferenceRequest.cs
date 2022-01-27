@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Models.Postback.Requests
 {
-    public class ReferenceUpdateRequest : ReferenceBase
+    public class ReferenceRequest : ReferenceBase
     {
         public long AffiliateId { get; set; }
     }
