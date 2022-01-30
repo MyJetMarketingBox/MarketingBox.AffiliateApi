@@ -50,7 +50,7 @@ namespace MarketingBox.AffiliateApi
                  builder =>
                  {
                      builder
-                      .WithOrigins("http://localhost:3001", "http://localhost:3002")
+                      .WithOrigins("http://localhost:3001", "http://localhost:3002", "http://localhost:3000")
                       .AllowCredentials()
                       .AllowAnyHeader()
                       .AllowAnyMethod();
@@ -114,7 +114,7 @@ namespace MarketingBox.AffiliateApi
 
             services.BindTelemetry("AffiliateApi", "MB-", Program.Settings.JaegerUrl);
 
-
+            services.AddAutoMapper(typeof(Startup));
         }
 
         protected virtual void ConfigureJwtBearerOptions(JwtBearerOptions options)
@@ -189,6 +189,7 @@ namespace MarketingBox.AffiliateApi
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterModule<SettingsModule>();
+            builder.RegisterModule<ClientModule>();
             builder.RegisterModule<ServiceModule>();
         }
         public ISet<int> ModelStateDictionaryResponseCodes { get; }

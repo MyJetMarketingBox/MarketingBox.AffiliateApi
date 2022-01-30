@@ -34,5 +34,8 @@ namespace MarketingBox.AffiliateApi.Settings
 
         [YamlProperty("MarketingBoxAffiliateApi.MarketingBoxServiceBusHostPort")]
         public string MarketingBoxServiceBusHostPort { get; set; }
+
+        [YamlProperty("MarketingBoxAffiliateApi.PostbackServiceUrl")]
+        public string PostbackServiceUrl { get; internal set; }
     }
 }
