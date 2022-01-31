@@ -1,4 +1,4 @@
-﻿namespace MarketingBox.AffiliateApi
+﻿namespace MarketingBox.AffiliateApi.Enums
 {
     public enum HttpQueryType
     {

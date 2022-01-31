@@ -1,4 +1,6 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Postback
+﻿using MarketingBox.AffiliateApi.Enums;
+
+namespace MarketingBox.AffiliateApi.Models.Postback
 {
     public class ReferenceBase
     {
@@ -10,6 +12,6 @@
 
         public string DepositTGReference { get; init; }
 
-        public HttpQueryType HttpQueryType { get; set; }
+        public HttpQueryType HttpQueryType { get; init; }
     }
 }
