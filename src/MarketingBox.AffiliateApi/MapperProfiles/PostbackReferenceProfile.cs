@@ -9,7 +9,10 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public PostbackReferenceProfile()
         {
-            CreateMap<ReferenceRequest, FullReferenceRequest>();
+            CreateMap<ReferenceRequest, FullReferenceRequest>()
+                .ForMember(
+                    x => x.AffiliateId,
+                    o => o.MapFrom(p => p.AffiliateId));
             CreateMap<ReferenceResponse, Reference>();
         }
     }
