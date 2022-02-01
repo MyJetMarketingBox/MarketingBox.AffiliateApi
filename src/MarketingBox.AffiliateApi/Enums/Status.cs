@@ -3,6 +3,6 @@
     public enum Status
     {
         Registered,
-        Deposited
+        Approved
     }
 }
