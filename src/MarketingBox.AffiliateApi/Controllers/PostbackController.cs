@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Helpers;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -21,7 +22,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly IPostbackService _postbackService;
         private readonly IMapper _mapper;
         private readonly ILogger<PostbackController> _logger;
-
+        
         public PostbackController(
             IPostbackService postbackService,
             IMapper mapper,
@@ -32,7 +33,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<ActionResult<Reference>> GetReferenceAsync()
         {
             try
@@ -40,17 +41,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                 var affiliateId = this.GetAffiliateId();
                 var result = await _postbackService.GetReferenceAsync(
                     new ByAffiliateIdRequest { AffiliateId = affiliateId });
-                if (!result.Success)
-                {
-                    ModelState.AddModelError("Error", result.ErrorMessage);
-                    return BadRequest(ModelState);
-                }
-                return Ok(_mapper.Map<Reference>(result.Data));
+                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return BadRequest();
+                return StatusCode(500);
             }
         }
 
@@ -63,21 +59,16 @@ namespace MarketingBox.AffiliateApi.Controllers
                 request.AffiliateId = this.GetAffiliateId();
                 var result = await _postbackService.CreateReferenceAsync(
                     _mapper.Map<FullReferenceRequest>(request));
-                if (!result.Success)
-                {
-                    ModelState.AddModelError("Error", result.ErrorMessage);
-                    return BadRequest(ModelState);
-                }
-                return Ok(_mapper.Map<Reference>(result.Data));
+                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return BadRequest();
+                return StatusCode(500);
             }
         }
 
-        [HttpPut()]
+        [HttpPut]
         public async Task<ActionResult<Reference>> UpdateReferenceAsync(
             [FromBody] ReferenceRequest request)
         {
@@ -86,22 +77,17 @@ namespace MarketingBox.AffiliateApi.Controllers
                 request.AffiliateId = this.GetAffiliateId();
                 var result = await _postbackService.UpdateReferenceAsync(
                     _mapper.Map<FullReferenceRequest>(request));
-                if (!result.Success)
-                {
-                    ModelState.AddModelError("Error", result.ErrorMessage);
-                    return BadRequest(ModelState);
-                }
-                return Ok(_mapper.Map<Reference>(result.Data));
+                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return BadRequest();
+                return StatusCode(500);
             }
 
         }
 
-        [HttpDelete()]
+        [HttpDelete]
         public async Task<ActionResult> DeleteReferenceAsync()
         {
             try
@@ -109,17 +95,26 @@ namespace MarketingBox.AffiliateApi.Controllers
                 var affiliateId = this.GetAffiliateId();
                 var result = await _postbackService.DeleteReferenceAsync(
                     new ByAffiliateIdRequest { AffiliateId = affiliateId });
-                if (!result.Success)
+                switch (result.StatusCode)
                 {
-                    ModelState.AddModelError("Error", result.ErrorMessage);
-                    return BadRequest(ModelState);
+                    case Postback.Service.Grpc.Models.StatusCode.Ok:
+                        return Ok();
+                    case Postback.Service.Grpc.Models.StatusCode.NotFound:
+                        ModelState.AddModelError("Error", result.ErrorMessage);
+                        return NotFound(ModelState);
+                    case Postback.Service.Grpc.Models.StatusCode.BadRequest:
+                        ModelState.AddModelError("Error", result.ErrorMessage);
+                        return BadRequest(ModelState);
+                    case Postback.Service.Grpc.Models.StatusCode.InternalError:
+                        return StatusCode(500);
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                return Ok();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return BadRequest();
+                return StatusCode(500);
             }
         }
     }

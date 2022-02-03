@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Helpers;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -32,8 +33,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet()]
-        public async Task<ActionResult<List<Models.PostbackLogs.EventReferenceLog>>> GetLogs()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Models.PostbackLogs.EventReferenceLog>>> GetLogs()
         {
             try
             {
@@ -43,22 +44,16 @@ namespace MarketingBox.AffiliateApi.Controllers
                     {
                         AffiliateId = affiliateId
                     });
-
-                if (!response.Success)
-                {
-                    ModelState.AddModelError("Error", response.ErrorMessage);
-                    return BadRequest(ModelState);
-                }
-
-                return Ok(
+                return this.ProcessResult(
+                    response,
                     response.Data is null
-                    ? Enumerable.Empty<Models.PostbackLogs.EventReferenceLog>()
-                    : response.Data.Select(_mapper.Map<Models.PostbackLogs.EventReferenceLog>));
+                        ? Enumerable.Empty<Models.PostbackLogs.EventReferenceLog>()
+                        : response.Data.Select(_mapper.Map<Models.PostbackLogs.EventReferenceLog>));
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return BadRequest();
+                return StatusCode(500);
             }
         }
     }
