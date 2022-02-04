@@ -2,6 +2,6 @@
 {
     public class ReferenceRequest : ReferenceBase
     {
-        public long AffiliateId { get; set; }
+        internal long AffiliateId { get; set; }
     }
 }
