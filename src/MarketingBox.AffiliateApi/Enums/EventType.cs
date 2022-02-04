@@ -1,6 +1,6 @@
 ﻿namespace MarketingBox.AffiliateApi.Enums
 {
-    public enum Status
+    public enum EventType
     {
         Registered,
         Approved
