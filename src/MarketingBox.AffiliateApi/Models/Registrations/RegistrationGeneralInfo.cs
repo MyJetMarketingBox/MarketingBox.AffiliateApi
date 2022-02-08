@@ -21,7 +21,6 @@ namespace MarketingBox.AffiliateApi.Models.Registrations
         public string Ip { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        public DateTime? DepositedAt { get; set; }
         public DateTime? ConversionDate { get; set; }
         public string Country { get; set; }
     }
@@ -29,7 +28,6 @@ namespace MarketingBox.AffiliateApi.Models.Registrations
     public class RegistrationGeneralInfoForAffiliate
     {
         public DateTime CreatedAt { get; set; }
-        public DateTime? DepositedAt { get; set; }
         public DateTime? ConversionDate { get; set; }
         public string Country { get; set; }
     }

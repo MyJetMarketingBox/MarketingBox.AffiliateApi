@@ -12,6 +12,8 @@ using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.R
 using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.AffiliateApi.Models.Registrations.Requests;
+using MarketingBox.Reporting.Service.Domain.Models;
+using RegistrationStatus = MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -56,7 +58,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 TenantId = tenantId,
                 AffiliateId = request.AffiliateId,
-                MasterAffiliateId = masterAffiliateId
+                MasterAffiliateId = masterAffiliateId,
+                Type = request.Type ?? RegistrationsReportType.All
             });
 
             if (response.Error != null)
@@ -75,60 +78,52 @@ namespace MarketingBox.AffiliateApi.Controllers
                         Status = x.Status.MapEnum<RegistrationStatus>(),
                         GeneralInfo = new RegistrationGeneralInfoForAffiliate()
                         {
-                            CreatedAt = x.GeneralInfo.CreatedAt,
-                            DepositedAt = x.GeneralInfo.DepositedAt,
-                            ConversionDate = x.GeneralInfo.ConversionDate,
-                            Country = x.GeneralInfo.Country,
+                            CreatedAt = x.CreatedAt,
+                            ConversionDate = x.ConversionDate,
+                            Country = x.Country,
                         },
-                        RegistrationId = x.RegistrationId,
-                        Sequence = x.Sequence,
-                        UniqueId = x.UniqueId
+                        RegistrationId = x.RegistrationId
                     })
                     .ToArray()
                     .Paginate(request, Url, x => x.RegistrationId));
-
 
             return Ok(response.Registrations.Select(x => new RegistrationModel()
             {
                 AdditionalInfo = new RegistrationAdditionalInfo()
                 {
-                    So = x.AdditionalInfo.So,
-                    Sub = x.AdditionalInfo.Sub,
-                    Sub1 = x.AdditionalInfo.Sub1,
-                    Sub10 = x.AdditionalInfo.Sub10,
-                    Sub2 = x.AdditionalInfo.Sub2,
-                    Sub3 = x.AdditionalInfo.Sub3,
-                    Sub4 = x.AdditionalInfo.Sub4,
-                    Sub5 = x.AdditionalInfo.Sub5,
-                    Sub6 = x.AdditionalInfo.Sub6,
-                    Sub7 = x.AdditionalInfo.Sub7,
-                    Sub8 = x.AdditionalInfo.Sub8,
-                    Sub9 = x.AdditionalInfo.Sub9
+                    Funnel = x.Funnel,
+                    AffCode = x.AffCode,
+                    Sub1 = x.Sub1,
+                    Sub2 = x.Sub2,
+                    Sub3 = x.Sub3,
+                    Sub4 = x.Sub4,
+                    Sub5 = x.Sub5,
+                    Sub6 = x.Sub6,
+                    Sub7 = x.Sub7,
+                    Sub8 = x.Sub8,
+                    Sub9 = x.Sub9,
+                    Sub10 = x.Sub10
                 },
                 Status = x.Status.MapEnum<RegistrationStatus>(),
                 GeneralInfo = new RegistrationGeneralInfo()
                 {
-                    Email = x.GeneralInfo.Email,
-                    CreatedAt = x.GeneralInfo.CreatedAt,
-                    DepositedAt = x.GeneralInfo.DepositedAt,
-                    ConversionDate = x.GeneralInfo.ConversionDate,
-                    Country = x.GeneralInfo.Country,
-                    FirstName = x.GeneralInfo.FirstName,
-                    Ip = x.GeneralInfo.Ip,
-                    LastName = x.GeneralInfo.LastName,
-                    Phone = x.GeneralInfo.Phone
+                    Email = x.Email,
+                    CreatedAt = x.CreatedAt,
+                    ConversionDate = x.ConversionDate,
+                    Country = x.Country,
+                    FirstName = x.FirstName,
+                    Ip = x.Ip,
+                    LastName = x.LastName,
+                    Phone = x.Phone
                 },
                 RegistrationId = x.RegistrationId,
                 RouteInfo = new RegistrationRouteInfo()
                 {
-                    AffiliateId = x.RouteInfo.AffiliateId,
-                    CampaignId = x.RouteInfo.CampaignId,
-                    IntegrationIdId = x.RouteInfo.IntegrationId,
-                    BrandId = x.RouteInfo.BrandId
-                },
-                Sequence = x.Sequence,
-                    //Type = x.,
-                    UniqueId = x.UniqueId
+                    AffiliateId = x.AffiliateId,
+                    CampaignId = x.CampaignId,
+                    IntegrationIdId = x.IntegrationId,
+                    BrandId = x.BrandId
+                }
             })
                 .ToArray()
                 .Paginate(request, Url, x => x.RegistrationId));

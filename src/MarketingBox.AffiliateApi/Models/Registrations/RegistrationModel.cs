@@ -4,10 +4,6 @@
     {
         public long RegistrationId { get; set; }
 
-        public string UniqueId { get; set; }
-
-        public long Sequence { get; set; }
-
         public RegistrationGeneralInfo GeneralInfo { get; set; }
 
         public RegistrationRouteInfo RouteInfo { get; set; }
@@ -22,14 +18,7 @@
     {
         public long RegistrationId { get; set; }
 
-        public string UniqueId { get; set; }
-
-        public long Sequence { get; set; }
-
         public RegistrationGeneralInfoForAffiliate GeneralInfo { get; set; }
-
-
-        //public LeadType Type  { get; set; }
 
         public RegistrationStatus Status { get; set; }
 
