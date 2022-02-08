@@ -72,20 +72,20 @@ namespace MarketingBox.AffiliateApi.Controllers
             if (response.Registrations == null || !response.Registrations.Any())
                 return NotFound();
 
-            if (role == UserRole.Affiliate)
-                return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
-                    {
-                        Status = x.Status.MapEnum<RegistrationStatus>(),
-                        GeneralInfo = new RegistrationGeneralInfoForAffiliate()
-                        {
-                            CreatedAt = x.CreatedAt,
-                            ConversionDate = x.ConversionDate,
-                            Country = x.Country,
-                        },
-                        RegistrationId = x.RegistrationId
-                    })
-                    .ToArray()
-                    .Paginate(request, Url, x => x.RegistrationId));
+            //if (role == UserRole.Affiliate)
+            //    return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
+            //        {
+            //            Status = x.Status.MapEnum<RegistrationStatus>(),
+            //            GeneralInfo = new RegistrationGeneralInfoForAffiliate()
+            //            {
+            //                CreatedAt = x.CreatedAt,
+            //                ConversionDate = x.ConversionDate,
+            //                Country = x.Country,
+            //            },
+            //            RegistrationId = x.RegistrationId
+            //        })
+            //        .ToArray()
+            //        .Paginate(request, Url, x => x.RegistrationId));
 
             return Ok(response.Registrations.Select(x => new RegistrationModel()
             {
