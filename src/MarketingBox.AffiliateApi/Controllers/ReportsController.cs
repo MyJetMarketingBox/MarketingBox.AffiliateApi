@@ -2,16 +2,14 @@ using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Reports;
 using MarketingBox.AffiliateApi.Pagination;
 using MarketingBox.Reporting.Service.Grpc;
-using MarketingBox.Reporting.Service.Grpc.Models.Reports.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using MarketingBox.AffiliateApi.Authorization;
-using Microsoft.AspNetCore.Identity;
+using MarketingBox.Reporting.Service.Domain.Models.Reports.Requests;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -20,10 +18,14 @@ namespace MarketingBox.AffiliateApi.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;
+        private readonly IMapper _mapper;
 
-        public ReportsController(IReportService reportService)
+        public ReportsController(
+            IReportService reportService,
+            IMapper mapper)
         {
             _reportService = reportService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -45,15 +47,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
-            var response = await _reportService.SearchAsync(new ReportSearchRequest()
-            {
-                Asc = request.Order == PaginationOrder.Asc,
-                Cursor = request.Cursor,
-                FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Utc),
-                ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Utc),
-                Take = request.Limit,
-                TenantId = tenantId
-            });
+            request.TenantId = tenantId;
+            var response = await _reportService.SearchAsync(_mapper.Map<ReportSearchRequest>(request));
 
             if (response.Error != null)
             {
@@ -66,71 +61,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return NotFound();
 
             return Ok(
-                response.Reports.Select(x => new ReportModel()
-                {
-                    AffiliateId = x.AffiliateId,
-                    Cr = x.Cr,
-                    FtdCount = x.FtdCount,
-                    RegistrationsCount = x.RegistrationCount,
-                    Payout = x.Payout,
-                    Revenue = x.Revenue,
-                })
+                response.Reports.Select(x => _mapper.Map<ReportModel>(x))
                     .ToArray()
-                    .Paginate(request, Url, x => x.AffiliateId));
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
-        [HttpGet("by-days")]
-        [ProducesResponseType(typeof(ItemsContainer<ReportByDaysModel>), StatusCodes.Status200OK)]
-
-        public async Task<ActionResult<ItemsContainer<ReportByDaysModel>>> SearchByDaysAsync()
-        {
-            var tenantId = this.GetTenantId();
-            var role = this.GetRole();
-            var now = DateTime.UtcNow;
-            var days = System.DateTime.DaysInMonth(now.Year, now.Month);
-            var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0);
-            var endOfMonth = new DateTime(now.Year, now.Month, days, 23, 59, 59);
-            long? masterAffiliateId = null;
-
-            if (role.IsRestricted())
-                masterAffiliateId = this.GetAffiliateId();
-
-            var response = await _reportService.SearchByDayAsync(new ReportByDaySearchRequest()
-            {
-                Asc = true,
-                Cursor = null,
-                FromDate = startOfMonth,
-                ToDate = endOfMonth,
-                Take = days,
-                TenantId = tenantId,
-                MasterAffiliateId = masterAffiliateId
-            });
-
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            if (response.Reports == null)
-                return NotFound();
-
-            return Ok(new ItemsContainer<ReportByDaysModel>()
-            {
-                Items = response.Reports.Select(x => new ReportByDaysModel()
-                {
-                    CreatedAt = x.CreatedAt,
-                    FtdCount = x.FtdCount,
-                    RegistrationsCount = x.RegistrationCount,
-                })
-                    .ToArray()
-            });
+                    .Paginate(request, Url, x => x.Id));
         }
     }
 }
