@@ -1,10 +1,9 @@
+using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Pagination;
-using MarketingBox.Reporting.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Authorization;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
@@ -13,6 +12,7 @@ using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.Reg
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 using MarketingBox.Reporting.Service.Domain.Models;
+using MarketingBox.Reporting.Service.Grpc;
 using RegistrationStatus = MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus;
 
 namespace MarketingBox.AffiliateApi.Controllers
