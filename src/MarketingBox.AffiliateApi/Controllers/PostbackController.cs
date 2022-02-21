@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Postback;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.Postback.Service.Grpc;
-using MarketingBox.Postback.Service.Grpc.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Helpers;
+using MarketingBox.Postback.Service.Domain.Models;
+using Reference = MarketingBox.AffiliateApi.Models.Postback.Reference;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -58,7 +58,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 request.AffiliateId = this.GetAffiliateId();
                 var result = await _postbackService.CreateReferenceAsync(
-                    _mapper.Map<FullReferenceRequest>(request));
+                    _mapper.Map<MarketingBox.Postback.Service.Domain.Models.Reference>(request));
                 return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
             }
             catch (Exception ex)
@@ -76,7 +76,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 request.AffiliateId = this.GetAffiliateId();
                 var result = await _postbackService.UpdateReferenceAsync(
-                    _mapper.Map<FullReferenceRequest>(request));
+                    _mapper.Map<MarketingBox.Postback.Service.Domain.Models.Reference>(request));
                 return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
             }
             catch (Exception ex)

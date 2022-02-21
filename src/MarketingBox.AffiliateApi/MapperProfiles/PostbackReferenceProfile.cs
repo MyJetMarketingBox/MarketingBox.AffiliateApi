@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MarketingBox.AffiliateApi.Models.Postback;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
-using MarketingBox.Postback.Service.Grpc.Models;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles
 {
@@ -9,11 +8,11 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public PostbackReferenceProfile()
         {
-            CreateMap<ReferenceRequest, FullReferenceRequest>()
+            CreateMap<ReferenceRequest, MarketingBox.Postback.Service.Domain.Models.Reference>()
                 .ForMember(
                     x => x.AffiliateId,
                     o => o.MapFrom(p => p.AffiliateId));
-            CreateMap<ReferenceResponse, Reference>();
+            CreateMap<Reference, MarketingBox.Postback.Service.Domain.Models.Reference>().ReverseMap();
         }
     }
 }
