@@ -2,14 +2,18 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.CampaignBoxes;
 using MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests;
-using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Authorization;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using CampaignBoxCreateRequest = MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests.CampaignBoxCreateRequest;
 using CampaignBoxUpdateRequest = MarketingBox.AffiliateApi.Models.CampaignBoxes.Requests.CampaignBoxUpdateRequest;
 
@@ -33,37 +37,43 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<CampaignRowModel, long>), StatusCodes.Status200OK)]
-
-        public async Task<ActionResult<Paginated<CampaignRowModel, long>>> SearchAsync(
+        public async Task<ActionResult<Paginated<CampaignRowModel, long?>>> SearchAsync(
             [FromQuery] CampaignBoxesSearchRequest request)
         {
             if (request.Limit < 1 || request.Limit > 1000)
             {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should not be in the range 1..1000");
-
-                return BadRequest();
+                throw new ApiException(new Error
+                {
+                    ErrorMessage = "validation error",
+                    ValidationErrors = new()
+                    {
+                        new()
+                        {
+                            ParameterName = nameof(request.Limit),
+                            ErrorMessage = "Should be in the range 1..1000"
+                        }
+                    }
+                });
             }
 
             var tenantId = this.GetTenantId();
 
-            var response = await _campaignBoxService.SearchAsync(new ()
+            var response = await _campaignBoxService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
-                BrandId= request.BrandId,
+                BrandId = request.BrandId,
                 Cursor = request.Cursor,
                 CampaignRowId = request.Id,
                 CampaignId = request.CampaignId,
                 Take = request.Limit,
                 TenantId = tenantId
             });
-
-            if (response.CampaignBoxes != null && response.CampaignBoxes.Any())
-                return Ok(
-                    response.CampaignBoxes.Select(Map)
-                        .ToArray()
-                        .Paginate(request, Url, x => x.CampaignRowId));
-            
-            return NotFound();
+            return this.ProcessResult(
+                response,
+                response.Data?
+                    .Select(Map)
+                    .ToArray()
+                    .Paginate(request, Url, x => x.CampaignRowId));
         }
 
         /// <summary>
@@ -72,14 +82,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpGet("{campaignRowId}")]
         [ProducesResponseType(typeof(CampaignRowModel), StatusCodes.Status200OK)]
-
         public async Task<ActionResult<CampaignRowModel>> GetAsync(
             [FromRoute, Required] long campaignRowId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.GetAsync(new () { CampaignRowId = campaignRowId });
+            var response = await _campaignBoxService.GetAsync(new() {CampaignRowId = campaignRowId});
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -92,15 +101,16 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] CampaignBoxCreateRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.CreateAsync(new ()
+            var response = await _campaignBoxService.CreateAsync(new()
             {
-                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
-                {
-                    Day = x.Day,
-                    From = x.From,
-                    IsActive = x.IsActive,
-                    To = x.To
-                }).ToList(),
+                ActivityHours = request.ActivityHours.Select(x =>
+                    new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
+                    {
+                        Day = x.Day,
+                        From = x.From,
+                        IsActive = x.IsActive,
+                        To = x.To
+                    }).ToList(),
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
@@ -112,7 +122,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Weight = request.Weight
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -125,17 +135,18 @@ namespace MarketingBox.AffiliateApi.Controllers
             [Required, FromRoute] long campaignRowId,
             [FromBody] CampaignBoxUpdateRequest request)
         {
-            var response = await _campaignBoxService.UpdateAsync(new ()
+            var response = await _campaignBoxService.UpdateAsync(new()
             {
                 Sequence = request.Sequence,
                 CampaignRowId = campaignRowId,
-                ActivityHours = request.ActivityHours.Select(x => new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
-                {
-                    Day = x.Day,
-                    From = x.From,
-                    IsActive = x.IsActive,
-                    To = x.To
-                }).ToList(),
+                ActivityHours = request.ActivityHours.Select(x =>
+                    new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
+                    {
+                        Day = x.Day,
+                        From = x.From,
+                        IsActive = x.IsActive,
+                        To = x.To
+                    }).ToList(),
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
@@ -147,7 +158,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Weight = request.Weight
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -160,27 +171,13 @@ namespace MarketingBox.AffiliateApi.Controllers
             [Required, FromRoute] long campaignRowId)
         {
             var response = await _campaignBoxService.DeleteAsync(
-                new ()
+                new()
                 {
                     CampaignRowId = campaignRowId,
                 });
 
-            return MapToResponseEmpty(response);
-        }
-
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRowResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            if (response.CampaignRow == null)
-                return NotFound();
-
-            return Ok(Map(response.CampaignRow));
+            this.ProcessResult(response, true);
+            return Ok();
         }
 
         private static CampaignRowModel Map(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRow campaignRow)
@@ -198,26 +195,15 @@ namespace MarketingBox.AffiliateApi.Controllers
                 }).ToArray(),
                 CampaignRowId = campaignRow.CampaignRowId,
                 CapType = campaignRow.CapType.MapEnum<CapType>(),
-                CountryCode =   campaignRow.CountryCode,
+                CountryCode = campaignRow.CountryCode,
                 DailyCapValue = campaignRow.DailyCapValue,
                 EnableTraffic = campaignRow.EnableTraffic,
-                Information =   campaignRow.Information,
-                Priority =      campaignRow.Priority,
+                Information = campaignRow.Information,
+                Priority = campaignRow.Priority,
                 Weight = campaignRow.Weight,
                 Sequence = campaignRow.Sequence
             };
         }
 
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRowResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            return Ok();
-        }
     }
 }

@@ -1,29 +1,25 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using Autofac;
+using AutoWrapper;
 using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Grpc;
 using MarketingBox.AffiliateApi.Modules;
 using MarketingBox.AffiliateApi.Services;
+using MarketingBox.Sdk.Common.Models.RestApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Service;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Prometheus;
 using SimpleTrading.ServiceStatusReporterConnector;
 using SimpleTrading.Telemetry;
@@ -33,6 +29,7 @@ namespace MarketingBox.AffiliateApi
     public class Startup
     {
         private readonly string _corsPolicy = "Develop";
+
         public Startup()
         {
             ModelStateDictionaryResponseCodes = new HashSet<int>();
@@ -40,6 +37,7 @@ namespace MarketingBox.AffiliateApi
             ModelStateDictionaryResponseCodes.Add(StatusCodes.Status400BadRequest);
             ModelStateDictionaryResponseCodes.Add(StatusCodes.Status500InternalServerError);
         }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.BindCodeFirstGrpc();
@@ -47,14 +45,14 @@ namespace MarketingBox.AffiliateApi
             services.AddCors(options =>
             {
                 options.AddPolicy(_corsPolicy,
-                 builder =>
-                 {
-                     builder
-                      .WithOrigins("http://localhost:3001", "http://localhost:3002", "http://localhost:3000")
-                      .AllowCredentials()
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
-                 });
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins("http://localhost:3001", "http://localhost:3002", "http://localhost:3000")
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
             });
 
             services.AddAuthorization(options =>
@@ -62,7 +60,7 @@ namespace MarketingBox.AffiliateApi
                 options.AddPolicy(AuthorizationPolicies.AffiliateAndHigher, policy =>
                 {
                     policy.RequireClaim(ClaimTypes.Role);
-                    policy.Requirements.Add(new RolesAuthorizationRequirement(new []
+                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
                     {
                         UserRole.Affiliate.ToString(),
                         UserRole.AffiliateManager.ToString(),
@@ -153,6 +151,13 @@ namespace MarketingBox.AffiliateApi
 
             app.UseAuthorization();
 
+            app.UseApiResponseAndExceptionWrapper<ApiResponseMap>(
+               new AutoWrapperOptions
+               {
+                   UseCustomSchema = true,
+                   IgnoreWrapForOkRequests = true
+               });
+
             app.UseMetricServer();
 
             app.BindServicesTree(Assembly.GetExecutingAssembly());
@@ -167,24 +172,23 @@ namespace MarketingBox.AffiliateApi
 
                 endpoints.MapControllers();
 
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-                });
+                endpoints.MapGet("/",
+                    async context =>
+                    {
+                        await context.Response.WriteAsync(
+                            "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                    });
             });
 
-            app.UseOpenApi(settings =>
-            {
-                settings.Path = $"/swagger/api/swagger.json";
-            });
+            app.UseOpenApi(settings => { settings.Path = $"/swagger/api/swagger.json"; });
 
             app.UseSwaggerUi3(settings =>
             {
                 settings.EnableTryItOut = true;
                 settings.Path = $"/swagger/api";
                 settings.DocumentPath = $"/swagger/api/swagger.json";
-
-            });        }
+            });
+        }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
@@ -192,6 +196,7 @@ namespace MarketingBox.AffiliateApi
             builder.RegisterModule<ClientModule>();
             builder.RegisterModule<ServiceModule>();
         }
+
         public ISet<int> ModelStateDictionaryResponseCodes { get; }
     }
 }

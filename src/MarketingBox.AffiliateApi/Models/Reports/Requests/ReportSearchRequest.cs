@@ -1,10 +1,11 @@
 ﻿using System;
-using MarketingBox.AffiliateApi.Pagination;
 using MarketingBox.Reporting.Service.Domain.Models.Reports;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.Models.Reports.Requests
 {
-    public class ReportSearchRequest : PaginationRequest<long?>
+    public class 
+        ReportSearchRequest : PaginationRequest<long?>
     {
         public long? AffiliateId { get; set; }
         public string Country { get; set; }

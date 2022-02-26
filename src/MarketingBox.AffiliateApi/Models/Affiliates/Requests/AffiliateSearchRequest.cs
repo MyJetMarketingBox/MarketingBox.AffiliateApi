@@ -1,6 +1,6 @@
 ﻿using System;
 using MarketingBox.AffiliateApi.Models.Partners;
-using MarketingBox.AffiliateApi.Pagination;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests

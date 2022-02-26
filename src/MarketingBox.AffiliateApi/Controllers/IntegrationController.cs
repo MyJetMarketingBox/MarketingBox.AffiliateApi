@@ -2,13 +2,18 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Brands;
 using MarketingBox.AffiliateApi.Models.Brands.Requests;
-using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Authorization;
+using MarketingBox.AffiliateApi.Models.Integrations.Requests;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
@@ -32,14 +37,23 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<IntegrationModel, long>), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<IntegrationModel, long>>> SearchAsync(
+        public async Task<ActionResult<Paginated<IntegrationModel, long?>>> SearchAsync(
             [FromQuery] IntegrationsSearchRequest request)
         {
             if (request.Limit < 1 || request.Limit > 1000)
             {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should not be in the range 1..1000");
-
-                return BadRequest();
+                throw new ApiException(new Error
+                {
+                    ErrorMessage = "validation error",
+                    ValidationErrors = new()
+                    {
+                        new()
+                        {
+                            ParameterName = nameof(request.Limit),
+                            ErrorMessage = "Should be in the range 1..1000"
+                        }
+                    }
+                });
             }
 
             var tenantId = this.GetTenantId();
@@ -53,9 +67,10 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 TenantId = tenantId
             });
-
-            return Ok(
-                response.Integrations.Select(Map)
+            return this.ProcessResult(
+                response,
+                response.Data?
+                    .Select(Map)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
         }
@@ -63,7 +78,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet("{integrationId}")]
         [ProducesResponseType(typeof(IntegrationModel), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<IntegrationModel, long>>> GetAsync(
+        public async Task<ActionResult<IntegrationModel>> GetAsync(
             [FromRoute] long integrationId)
         {
             var response = await _integrationService.GetAsync(new ()
@@ -71,7 +86,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                  IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -91,7 +106,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = tenantId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -114,7 +129,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         /// <summary>
@@ -133,22 +148,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
-        }
-
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.Integrations.IntegrationResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            if (response.Integration == null)
-                return NotFound();
-            
-            return Ok(Map(response.Integration));
+            this.ProcessResult(response, true);
+            return Ok();
         }
 
         private static IntegrationModel Map(Affiliate.Service.Grpc.Models.Integrations.Integration integration)
@@ -159,18 +160,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Name = integration.Name,
                 Id = integration.Id
             };
-        }
-
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.Brands.BrandResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            return Ok();
         }
     }
 }

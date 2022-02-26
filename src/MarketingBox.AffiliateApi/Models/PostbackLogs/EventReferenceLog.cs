@@ -15,5 +15,6 @@ namespace MarketingBox.AffiliateApi.Models.PostbackLogs
         public string EventMessage { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
         public DateTime Date { get; set; }
+        public string AffiliateName { get; set; }
     }
 }

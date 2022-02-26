@@ -7,7 +7,11 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public PostbackLogsProfile()
         {
-            CreateMap<EventReferenceLog, Models.PostbackLogs.EventReferenceLog>();
+            CreateMap<EventReferenceLog, Models.PostbackLogs.EventReferenceLog>()
+                .ForMember(
+                    d => d.AffiliateName, 
+                    m => 
+                        m.MapFrom(s => s.Affiliate.Name));
         }
     }
 }

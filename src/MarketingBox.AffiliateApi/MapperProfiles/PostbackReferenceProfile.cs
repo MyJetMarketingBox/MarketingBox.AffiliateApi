@@ -12,7 +12,12 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
                 .ForMember(
                     x => x.AffiliateId,
                     o => o.MapFrom(p => p.AffiliateId));
-            CreateMap<Reference, MarketingBox.Postback.Service.Domain.Models.Reference>().ReverseMap();
+            CreateMap<Reference, MarketingBox.Postback.Service.Domain.Models.Reference>()
+                .ReverseMap()
+                .ForMember(
+                    d => d.AffiliateName, 
+                    m => 
+                        m.MapFrom(s => s.Affiliate.Name));
         }
     }
 }

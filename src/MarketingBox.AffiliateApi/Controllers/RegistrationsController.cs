@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Authorization;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
 using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
@@ -13,7 +14,13 @@ using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 using MarketingBox.Reporting.Service.Domain.Models;
 using MarketingBox.Reporting.Service.Grpc;
+using MarketingBox.Sdk.Common.Exceptions;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using RegistrationStatus = MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus;
+using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -37,17 +44,25 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(Paginated<RegistrationModel, long>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Paginated<RegistrationModelForAffiliate, long>), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<RegistrationModel, long>>> SearchAsync(
+        public async Task<ActionResult<Paginated<RegistrationModel, long?>>> SearchAsync(
             [FromQuery] RegistrationSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
+            if (request.Limit is < 1 or > 1000)
             {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should be in the range 1..1000");
-
-                return BadRequest();
+                throw new ApiException(new Error
+                {
+                    ErrorMessage = BadRequestException.DefaultErrorMessage,
+                    ValidationErrors = new List<ValidationError>
+                    {
+                        new ()
+                        {
+                            ErrorMessage = "Should be in the range 1..1000",
+                            ParameterName = nameof(request.Limit)
+                        }
+                    }
+                });
             }
-
-            var role = this.GetRole();
+            
             var tenantId = this.GetTenantId();
             var masterAffiliateId = this.GetAffiliateId();
             
@@ -62,71 +77,53 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Type = request.Type ?? RegistrationsReportType.All
             });
 
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
+            return this.ProcessResult(response,
+                response.Data?
+                    .Select(Map)
+                    .ToArray()
+                    .Paginate(request, Url, x => x.RegistrationId));
+        }
 
-                return BadRequest(ModelState);
-            }
-
-            if (response.Registrations == null || !response.Registrations.Any())
-                return NotFound();
-
-            //if (role == UserRole.Affiliate)
-            //    return Ok(response.Registrations.Select(x => new RegistrationModelForAffiliate()
-            //        {
-            //            Status = x.Status.MapEnum<RegistrationStatus>(),
-            //            GeneralInfo = new RegistrationGeneralInfoForAffiliate()
-            //            {
-            //                CreatedAt = x.CreatedAt,
-            //                ConversionDate = x.ConversionDate,
-            //                Country = x.Country,
-            //            },
-            //            RegistrationId = x.RegistrationId
-            //        })
-            //        .ToArray()
-            //        .Paginate(request, Url, x => x.RegistrationId));
-
-            return Ok(response.Registrations.Select(x => new RegistrationModel()
+        private static RegistrationModel Map(RegistrationDetails registrationDetails)
+        {
+            return new RegistrationModel()
             {
                 AdditionalInfo = new RegistrationAdditionalInfo()
                 {
-                    Funnel = x.Funnel,
-                    AffCode = x.AffCode,
-                    Sub1 = x.Sub1,
-                    Sub2 = x.Sub2,
-                    Sub3 = x.Sub3,
-                    Sub4 = x.Sub4,
-                    Sub5 = x.Sub5,
-                    Sub6 = x.Sub6,
-                    Sub7 = x.Sub7,
-                    Sub8 = x.Sub8,
-                    Sub9 = x.Sub9,
-                    Sub10 = x.Sub10
+                    Funnel = registrationDetails.Funnel,
+                    AffCode = registrationDetails.AffCode,
+                    Sub1 = registrationDetails.Sub1,
+                    Sub2 = registrationDetails.Sub2,
+                    Sub3 = registrationDetails.Sub3,
+                    Sub4 = registrationDetails.Sub4,
+                    Sub5 = registrationDetails.Sub5,
+                    Sub6 = registrationDetails.Sub6,
+                    Sub7 = registrationDetails.Sub7,
+                    Sub8 = registrationDetails.Sub8,
+                    Sub9 = registrationDetails.Sub9,
+                    Sub10 = registrationDetails.Sub10
                 },
-                Status = x.Status.MapEnum<RegistrationStatus>(),
+                Status = registrationDetails.Status.MapEnum<RegistrationStatus>(),
                 GeneralInfo = new RegistrationGeneralInfo()
                 {
-                    Email = x.Email,
-                    CreatedAt = x.CreatedAt,
-                    ConversionDate = x.ConversionDate,
-                    Country = x.Country,
-                    FirstName = x.FirstName,
-                    Ip = x.Ip,
-                    LastName = x.LastName,
-                    Phone = x.Phone
+                    Email = registrationDetails.Email,
+                    CreatedAt = registrationDetails.CreatedAt,
+                    ConversionDate = registrationDetails.ConversionDate,
+                    Country = registrationDetails.Country,
+                    FirstName = registrationDetails.FirstName,
+                    Ip = registrationDetails.Ip,
+                    LastName = registrationDetails.LastName,
+                    Phone = registrationDetails.Phone
                 },
-                RegistrationId = x.RegistrationId,
+                RegistrationId = registrationDetails.RegistrationId,
                 RouteInfo = new RegistrationRouteInfo()
                 {
-                    AffiliateId = x.AffiliateId,
-                    CampaignId = x.CampaignId,
-                    IntegrationIdId = x.IntegrationId,
-                    BrandId = x.BrandId
+                    AffiliateId = registrationDetails.AffiliateId,
+                    CampaignId = registrationDetails.CampaignId,
+                    IntegrationIdId = registrationDetails.IntegrationId,
+                    BrandId = registrationDetails.BrandId
                 }
-            })
-                .ToArray()
-                .Paginate(request, Url, x => x.RegistrationId));
+            };
         }
     }
 }
