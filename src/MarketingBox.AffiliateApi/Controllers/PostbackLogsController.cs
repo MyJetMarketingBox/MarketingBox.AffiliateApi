@@ -5,7 +5,6 @@ using MarketingBox.Postback.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.Postback.Service.Domain.Models;
@@ -39,9 +38,15 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<EventReferenceLog, long>>> GetLogs(
             [FromQuery] PaginationRequest<long> paginationRequest)
         {
+            var asc = paginationRequest.Order == PaginationOrder.Asc;
+            if (!asc && paginationRequest.Cursor == 0)
+            {
+                paginationRequest.Cursor = paginationRequest.Limit;
+            }
+
             var request = new ByAffiliateIdPaginatedRequest
             {
-                Asc = paginationRequest.Order == PaginationOrder.Asc,
+                Asc = asc,
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
                 AffiliateId = this.GetAffiliateId()
