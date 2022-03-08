@@ -114,7 +114,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
-                CountryCode = request.CountryCode,
+                GeoId = request.GeoId,
                 DailyCapValue = request.DailyCapValue,
                 EnableTraffic = request.EnableTraffic,
                 Information = request.Information,
@@ -137,7 +137,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var response = await _campaignBoxService.UpdateAsync(new()
             {
-                Sequence = request.Sequence,
                 CampaignRowId = campaignRowId,
                 ActivityHours = request.ActivityHours.Select(x =>
                     new Affiliate.Service.Grpc.Models.CampaignRows.ActivityHours()
@@ -150,7 +149,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 BrandId = request.BrandId,
                 CampaignId = request.CampaignId,
                 CapType = request.CapType.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.CampaignRows.CapType>(),
-                CountryCode = request.CountryCode,
+                GeoId = request.GeoId,
                 DailyCapValue = request.DailyCapValue,
                 EnableTraffic = request.EnableTraffic,
                 Information = request.Information,
@@ -195,13 +194,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 }).ToArray(),
                 CampaignRowId = campaignRow.CampaignRowId,
                 CapType = campaignRow.CapType.MapEnum<CapType>(),
-                CountryCode = campaignRow.CountryCode,
+                GeoId = campaignRow.GeoId,
+                GeoName = campaignRow.GeoName,
                 DailyCapValue = campaignRow.DailyCapValue,
                 EnableTraffic = campaignRow.EnableTraffic,
                 Information = campaignRow.Information,
                 Priority = campaignRow.Priority,
                 Weight = campaignRow.Weight,
-                Sequence = campaignRow.Sequence
             };
         }
 
