@@ -27,18 +27,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<Paginated<Geo, int>>> GetAllAsync(
-            [FromQuery] PaginationRequest<int> paginationRequest)
+        public async Task<ActionResult<Paginated<Geo, int?>>> GetAllAsync(
+            [FromQuery] PaginationRequest<int?> paginationRequest)
         {
-            var asc = paginationRequest.Order == PaginationOrder.Asc;
-            if (!asc && paginationRequest.Cursor == 0)
-            {
-                paginationRequest.Cursor = paginationRequest.Limit;
-            }
-
             var request = new GetAllRequest
             {
-                Asc = asc,
+                Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit
             };

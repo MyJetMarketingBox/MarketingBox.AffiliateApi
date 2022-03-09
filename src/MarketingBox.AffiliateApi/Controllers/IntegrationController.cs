@@ -35,7 +35,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<IntegrationModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<IntegrationModel, long?>), StatusCodes.Status200OK)]
 
         public async Task<ActionResult<Paginated<IntegrationModel, long?>>> SearchAsync(
             [FromQuery] IntegrationsSearchRequest request)

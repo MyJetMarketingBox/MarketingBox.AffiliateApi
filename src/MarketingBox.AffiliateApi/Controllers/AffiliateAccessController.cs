@@ -30,7 +30,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<AffiliateAccessModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<AffiliateAccessModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<AffiliateAccessModel, long?>>> SearchAsync(
             [FromQuery] AffiliateAccessSearchRequest request)
         {

@@ -36,7 +36,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<CampaignRowModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<CampaignRowModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<CampaignRowModel, long?>>> SearchAsync(
             [FromQuery] CampaignBoxesSearchRequest request)
         {

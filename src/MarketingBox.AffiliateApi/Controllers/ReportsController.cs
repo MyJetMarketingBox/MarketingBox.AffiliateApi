@@ -41,8 +41,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<ReportModel, long>), StatusCodes.Status200OK)]
-
+        [ProducesResponseType(typeof(Paginated<ReportModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(
             [FromQuery] Models.Reports.Requests.ReportSearchRequest request)
         {

@@ -35,23 +35,18 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Paginated<EventReferenceLog, long>>> GetLogs(
-            [FromQuery] PaginationRequest<long> paginationRequest)
+        public async Task<ActionResult<Paginated<EventReferenceLog, long?>>> GetLogs(
+            [FromQuery] PaginationRequest<long?> paginationRequest)
         {
-            var asc = paginationRequest.Order == PaginationOrder.Asc;
-            if (!asc && paginationRequest.Cursor == 0)
-            {
-                paginationRequest.Cursor = paginationRequest.Limit;
-            }
-
             var request = new ByAffiliateIdPaginatedRequest
             {
-                Asc = asc,
+                Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
                 AffiliateId = this.GetAffiliateId()
             };
             var response = await _eventReferenceLogService.GetAsync(request);
+            
             return this.ProcessResult(
                 response,
                 response.Data?

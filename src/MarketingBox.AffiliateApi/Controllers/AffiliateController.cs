@@ -49,7 +49,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.MasterAffiliateAndHigher)]
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<AffiliateModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<AffiliateModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<AffiliateModel, long?>>> SearchAsync(
             [FromQuery] AffiliateSearchRequest request)
         {
