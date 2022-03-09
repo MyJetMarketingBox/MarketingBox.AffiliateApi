@@ -181,6 +181,10 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         private static CampaignRowModel Map(Affiliate.Service.Grpc.Models.CampaignRows.CampaignRow campaignRow)
         {
+            if (campaignRow is null)
+            {
+                return null;
+            }
             return new CampaignRowModel()
             {
                 BrandId = campaignRow.BrandId,
