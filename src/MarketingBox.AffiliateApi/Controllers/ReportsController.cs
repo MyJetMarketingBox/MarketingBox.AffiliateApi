@@ -61,11 +61,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 });
             }
 
-            if (request.Order == PaginationOrder.Desc && request.Cursor is null)
-            {
-                request.Cursor = request.Limit;
-            }
-
             var tenantId = this.GetTenantId();
             request.TenantId = tenantId;
             var response = await _reportService.SearchAsync(_mapper.Map<ReportSearchRequest>(request));

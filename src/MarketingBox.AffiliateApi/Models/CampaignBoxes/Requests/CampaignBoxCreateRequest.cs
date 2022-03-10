@@ -7,7 +7,6 @@
         public int Priority { get; set; }
         public int Weight { get; set; }
         public CapType CapType { get; set; }
-
         public long DailyCapValue { get; set; }
         public ActivityHours[] ActivityHours { get; set; }
         public string Information { get; set; }
