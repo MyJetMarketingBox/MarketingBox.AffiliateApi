@@ -1,4 +1,5 @@
 ﻿using System;
+using MarketingBox.Reporting.Service.Domain.Models;
 using MarketingBox.Reporting.Service.Domain.Models.Reports;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
