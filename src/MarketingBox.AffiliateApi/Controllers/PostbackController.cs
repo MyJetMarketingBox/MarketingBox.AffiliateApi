@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using MarketingBox.Postback.Service.Domain.Models;
+using MarketingBox.Postback.Service.Domain.Models.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using Reference = MarketingBox.AffiliateApi.Models.Postback.Reference;
 
@@ -48,7 +48,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             request.AffiliateId = this.GetAffiliateId();
             var result = await _postbackService.CreateAsync(
-                _mapper.Map<MarketingBox.Postback.Service.Domain.Models.Reference>(request));
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request));
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
@@ -58,7 +58,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             request.AffiliateId = this.GetAffiliateId();
             var result = await _postbackService.UpdateAsync(
-                _mapper.Map<MarketingBox.Postback.Service.Domain.Models.Reference>(request));
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request));
 
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }

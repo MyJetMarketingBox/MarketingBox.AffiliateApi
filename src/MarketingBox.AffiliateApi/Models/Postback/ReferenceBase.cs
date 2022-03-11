@@ -12,6 +12,6 @@ namespace MarketingBox.AffiliateApi.Models.Postback
 
         public string DepositTGReference { get; init; }
 
-        public HttpQueryType HttpQueryType { get; init; }
+        public HttpQueryType? HttpQueryType { get; init; }
     }
 }
