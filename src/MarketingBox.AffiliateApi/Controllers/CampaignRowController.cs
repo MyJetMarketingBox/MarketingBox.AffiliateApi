@@ -9,7 +9,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -19,7 +18,7 @@ using CampaignBoxUpdateRequest = MarketingBox.AffiliateApi.Models.CampaignBoxes.
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/campaign-rows")]
     public class CampaignRowController : ControllerBase

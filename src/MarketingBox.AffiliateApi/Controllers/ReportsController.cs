@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.Reporting.Service.Domain.Models.Reports.Requests;
 using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
@@ -21,6 +20,7 @@ using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/reports")]
     public class ReportsController : ControllerBase
     {
@@ -39,7 +39,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [Authorize(Policy = AuthorizationPolicies.AffiliateManagerAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<ReportModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(

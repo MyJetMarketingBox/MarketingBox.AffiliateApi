@@ -8,7 +8,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Models.Integrations.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
@@ -18,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/integrations")]
     public class IntegrationController : ControllerBase

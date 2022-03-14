@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Security.Claims;
 using System.Text;
 using Autofac;
 using AutoWrapper;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Grpc;
 using MarketingBox.AffiliateApi.Modules;
 using MarketingBox.AffiliateApi.Services;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -55,52 +52,7 @@ namespace MarketingBox.AffiliateApi
                     });
             });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(AuthorizationPolicies.AffiliateAndHigher, policy =>
-                {
-                    policy.RequireClaim(ClaimTypes.Role);
-                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
-                    {
-                        UserRole.Affiliate.ToString(),
-                        UserRole.AffiliateManager.ToString(),
-                        UserRole.MasterAffiliate.ToString(),
-                        UserRole.MasterAffiliateReferral.ToString(),
-                        UserRole.Admin.ToString()
-                    }));
-                });
-
-                options.AddPolicy(AuthorizationPolicies.MasterAffiliateAndHigher, policy =>
-                {
-                    policy.RequireClaim(ClaimTypes.Role);
-                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
-                    {
-                        UserRole.AffiliateManager.ToString(),
-                        UserRole.MasterAffiliate.ToString(),
-                        UserRole.MasterAffiliateReferral.ToString(),
-                        UserRole.Admin.ToString()
-                    }));
-                });
-
-                options.AddPolicy(AuthorizationPolicies.AffiliateManagerAndHigher, policy =>
-                {
-                    policy.RequireClaim(ClaimTypes.Role);
-                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
-                    {
-                        UserRole.AffiliateManager.ToString(),
-                        UserRole.Admin.ToString()
-                    }));
-                });
-
-                options.AddPolicy(AuthorizationPolicies.AdminOnly, policy =>
-                {
-                    policy.RequireClaim(ClaimTypes.Role);
-                    policy.Requirements.Add(new RolesAuthorizationRequirement(new[]
-                    {
-                        UserRole.Admin.ToString()
-                    }));
-                });
-            });
+            services.AddAuthorization();
             services.AddControllers();
             services.SetupSwaggerDocumentation();
 

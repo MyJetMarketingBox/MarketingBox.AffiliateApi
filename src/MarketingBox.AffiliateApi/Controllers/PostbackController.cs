@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.Postback.Service.Grpc;
@@ -13,7 +12,7 @@ using Reference = MarketingBox.AffiliateApi.Models.Postback.Reference;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
+    [Authorize]
     [ApiController]
     [Route("/api/postback/")]
     public class PostbackController : ControllerBase

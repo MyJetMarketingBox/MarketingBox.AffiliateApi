@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Brands.Requests;
 using MarketingBox.AffiliateApi.Models.Campaigns;
@@ -19,7 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/brands")]
     public class BrandController : ControllerBase

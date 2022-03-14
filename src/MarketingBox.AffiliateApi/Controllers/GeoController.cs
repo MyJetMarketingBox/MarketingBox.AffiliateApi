@@ -6,6 +6,7 @@ using MarketingBox.Affiliate.Service.Grpc.Models.Country;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Geo = MarketingBox.AffiliateApi.Models.Country.Geo;
 using ApiModel = MarketingBox.AffiliateApi.Models.Country.Requests;
@@ -14,6 +15,7 @@ using GrpcModel = MarketingBox.Affiliate.Service.Grpc.Models.Country;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/geo")]
     public class GeoController : ControllerBase
     {
