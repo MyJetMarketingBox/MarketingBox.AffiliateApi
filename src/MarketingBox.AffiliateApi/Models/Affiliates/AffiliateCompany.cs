@@ -1,4 +1,4 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Partners
+﻿namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
     public class AffiliateCompany
     {

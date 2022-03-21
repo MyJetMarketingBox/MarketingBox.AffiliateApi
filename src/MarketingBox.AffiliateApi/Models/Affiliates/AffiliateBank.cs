@@ -1,4 +1,4 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Partners
+﻿namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
     public class AffiliateBank
     {
@@ -6,9 +6,9 @@
 
         public string BeneficiaryAddress { get; set; }
 
-        public string BankName { get; set; }
+        public string Name { get; set; }
 
-        public string BankAddress { get; set; }
+        public string Address { get; set; }
 
         public string AccountNumber { get; set; }
 

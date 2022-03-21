@@ -1,18 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MarketingBox.AffiliateApi.Models.Partners
+﻿namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
     public class AffiliateModel
     {
-        public long AffiliateId { get; set; }
+        public long Id { get; set; }
 
         public AffiliateGeneralInfo GeneralInfo { get; set; }
 
         public AffiliateCompany Company { get; set; }
 
         public AffiliateBank Bank { get; set; }
-        public long Sequence { get; set; }
     }
 }

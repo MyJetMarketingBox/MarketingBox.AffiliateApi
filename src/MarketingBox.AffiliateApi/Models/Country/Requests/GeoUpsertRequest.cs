@@ -1,6 +1,6 @@
 namespace MarketingBox.AffiliateApi.Models.Country.Requests
 {
-    public class GeoRequest
+    public class GeoUpsertRequest
     {
         public string Name{ get; set; }
         public int[] CountryIds { get; set; }

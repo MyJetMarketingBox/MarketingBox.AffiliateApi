@@ -1,14 +1,15 @@
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Brands;
 using MarketingBox.AffiliateApi.Models.Brands.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Authorization;
+using MarketingBox.AffiliateApi.Models.Integrations;
 using MarketingBox.AffiliateApi.Models.Integrations.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
@@ -24,10 +25,12 @@ namespace MarketingBox.AffiliateApi.Controllers
     public class IntegrationController : ControllerBase
     {
         private readonly IIntegrationService _integrationService;
+        private readonly IMapper _mapper;
 
-        public IntegrationController(IIntegrationService integrationService)
+        public IntegrationController(IIntegrationService integrationService, IMapper mapper)
         {
             _integrationService = integrationService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -70,7 +73,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(
                 response,
                 response.Data?
-                    .Select(Map)
+                    .Select(_mapper.Map<IntegrationModel>)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
         }
@@ -86,7 +89,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                  IntegrationId = integrationId
             });
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -106,7 +109,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = tenantId
             });
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -125,11 +128,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Name = request.Name,
                 TenantId = tenantId,
-                Sequence = request.Sequence,
                 IntegrationId = integrationId
             });
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -150,16 +152,6 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             this.ProcessResult(response, true);
             return Ok();
-        }
-
-        private static IntegrationModel Map(Affiliate.Service.Grpc.Models.Integrations.Integration integration)
-        {
-            return new()
-            {
-                Sequence = integration.Sequence,
-                Name = integration.Name,
-                Id = integration.Id
-            };
         }
     }
 }

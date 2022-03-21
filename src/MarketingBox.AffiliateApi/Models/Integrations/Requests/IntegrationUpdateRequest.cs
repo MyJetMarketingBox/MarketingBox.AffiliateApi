@@ -1,9 +1,7 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Brands.Requests
+﻿namespace MarketingBox.AffiliateApi.Models.Integrations.Requests
 {
     public class IntegrationUpdateRequest
     {
         public string Name { get; set; }
-
-        public long Sequence { get; set; }
     }
 }

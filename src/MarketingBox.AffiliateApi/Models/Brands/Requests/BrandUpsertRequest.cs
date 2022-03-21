@@ -3,7 +3,7 @@ using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
 
 namespace MarketingBox.AffiliateApi.Models.Brands.Requests
 {
-    public class BrandCreateRequest
+    public class BrandUpsertRequest
     {
         public string Name { get; set; }
 

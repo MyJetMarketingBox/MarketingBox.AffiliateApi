@@ -1,0 +1,18 @@
+using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.CampaignRows;
+using MarketingBox.Affiliate.Service.Grpc.Requests.CampaignRows;
+using MarketingBox.AffiliateApi.Models.CampaignRows;
+using MarketingBox.AffiliateApi.Models.CampaignRows.Requests;
+
+namespace MarketingBox.AffiliateApi.MapperProfiles
+{
+    public class CampaignRowMapperProfile:Profile
+    {
+        public CampaignRowMapperProfile()
+        {
+            CreateMap<CampaignRowUpsertRequest, CampaignRowCreateRequest>();
+            CreateMap<CampaignRowUpsertRequest, CampaignRowUpdateRequest>();
+            CreateMap<CampaignRow, CampaignRowModel>();
+        }
+    }
+}

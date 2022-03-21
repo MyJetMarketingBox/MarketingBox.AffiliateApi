@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Models.Country;
+using MarketingBox.Affiliate.Service.Grpc.Requests;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -27,7 +27,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<Paginated<Country, int?>>> GetAllAsync(
+        public async Task<ActionResult<Paginated<CountryModel, int?>>> GetAllAsync(
             [FromQuery] PaginationRequest<int?> paginationRequest)
         {
             var request = new GetAllRequest
@@ -40,7 +40,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(
                 response,
                 response.Data?
-                    .Select(_mapper.Map<Country>)
+                    .Select(_mapper.Map<CountryModel>)
                     .ToArray()
                     .Paginate(paginationRequest, Url, x => x.Id));
         }  

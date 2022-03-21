@@ -2,19 +2,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Models.Country;
+using MarketingBox.Affiliate.Service.Grpc.Requests;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Country;
+using MarketingBox.AffiliateApi.Models.Country;
+using MarketingBox.AffiliateApi.Models.Country.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
-using Geo = MarketingBox.AffiliateApi.Models.Country.Geo;
-using ApiModel = MarketingBox.AffiliateApi.Models.Country.Requests;
-using GrpcModel = MarketingBox.Affiliate.Service.Grpc.Models.Country;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    [Route("/api/geo")]
+    [Route("/api/[controller]")]
     public class GeoController : ControllerBase
     {
         private readonly IGeoService _geoService;
@@ -25,9 +25,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             _geoService = geoService;
             _mapper = mapper;
         }
-        
+
         [HttpGet]
-        public async Task<ActionResult<Paginated<Geo, int?>>> GetAllAsync(
+        public async Task<ActionResult<Paginated<GeoModel, int?>>> GetAllAsync(
             [FromQuery] PaginationRequest<int?> paginationRequest)
         {
             var request = new GetAllRequest
@@ -40,33 +40,33 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(
                 response,
                 response.Data?
-                    .Select(_mapper.Map<Geo>)
+                    .Select(_mapper.Map<GeoModel>)
                     .ToArray()
                     .Paginate(paginationRequest, Url, x => x.Id));
         }
-        
+
         [HttpPost]
-        public async Task<ActionResult<Geo>> CreateAsync([FromBody] ApiModel.GeoRequest request)
+        public async Task<ActionResult<GeoModel>> CreateAsync([FromBody] GeoUpsertRequest upsertRequest)
         {
-            var response = await _geoService.CreateAsync(_mapper.Map<GeoCreateRequest>(request));
-            return this.ProcessResult(response, _mapper.Map<Geo>(response.Data));
+            var response = await _geoService.CreateAsync(_mapper.Map<GeoCreateRequest>(upsertRequest));
+            return this.ProcessResult(response, _mapper.Map<GeoModel>(response.Data));
         }
 
-        [HttpPut("/api/geo/{geoId}")]
-        public async Task<ActionResult<Geo>> UpdateAsync(
+        [HttpPut("{geoId}")]
+        public async Task<ActionResult<GeoModel>> UpdateAsync(
             [FromRoute] int geoId,
-            [FromBody] ApiModel.GeoRequest updateRequest)
+            [FromBody] GeoUpsertRequest updateUpsertRequest)
         {
-            var request = _mapper.Map<GeoUpdateRequest>(updateRequest);
+            var request = _mapper.Map<GeoUpdateRequest>(updateUpsertRequest);
             request.Id = geoId;
             var response = await _geoService.UpdateAsync(request);
-            return this.ProcessResult(response, _mapper.Map<Geo>(response.Data));
+            return this.ProcessResult(response, _mapper.Map<GeoModel>(response.Data));
         }
 
-        [HttpDelete("/api/geo/{geoId}")]
+        [HttpDelete("{geoId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int geoId)
         {
-            var response = await _geoService.DeleteAsync(new GeoByIdRequest {CountryBoxId = geoId});
+            var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId});
             return this.ProcessResult(response);
         }
     }

@@ -1,28 +1,25 @@
 using System;
-using MarketingBox.AffiliateApi.Models.Partners;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using AutoMapper;
 using AutoWrapper.Wrappers;
 using MarketingBox.Affiliate.Service.Messages.Affiliates;
 using MarketingBox.AffiliateApi.Authorization;
+using MarketingBox.AffiliateApi.Models.Affiliates;
+using MarketingBox.AffiliateApi.Models.Affiliates.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
-using AffiliateBank = MarketingBox.AffiliateApi.Models.Partners.AffiliateBank;
-using AffiliateCompany = MarketingBox.AffiliateApi.Models.Partners.AffiliateCompany;
-using AffiliateCreateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateCreateRequest;
-using AffiliateGeneralInfo = MarketingBox.AffiliateApi.Models.Partners.AffiliateGeneralInfo;
 using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Affiliates.Requests.AffiliateSearchRequest;
-using AffiliateUpdateRequest = MarketingBox.AffiliateApi.Models.Partners.Requests.AffiliateUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -33,14 +30,17 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly ILogger<AffiliateController> _logger;
         private readonly IAffiliateService _affiliateService;
         private readonly IServiceBusPublisher<AffiliateDeleteMessage> _serviceBusPublisher;
+        private readonly IMapper _mapper;
 
         public AffiliateController(IAffiliateService affiliateService,
             IServiceBusPublisher<AffiliateDeleteMessage> serviceBusPublisher,
-            ILogger<AffiliateController> logger)
+            ILogger<AffiliateController> logger,
+            IMapper mapper)
         {
             _affiliateService = affiliateService;
             _serviceBusPublisher = serviceBusPublisher;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -70,33 +70,24 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
-            var userRole = this.GetRole();
-            var role = request.Role?.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateRole>();
-
-            long? masterAffiliateId = null;
-
-            if (userRole.IsRestricted())
-                masterAffiliateId = this.GetAffiliateId();
 
             var response = await _affiliateService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
                 AffiliateId = request.Id,
-                CreatedAt = request.CreatedAt?.DateTime ?? default,
+                CreatedAt = request.CreatedAt,
                 Email = request.Email,
-                Role = role,
                 Username = request.Username,
                 Take = request.Limit,
-                TenantId = tenantId,
-                MasterAffiliateId = masterAffiliateId
+                TenantId = tenantId
             });
             return this.ProcessResult(
                 response,
                 response.Data?
-                    .Select(Map)
+                    .Select(_mapper.Map<AffiliateModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.AffiliateId));
+                    .Paginate(request, Url, x => x.Id));
         }
 
         /// <summary>
@@ -114,7 +105,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 AffiliateId = affiliateId
             });
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
         }
 
         /// <summary>
@@ -125,49 +116,14 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> CreateAsync(
-            [FromBody] AffiliateCreateRequest request)
+            [FromBody] AffiliateUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _affiliateService.CreateAsync(new()
-            {
-                TenantId = tenantId,
-                Bank = new()
-                {
-                    AccountNumber = request.Bank.AccountNumber,
-                    BankAddress = request.Bank.BankAddress,
-                    BankName = request.Bank.BankName,
-                    BeneficiaryAddress = request.Bank.BeneficiaryAddress,
-                    BeneficiaryName = request.Bank.BeneficiaryName,
-                    Iban = request.Bank.Iban,
-                    Swift = request.Bank.Swift
-                },
-                Company = new()
-                {
-                    Address = request.Company.Address,
-                    Name = request.Company.Name,
-                    RegNumber = request.Company.RegNumber,
-                    VatId = request.Company.VatId
-                },
-                GeneralInfo = new()
-                {
-                    CreatedAt = request.GeneralInfo.CreatedAt,
-                    Currency = request.GeneralInfo.Currency
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Email = request.GeneralInfo.Email,
-                    Password = request.GeneralInfo.Password,
-                    Phone = request.GeneralInfo.Phone,
-                    Role = request.GeneralInfo.Role
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateRole>(),
-                    Skype = request.GeneralInfo.Skype,
-                    State = request.GeneralInfo.State
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateState>(),
-                    Username = request.GeneralInfo.Username,
-                    ZipCode = request.GeneralInfo.ZipCode,
-                    ApiKey = request.GeneralInfo.ApiKey
-                },
-            });
+            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Affiliates.AffiliateCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            var response = await _affiliateService.CreateAsync(requestGrpc);
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
         }
 
         /// <summary>
@@ -179,52 +135,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> UpdateAsync(
             [Required, FromRoute] long affiliateId,
-            [FromBody] AffiliateUpdateRequest request)
+            [FromBody] AffiliateUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _affiliateService.UpdateAsync(new()
-            {
-                Sequence = request.Sequence,
-                AffiliateId = affiliateId,
-                TenantId = tenantId,
-                Bank = new()
-                {
-                    AccountNumber = request.Bank.AccountNumber,
-                    BankAddress = request.Bank.BankAddress,
-                    BankName = request.Bank.BankName,
-                    BeneficiaryAddress = request.Bank.BeneficiaryAddress,
-                    BeneficiaryName = request.Bank.BeneficiaryName,
-                    Iban = request.Bank.Iban,
-                    Swift = request.Bank.Swift
-                },
-                Company = new()
-                {
-                    Address = request.Company.Address,
-                    Name = request.Company.Name,
-                    RegNumber = request.Company.RegNumber,
-                    VatId = request.Company.VatId
-                },
-                GeneralInfo = new()
-                {
-                    CreatedAt = request.GeneralInfo.CreatedAt,
-                    Currency = request.GeneralInfo.Currency
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Common.Currency>(),
-                    Email = request.GeneralInfo.Email,
-                    Password = request.GeneralInfo.Password,
-                    Phone = request.GeneralInfo.Phone,
-                    Role = request.GeneralInfo.Role
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateRole>(),
-                    Skype = request.GeneralInfo.Skype,
-                    State = request.GeneralInfo.State
-                        .MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Affiliates.AffiliateState>(),
-                    Username = request.GeneralInfo.Username,
-                    ZipCode = request.GeneralInfo.ZipCode,
-                    ApiKey = request.GeneralInfo.ApiKey
-                },
-            });
+            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Affiliates.AffiliateUpdateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            requestGrpc.AffiliateId = affiliateId;
+            var response = await _affiliateService.UpdateAsync(requestGrpc);
 
 
-            return this.ProcessResult(response, Map(response.Data));
+            return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
         }
 
         /// <summary>
@@ -251,46 +171,6 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             return Ok();
-        }
-
-        private static AffiliateModel Map(Affiliate.Service.Grpc.Models.Affiliates.Affiliate affiliate)
-        {
-            return new AffiliateModel()
-            {
-                AffiliateId = affiliate.AffiliateId,
-                Bank = new AffiliateBank()
-                {
-                    AccountNumber = affiliate.Bank.AccountNumber,
-                    BankAddress = affiliate.Bank.BankAddress,
-                    BankName = affiliate.Bank.BankName,
-                    BeneficiaryAddress = affiliate.Bank.BeneficiaryAddress,
-                    BeneficiaryName = affiliate.Bank.BeneficiaryName,
-                    Iban = affiliate.Bank.Iban,
-                    Swift = affiliate.Bank.Swift
-                },
-                Company = new AffiliateCompany()
-                {
-                    Address = affiliate.Company.Address,
-                    Name = affiliate.Company.Name,
-                    RegNumber = affiliate.Company.RegNumber,
-                    VatId = affiliate.Company.VatId
-                },
-                GeneralInfo = new AffiliateGeneralInfo()
-                {
-                    CreatedAt = affiliate.GeneralInfo.CreatedAt,
-                    Currency = affiliate.GeneralInfo.Currency.MapEnum<Currency>(),
-                    Email = affiliate.GeneralInfo.Email,
-                    Password = affiliate.GeneralInfo.Password,
-                    Phone = affiliate.GeneralInfo.Phone,
-                    Role = affiliate.GeneralInfo.Role.MapEnum<AffiliateRole>(),
-                    Skype = affiliate.GeneralInfo.Skype,
-                    State = affiliate.GeneralInfo.State.MapEnum<AffiliateState>(),
-                    Username = affiliate.GeneralInfo.Username,
-                    ZipCode = affiliate.GeneralInfo.ZipCode,
-                    ApiKey = affiliate.GeneralInfo.ApiKey
-                },
-                Sequence = affiliate.Sequence
-            };
         }
     }
 }

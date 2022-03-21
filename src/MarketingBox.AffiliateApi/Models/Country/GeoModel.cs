@@ -2,7 +2,7 @@ using System;
 
 namespace MarketingBox.AffiliateApi.Models.Country
 {
-    public class Geo
+    public class GeoModel
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }

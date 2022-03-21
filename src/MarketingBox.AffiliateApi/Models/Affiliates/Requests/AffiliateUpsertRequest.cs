@@ -1,12 +1,11 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Partners.Requests
+﻿namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
 {
-    public class AffiliateUpdateRequest
+    public class AffiliateUpsertRequest
     {
         public AffiliateGeneralInfo GeneralInfo { get; set; }
 
         public AffiliateCompany Company { get; set; }
 
         public AffiliateBank Bank { get; set; }
-        public long Sequence { get; set; }
     }
 }

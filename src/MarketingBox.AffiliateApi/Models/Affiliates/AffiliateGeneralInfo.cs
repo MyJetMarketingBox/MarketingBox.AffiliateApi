@@ -1,6 +1,7 @@
-﻿using System;
+﻿using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
+using MarketingBox.Affiliate.Service.Domain.Models.Common;
 
-namespace MarketingBox.AffiliateApi.Models.Partners
+namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
     public class AffiliateGeneralInfo
     {
@@ -10,10 +11,7 @@ namespace MarketingBox.AffiliateApi.Models.Partners
         public string Phone { get; set; }
         public string Skype { get; set; }
         public string ZipCode { get; set; }
-        public AffiliateRole Role { get; set; }
-        public AffiliateState State { get; set; }
+        public State State { get; set; }
         public Currency Currency { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string ApiKey { get; set; }
     }
 }

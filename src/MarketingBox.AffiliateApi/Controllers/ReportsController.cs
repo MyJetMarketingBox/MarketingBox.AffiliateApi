@@ -66,7 +66,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _reportService.SearchAsync(_mapper.Map<ReportSearchRequest>(request));
 
             return this.ProcessResult(response,
-                response.Data?.Select(x => _mapper.Map<ReportModel>(x))
+                response.Data?.Select(_mapper.Map<ReportModel>)
                     .ToArray()
                     .Paginate(request, Url, x => x.Id));
         }

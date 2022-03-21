@@ -1,8 +1,8 @@
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.Country;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Country;
 using MarketingBox.AffiliateApi.Models.Country;
-using GrpcModel = MarketingBox.Affiliate.Service.Domain.Models.Country;
-using ApiModel = MarketingBox.AffiliateApi.Models.Country.Requests;
-using GrpcRequestModel = MarketingBox.Affiliate.Service.Grpc.Models.Country;
+using MarketingBox.AffiliateApi.Models.Country.Requests;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles
 {
@@ -10,10 +10,10 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public CountryMapperProfile()
         {
-            CreateMap<GrpcModel.Country, Country>();
-            CreateMap<GrpcModel.Geo, Geo>();
-            CreateMap<ApiModel.GeoRequest, GrpcRequestModel.GeoCreateRequest>();
-            CreateMap<ApiModel.GeoRequest, GrpcRequestModel.GeoUpdateRequest>();
+            CreateMap<Country, CountryModel>();
+            CreateMap<Geo, GeoModel>();
+            CreateMap<GeoUpsertRequest, GeoCreateRequest>();
+            CreateMap<GeoUpsertRequest, GeoUpdateRequest>();
         }
     }
 }

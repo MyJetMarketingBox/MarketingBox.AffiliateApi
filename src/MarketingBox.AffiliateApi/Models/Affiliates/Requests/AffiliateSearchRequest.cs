@@ -1,5 +1,4 @@
 ﻿using System;
-using MarketingBox.AffiliateApi.Models.Partners;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +12,10 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
         [FromQuery(Name = "username")]
         public string Username { get; set; }
 
-        [FromQuery(Name = "role")]
-        public AffiliateRole? Role { get; set; }
-
         [FromQuery(Name = "email")]
         public string Email { get; set; }
 
         [FromQuery(Name = "createdAt")]
-        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }
