@@ -5,11 +5,13 @@ using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.Sdk.Common.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/[controller]")]
     public class OffersController : ControllerBase
     {

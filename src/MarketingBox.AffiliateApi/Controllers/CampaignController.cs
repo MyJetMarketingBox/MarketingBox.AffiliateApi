@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Authorization;
+using MarketingBox.AffiliateApi.Models.Campaigns;
 using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;

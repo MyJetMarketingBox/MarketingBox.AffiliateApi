@@ -4,11 +4,13 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.Sdk.Common.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/[controller]")]
     public class AffiliatePayoutsController : ControllerBase
     {
