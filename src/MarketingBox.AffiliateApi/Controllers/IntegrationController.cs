@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/integrations")]
     public class IntegrationController : ControllerBase

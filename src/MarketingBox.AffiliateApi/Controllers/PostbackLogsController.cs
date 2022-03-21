@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MarketingBox.AffiliateApi.Authorization;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.Postback.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +14,7 @@ using EventReferenceLog = MarketingBox.AffiliateApi.Models.PostbackLogs.EventRef
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
+    [Authorize]
     [ApiController]
     [Route("/api/[controller]/")]
     public class PostbackLogsController : ControllerBase

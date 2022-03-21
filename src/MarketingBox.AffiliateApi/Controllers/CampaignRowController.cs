@@ -8,10 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoWrapper.Wrappers;
-using MarketingBox.Affiliate.Service.Grpc.Requests.CampaignRows;
 using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Models.CampaignRows;
-using MarketingBox.AffiliateApi.Models.CampaignRows.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -21,7 +18,7 @@ using CampaignRowSearchRequest = MarketingBox.AffiliateApi.Models.CampaignRows.R
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/campaign-rows")]
     public class CampaignRowController : ControllerBase

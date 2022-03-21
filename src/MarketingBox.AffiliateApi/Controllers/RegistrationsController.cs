@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoWrapper.Wrappers;
-using MarketingBox.AffiliateApi.Authorization;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
 using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
 using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
@@ -25,6 +24,7 @@ using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/registrations")]
     public class RegistrationsController : ControllerBase
     {
@@ -39,7 +39,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<RegistrationModel, long?>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Paginated<RegistrationModelForAffiliate, long?>), StatusCodes.Status200OK)]

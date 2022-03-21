@@ -9,11 +9,13 @@ using MarketingBox.AffiliateApi.Models.Country.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/api/[controller]")]
     public class GeoController : ControllerBase
     {
