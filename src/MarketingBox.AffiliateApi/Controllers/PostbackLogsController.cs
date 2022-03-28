@@ -42,7 +42,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
-                AffiliateId = this.GetAffiliateId()
+                AffiliateId = this.GetUserId()
             };
             var response = await _eventReferenceLogService.GetAsync(request);
             

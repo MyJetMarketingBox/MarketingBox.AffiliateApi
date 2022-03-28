@@ -9,7 +9,7 @@ namespace MarketingBox.AffiliateApi.Extensions
         {
             return controllerBase.User.GetTenantId();
         }
-        public static long GetAffiliateId(this ControllerBase controllerBase)
+        public static long GetUserId(this ControllerBase controllerBase)
         {
             return long.Parse(controllerBase.User.GetUserId());
         }

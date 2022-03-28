@@ -34,7 +34,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet]
         public async Task<ActionResult<Reference>> GetAsync()
         {
-            var affiliateId = this.GetAffiliateId();
+            var affiliateId = this.GetUserId();
             var result = await _postbackService.GetAsync(
                 new ByAffiliateIdRequest {AffiliateId = affiliateId});
 
@@ -45,7 +45,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Reference>> CreateAsync(
             [FromBody] ReferenceRequest request)
         {
-            request.AffiliateId = this.GetAffiliateId();
+            request.AffiliateId = this.GetUserId();
             var result = await _postbackService.CreateAsync(
                 _mapper.Map<CreateOrUpdateReferenceRequest>(request));
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
@@ -55,7 +55,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Reference>> UpdateAsync(
             [FromBody] ReferenceRequest request)
         {
-            request.AffiliateId = this.GetAffiliateId();
+            request.AffiliateId = this.GetUserId();
             var result = await _postbackService.UpdateAsync(
                 _mapper.Map<CreateOrUpdateReferenceRequest>(request));
 
@@ -65,7 +65,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteAsync()
         {
-            var affiliateId = this.GetAffiliateId();
+            var affiliateId = this.GetUserId();
             var result = await _postbackService.DeleteAsync(
                 new ByAffiliateIdRequest {AffiliateId = affiliateId});
             this.ProcessResult(result, true);

@@ -1,16 +1,22 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using AutoMapper;
 using AutoWrapper.Wrappers;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
 using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
 using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.AffiliateApi.Models.Registrations.Requests;
+using MarketingBox.Redistribution.Service.Domain.Models;
+using MarketingBox.Redistribution.Service.Grpc;
+using MarketingBox.Redistribution.Service.Grpc.Models;
 using MarketingBox.Reporting.Service.Domain.Models;
 using MarketingBox.Reporting.Service.Grpc;
 using MarketingBox.Sdk.Common.Exceptions;
@@ -18,6 +24,7 @@ using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Microsoft.Extensions.Logging;
 using RegistrationStatus = MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus;
 using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 
@@ -28,11 +35,20 @@ namespace MarketingBox.AffiliateApi.Controllers
     [Route("/api/registrations")]
     public class RegistrationsController : ControllerBase
     {
+        private readonly ILogger<RegistrationsController> _logger;
+        private readonly IMapper _mapper;
         private readonly IRegistrationService _registrationService;
+        private readonly IRegistrationImporter _registrationImporter;
 
-        public RegistrationsController(IRegistrationService registrationService)
+        public RegistrationsController(IRegistrationService registrationService, 
+            IRegistrationImporter registrationImporter, 
+            ILogger<RegistrationsController> logger, 
+            IMapper mapper)
         {
             _registrationService = registrationService;
+            _registrationImporter = registrationImporter;
+            _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -62,7 +78,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
             
             var tenantId = this.GetTenantId();
-            var masterAffiliateId = this.GetAffiliateId();
+            var masterAffiliateId = this.GetUserId();
             
             var response = await _registrationService.SearchAsync(new()
             {
@@ -80,6 +96,65 @@ namespace MarketingBox.AffiliateApi.Controllers
                     .Select(Map)
                     .ToArray()
                     .Paginate(request, Url, x => x.RegistrationId));
+        }
+        
+        [HttpPost("upload-file")]
+        public async Task<ActionResult> UploadFileAsync(IFormFile file)
+        {
+            try
+            {
+                await using var s = file.OpenReadStream();
+                using var br = new BinaryReader(s);
+                var bytes = br.ReadBytes((int)s.Length);
+
+                await _registrationImporter.ImportAsync(new ImportRequest()
+                {
+                    RegistrationsFile = bytes,
+                    UserId = this.GetUserId()
+                });
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw new ApiException(ex.Message);
+            }
+        }
+        
+        [HttpGet("files")]
+        public async Task<ActionResult<GetRegistrationFilesResponse>> GetFilesAsync()
+        {
+            try
+            {
+                var result = await _registrationImporter.GetRegistrationFilesAsync();
+
+                return this.ProcessResult(result, _mapper.Map<GetRegistrationFilesResponse>(result.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw new ApiException(ex.Message);
+            }
+        }
+        
+        [HttpGet("parse-file")]
+        public async Task<ActionResult<List<RegistrationFromFile>>> GetRegistrationsFromFileAsync([FromQuery] long fileId)
+        {
+            try
+            {
+                var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
+                {
+                    FileId = fileId
+                });
+
+                return this.ProcessResult(result, _mapper.Map<List<RegistrationFromFile>>(result.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw new ApiException(ex.Message);
+            }
         }
 
         private static RegistrationModel Map(RegistrationDetails registrationDetails)
