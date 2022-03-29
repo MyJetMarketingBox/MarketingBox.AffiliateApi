@@ -16,7 +16,6 @@
     <PackageReference Include="MarketingBox.Affiliate.Service.Client" Version="2.2.2" />
     <PackageReference Include="MarketingBox.Postback.Service.Client" Version="1.0.15" />
     <PackageReference Include="MarketingBox.Redistribution.Service.Client" Version="1.0.1" />
-    <PackageReference Include="MarketingBox.Registration.Service.Client" Version="3.3.5" />
     <PackageReference Include="MarketingBox.Reporting.Service.Client" Version="3.3.11" />
     <PackageReference Include="MarketingBox.Sdk.Common" Version="1.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
