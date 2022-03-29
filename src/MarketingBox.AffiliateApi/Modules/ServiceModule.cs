@@ -1,8 +1,6 @@
 ﻿using Autofac;
-using MarketingBox.Affiliate.Service.Client;
 using MarketingBox.Affiliate.Service.Messages;
 using MarketingBox.Affiliate.Service.Messages.Affiliates;
-using MarketingBox.Reporting.Service.Client;
 using MyJetWallet.Sdk.ServiceBus;
 
 namespace MarketingBox.AffiliateApi.Modules
@@ -11,9 +9,6 @@ namespace MarketingBox.AffiliateApi.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterAffiliateServiceClient(Program.Settings.AffiliateServiceUrl);
-            builder.RegisterReportingServiceClient(Program.Settings.ReportingServiceUrl);
-            
             var serviceBusClient = builder
                 .RegisterMyServiceBusTcpClient(
                     Program.ReloadedSettings(e => e.MarketingBoxServiceBusHostPort),
