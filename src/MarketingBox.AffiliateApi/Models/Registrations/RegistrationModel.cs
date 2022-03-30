@@ -1,4 +1,6 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Registrations
+﻿using MarketingBox.Registration.Service.Domain.Models.Common;
+
+namespace MarketingBox.AffiliateApi.Models.Registrations
 {
     public class RegistrationModel
     {

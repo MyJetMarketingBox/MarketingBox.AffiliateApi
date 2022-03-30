@@ -3,9 +3,7 @@ using System.Reflection;
 using System.Text;
 using Autofac;
 using AutoWrapper;
-using MarketingBox.AffiliateApi.Grpc;
 using MarketingBox.AffiliateApi.Modules;
-using MarketingBox.AffiliateApi.Services;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -118,8 +116,6 @@ namespace MarketingBox.AffiliateApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<HelloService, IHelloService>();
-
                 endpoints.MapGrpcSchemaRegistry();
 
                 endpoints.MapControllers();

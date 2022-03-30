@@ -28,9 +28,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly ICampaignRowService _campaignBoxService;
         private readonly IMapper _mapper;
 
-        public CampaignRowController(ICampaignRowService campaignBoxService)
+        public CampaignRowController(ICampaignRowService campaignBoxService, 
+            IMapper mapper)
         {
             _campaignBoxService = campaignBoxService;
+            _mapper = mapper;
         }
 
         /// <summary>
