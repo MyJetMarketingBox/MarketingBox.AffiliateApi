@@ -1,14 +1,10 @@
-using MarketingBox.AffiliateApi.Models.Affiliates;
-using MarketingBox.AffiliateApi.Models.Campaigns;
-using MarketingBox.AffiliateApi.Models.Offers;
-
 namespace MarketingBox.AffiliateApi.Models.OfferAffiliates
 {
     public class OfferAffiliateModel
     {
         public long Id { get; set; }
-        public CampaignModel Campaign { get; set; }
-        public AffiliateModel Affiliate { get; set; }
-        public OfferModel Offer { get; set; }
+        public long? CampaignId { get; set; }
+        public long? AffiliateId { get; set; }
+        public long? OfferId { get; set; }
     }
 }

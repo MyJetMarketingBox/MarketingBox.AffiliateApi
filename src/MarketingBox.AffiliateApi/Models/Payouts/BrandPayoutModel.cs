@@ -12,7 +12,6 @@ namespace MarketingBox.AffiliateApi.Models.Payouts
         public decimal Amount { get; set; }
         public Currency Currency { get; set; }
         public PayoutType PayoutType { get; set; }
-        public ICollection<BrandModel> Brands { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
         public GeoModel Geo { get; set; }
