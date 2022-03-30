@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
 using MarketingBox.Affiliate.Service.Domain.Models.OfferAffiliates;
+using MarketingBox.AffiliateApi.Models.OfferAffiliates;
+using MarketingBox.AffiliateApi.Models.Payouts;
 
 namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
@@ -14,8 +16,8 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
 
         public AffiliateBank Bank { get; set; }
         
-        public List<AffiliatePayout> Payouts { get; set; } = new ();
+        public List<AffiliatePayoutModel> Payouts { get; set; } = new ();
 
-        public List<OfferAffiliate> OfferAffiliates { get; set; } = new ();
+        public List<OfferAffiliateModel> OfferAffiliates { get; set; } = new ();
     }
 }

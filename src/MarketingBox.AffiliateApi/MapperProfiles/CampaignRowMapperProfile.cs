@@ -12,7 +12,10 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
         {
             CreateMap<CampaignRowUpsertRequest, CampaignRowCreateRequest>();
             CreateMap<CampaignRowUpsertRequest, CampaignRowUpdateRequest>();
-            CreateMap<CampaignRow, CampaignRowModel>();
+            CreateMap<CampaignRow, CampaignRowModel>()
+                .ForMember(x => x.CampaignRowId, x => x.MapFrom(z => z.Id))
+                .ForMember(x => x.GeoId, x => x.MapFrom(z => z.Geo.Id))
+                .ForMember(x => x.GeoName, x => x.MapFrom(z => z.Geo.Name));
         }
     }
 }

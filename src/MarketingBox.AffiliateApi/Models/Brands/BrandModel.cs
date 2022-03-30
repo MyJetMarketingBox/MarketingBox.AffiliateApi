@@ -3,6 +3,7 @@ using MarketingBox.Affiliate.Service.Domain.Models.Brands;
 using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
 using MarketingBox.AffiliateApi.Models.CampaignRows;
 using MarketingBox.AffiliateApi.Models.Integrations;
+using MarketingBox.AffiliateApi.Models.Payouts;
 
 namespace MarketingBox.AffiliateApi.Models.Brands
 {
@@ -22,6 +23,6 @@ namespace MarketingBox.AffiliateApi.Models.Brands
 
         public List<CampaignRowModel> CampaignRows { get; set; } = new ();
 
-        public List<BrandPayout> Payouts { get; set; } = new ();
+        public List<BrandPayoutModel> Payouts { get; set; } = new ();
     }
 }

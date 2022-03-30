@@ -11,7 +11,7 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
         public string Phone { get; set; }
         public string Skype { get; set; }
         public string ZipCode { get; set; }
-        public State State { get; set; }
-        public Currency Currency { get; set; }
+        public State? State { get; set; }
+        public Currency? Currency { get; set; }
     }
 }
