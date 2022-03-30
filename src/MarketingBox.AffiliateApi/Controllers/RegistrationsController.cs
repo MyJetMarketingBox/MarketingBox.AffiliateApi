@@ -191,7 +191,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
         }
         [HttpGet("status-log")]
-        public async Task<ActionResult<StatusChangeLog>> GetStatusLogAsync(
+        public async Task<ActionResult<List<StatusChangeLog>>> GetStatusLogAsync(
             [FromQuery] long? userId, 
             [FromQuery] long? registrationId, 
             [FromQuery] UpdateMode? mode)
@@ -205,7 +205,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     UserId = userId
                 });
                     
-                return this.ProcessResult(response, _mapper.Map<StatusChangeLog>(response.Data));
+                return this.ProcessResult(response, _mapper.Map<List<StatusChangeLog>>(response.Data));
             }
             catch (Exception ex)
             {
