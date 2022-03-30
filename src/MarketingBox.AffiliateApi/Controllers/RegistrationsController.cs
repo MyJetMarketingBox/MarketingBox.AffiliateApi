@@ -17,15 +17,19 @@ using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 using MarketingBox.Redistribution.Service.Domain.Models;
 using MarketingBox.Redistribution.Service.Grpc;
 using MarketingBox.Redistribution.Service.Grpc.Models;
+using MarketingBox.Registration.Service.Domain.Models.Common;
+using MarketingBox.Registration.Service.Domain.Models.Registrations.Deposit;
+using MarketingBox.Registration.Service.Grpc;
+using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using MarketingBox.Reporting.Service.Domain.Models;
-using MarketingBox.Reporting.Service.Grpc;
 using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.Extensions.Logging;
-using RegistrationStatus = MarketingBox.AffiliateApi.Models.Registrations.RegistrationStatus;
+using IRegistrationService = MarketingBox.Reporting.Service.Grpc.IRegistrationService;
+using RegistrationStatus = MarketingBox.Registration.Service.Domain.Models.Common.RegistrationStatus;
 using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 
 namespace MarketingBox.AffiliateApi.Controllers
@@ -39,16 +43,19 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly IMapper _mapper;
         private readonly IRegistrationService _registrationService;
         private readonly IRegistrationImporter _registrationImporter;
+        private readonly IDepositService _depositService;
 
         public RegistrationsController(IRegistrationService registrationService, 
             IRegistrationImporter registrationImporter, 
             ILogger<RegistrationsController> logger, 
-            IMapper mapper)
+            IMapper mapper, 
+            IDepositService depositService)
         {
             _registrationService = registrationService;
             _registrationImporter = registrationImporter;
             _logger = logger;
             _mapper = mapper;
+            _depositService = depositService;
         }
 
         /// <summary>
@@ -149,6 +156,56 @@ namespace MarketingBox.AffiliateApi.Controllers
                 });
 
                 return this.ProcessResult(result, _mapper.Map<List<RegistrationFromFile>>(result.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw new ApiException(ex.Message);
+            }
+        }
+        
+        [HttpPut("update-status")]
+        public async Task<ActionResult<Deposit>> UpdateStatusAsync(
+            [FromQuery] long registrationId,
+            [FromQuery] Registration.Service.Domain.Models.Common.RegistrationStatus newStatus, 
+            [FromQuery] string comment)
+        {
+            try
+            {
+                var response = await _depositService.UpdateDepositStatusAsync(new UpdateDepositStatusRequest()
+                {
+                    Mode = UpdateMode.Manually,
+                    Comment = comment,
+                    NewStatus = newStatus,
+                    RegistrationId = registrationId,
+                    TenantId = this.GetTenantId(),
+                    UserId = this.GetUserId()
+                });
+                    
+                return this.ProcessResult(response, _mapper.Map<Deposit>(response.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw new ApiException(ex.Message);
+            }
+        }
+        [HttpGet("status-log")]
+        public async Task<ActionResult<StatusChangeLog>> GetStatusLogAsync(
+            [FromQuery] long? userId, 
+            [FromQuery] long? registrationId, 
+            [FromQuery] UpdateMode? mode)
+        {
+            try
+            {
+                var response = await _depositService.GetStatusChangeLogAsync(new GetStatusChangeLogRequest()
+                {
+                    Mode = mode,
+                    RegistrationId = registrationId,
+                    UserId = userId
+                });
+                    
+                return this.ProcessResult(response, _mapper.Map<StatusChangeLog>(response.Data));
             }
             catch (Exception ex)
             {

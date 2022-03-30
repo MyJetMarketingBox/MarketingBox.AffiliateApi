@@ -2,6 +2,7 @@
 using MarketingBox.Affiliate.Service.Client;
 using MarketingBox.Postback.Service.Client;
 using MarketingBox.Redistribution.Service.Client;
+using MarketingBox.Registration.Service.Client;
 using MarketingBox.Reporting.Service.Client;
 
 namespace MarketingBox.AffiliateApi.Modules
@@ -14,6 +15,7 @@ namespace MarketingBox.AffiliateApi.Modules
             builder.RegisterRedistributionServiceClient(Program.Settings.RedistributionServiceUrl);
             builder.RegisterAffiliateServiceClient(Program.Settings.AffiliateServiceUrl);
             builder.RegisterReportingServiceClient(Program.Settings.ReportingServiceUrl);
+            builder.RegisterRegistrationServiceClient(Program.Settings.RegistrationServiceUrl);
         }
     }
 }
