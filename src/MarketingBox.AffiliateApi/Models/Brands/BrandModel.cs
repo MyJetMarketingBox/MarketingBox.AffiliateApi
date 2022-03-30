@@ -12,7 +12,7 @@ namespace MarketingBox.AffiliateApi.Models.Brands
 
         public string Name { get; set; }
 
-        public IntegrationModel Integration { get; set; }
+        public long? IntegrationId { get; set; }
 
         public IntegrationType IntegrationType { get; set; }
 

@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using MarketingBox.Affiliate.Service.Domain.Models.Common;
-using MarketingBox.AffiliateApi.Models.Affiliates;
 using MarketingBox.AffiliateApi.Models.Country;
 
 namespace MarketingBox.AffiliateApi.Models.Payouts
