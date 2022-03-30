@@ -1,4 +1,5 @@
-﻿using MarketingBox.Affiliate.Service.Domain.Models.Brands;
+﻿using System.Collections.Generic;
+using MarketingBox.Affiliate.Service.Domain.Models.Brands;
 using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
 
 namespace MarketingBox.AffiliateApi.Models.Brands.Requests
@@ -10,8 +11,8 @@ namespace MarketingBox.AffiliateApi.Models.Brands.Requests
         public long? IntegrationId { get; set; }
         
         public IntegrationType? IntegrationType { get; set; }
-        
-        public long? BrandPayoutId { get; set; }
+
+        public ICollection<long> BrandPayoutIds { get; set; }
         
         public BrandStatus? Status { get; set; }
 

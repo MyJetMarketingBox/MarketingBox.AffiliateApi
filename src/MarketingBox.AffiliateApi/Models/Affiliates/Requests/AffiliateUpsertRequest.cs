@@ -1,4 +1,6 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
+﻿using System.Collections.Generic;
+
+namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
 {
     public class AffiliateUpsertRequest
     {
@@ -7,5 +9,6 @@
         public AffiliateCompany Company { get; set; }
 
         public AffiliateBank Bank { get; set; }
+        public List<long> AffiliatePayoutIds { get; set; }
     }
 }

@@ -20,8 +20,8 @@ namespace MarketingBox.AffiliateApi.Models.Brands
 
         public BrandPrivacy Privacy { get; set; }
 
-        public ICollection<CampaignRowModel> CampaignRows { get; set; } = new List<CampaignRowModel>();
+        public List<CampaignRowModel> CampaignRows { get; set; } = new ();
 
-        public ICollection<BrandPayout> Payouts { get; set; } = new List<BrandPayout>();
+        public List<BrandPayout> Payouts { get; set; } = new ();
     }
 }
