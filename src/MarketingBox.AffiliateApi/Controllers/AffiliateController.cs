@@ -142,30 +142,5 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
         }
-
-        /// <summary>
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        [HttpDelete("{affiliateId}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> DeleteAsync(
-            [Required, FromRoute] long affiliateId)
-        {
-            try
-            {
-                await _serviceBusPublisher.PublishAsync(new AffiliateDeleteMessage()
-                {
-                    AffiliateId = affiliateId
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
-            }
-
-            return Ok();
-        }
     }
 }
