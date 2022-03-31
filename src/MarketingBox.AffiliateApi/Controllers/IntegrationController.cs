@@ -100,7 +100,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(IntegrationModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<IntegrationModel>> CreateAsync(
             
-            [FromBody] IntegrationCreateRequest request)
+            [FromBody] IntegrationUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
             var response = await _integrationService.CreateAsync(new ()
@@ -121,7 +121,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<IntegrationModel>> UpdateAsync(
             
             [Required, FromRoute] long integrationId,
-            [FromBody] IntegrationUpdateRequest request)
+            [FromBody] IntegrationUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
             var response = await _integrationService.UpdateAsync(new ()

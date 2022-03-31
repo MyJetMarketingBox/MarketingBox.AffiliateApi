@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
-using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.Sdk.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfferCreateRequestGRPC = MarketingBox.Affiliate.Service.Grpc.Requests.Offers.OfferCreateRequest;
+using OfferCreateRequestAPI = MarketingBox.AffiliateApi.Models.Offers.Requests.OfferCreateRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -26,10 +26,10 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpPost]
         public async Task<ActionResult<OfferModel>> CreateAsync(
-            [FromBody] OfferAffiliateUpsertRequest upsertRequest)
+            [FromBody] OfferCreateRequestAPI upsertRequest)
         {
             var response =
-                await _offerService.CreateAsync(_mapper.Map<OfferCreateRequest>(upsertRequest));
+                await _offerService.CreateAsync(_mapper.Map<OfferCreateRequestGRPC>(upsertRequest));
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 

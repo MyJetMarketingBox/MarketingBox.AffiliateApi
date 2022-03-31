@@ -1,4 +1,5 @@
-﻿using MarketingBox.AffiliateApi.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using MarketingBox.AffiliateApi.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Postback
 {
@@ -11,7 +12,7 @@ namespace MarketingBox.AffiliateApi.Models.Postback
         public string DepositReference { get; init; }
 
         public string DepositTGReference { get; init; }
-
+        [Required]
         public HttpQueryType? HttpQueryType { get; init; }
     }
 }
