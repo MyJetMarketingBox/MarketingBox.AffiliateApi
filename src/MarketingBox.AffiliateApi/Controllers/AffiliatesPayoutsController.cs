@@ -1,32 +1,53 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Models.Payouts;
+using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("/api/[controller]")]
     public class AffiliatePayoutsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IAffiliatePayoutService _brandPayoutService;
-        public AffiliatePayoutsController(IMapper mapper, IAffiliatePayoutService brandPayoutService)
+        private readonly IAffiliatePayoutService _affiliatePayoutService;
+        public AffiliatePayoutsController(IMapper mapper, IAffiliatePayoutService affiliatePayoutService)
         {
             _mapper = mapper;
-            _brandPayoutService = brandPayoutService;
+            _affiliatePayoutService = affiliatePayoutService;
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<Paginated<AffiliatePayoutModel,long?>>> SearchAsync(
+            [FromQuery] AffiliatePayoutSearchRequest request)
+        {
+            var response = await _affiliatePayoutService.SearchAsync(new()
+            {
+                EntityId = request.AffiliateId,
+                Asc = request.Order == PaginationOrder.Asc,
+                Cursor = request.Cursor,
+                Take = request.Limit,
+            });
+            return this.ProcessResult(
+                response, response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)
+                    .ToArray()
+                    .Paginate(request, Url, x => x.Id));
         }
 
-        [HttpGet]
+        [HttpGet("{affiliatePayoutId}")]
         public async Task<ActionResult<AffiliatePayoutModel>> GetAsync(
             [FromQuery] long affiliatePayoutId)
         {
-            var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest(){PayoutId = affiliatePayoutId});
+            var response = await _affiliatePayoutService.GetAsync(new PayoutByIdRequest(){PayoutId = affiliatePayoutId});
             return this.ProcessResult(
                 response,_mapper.Map<AffiliatePayoutModel>(response.Data));
         }
@@ -34,7 +55,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         public async Task<ActionResult<AffiliatePayoutModel>> CreateAsync([FromBody] PayoutUpsertRequest request)
         {
-            var response = await _brandPayoutService.CreateAsync(_mapper.Map<PayoutCreateRequest>(request));
+            var response = await _affiliatePayoutService.CreateAsync(_mapper.Map<PayoutCreateRequest>(request));
             return this.ProcessResult(response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
 
@@ -45,14 +66,14 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var requestGrpc = _mapper.Map<PayoutUpdateRequest>(request);
             requestGrpc.Id = affiliatePayoutId;
-            var response = await _brandPayoutService.UpdateAsync(requestGrpc);
+            var response = await _affiliatePayoutService.UpdateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
 
         [HttpDelete("{affiliatePayoutId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int affiliatePayoutId)
         {
-            var response = await _brandPayoutService.DeleteAsync(new PayoutByIdRequest {PayoutId = affiliatePayoutId});
+            var response = await _affiliatePayoutService.DeleteAsync(new PayoutByIdRequest {PayoutId = affiliatePayoutId});
             return this.ProcessResult(response);
         }
     }

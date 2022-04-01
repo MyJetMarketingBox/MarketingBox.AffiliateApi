@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MarketingBox.Affiliate.Service.Domain.Models.Common;
 
-namespace MarketingBox.AffiliateApi.Models.Payouts
+namespace MarketingBox.AffiliateApi.Models.Payouts.Requests
 {
     public class PayoutUpsertRequest
     {

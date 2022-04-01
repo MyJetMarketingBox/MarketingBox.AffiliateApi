@@ -1,16 +1,20 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Models.Payouts;
+using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("/api/[controller]")]
     public class BrandPayoutsController : ControllerBase
     {
@@ -21,8 +25,25 @@ namespace MarketingBox.AffiliateApi.Controllers
             _mapper = mapper;
             _brandPayoutService = brandPayoutService;
         }
-
+        
         [HttpGet]
+        public async Task<ActionResult<Paginated<BrandPayoutModel,long?>>> SearchAsync(
+            [FromQuery] BrandPayoutSearchRequest request)
+        {
+            var response = await _brandPayoutService.SearchAsync(new()
+            {
+                EntityId = request.BrandId,
+                Asc = request.Order == PaginationOrder.Asc,
+                Cursor = request.Cursor,
+                Take = request.Limit,
+            });
+            return this.ProcessResult(
+                response, response.Data?.Select(_mapper.Map<BrandPayoutModel>)
+                    .ToArray()
+                    .Paginate(request, Url, x => x.Id));
+        }
+
+        [HttpGet("{brandPayoutId}")]
         public async Task<ActionResult<BrandPayoutModel>> GetAsync(
             [FromQuery] long brandPayoutId)
         {

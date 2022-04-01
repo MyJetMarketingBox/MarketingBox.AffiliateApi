@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+﻿using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Models.CampaignRows.Requests
