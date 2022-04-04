@@ -45,7 +45,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpGet("{affiliatePayoutId}")]
         public async Task<ActionResult<AffiliatePayoutModel>> GetAsync(
-            [FromQuery] long affiliatePayoutId)
+            [FromRoute] long affiliatePayoutId)
         {
             var response = await _affiliatePayoutService.GetAsync(new PayoutByIdRequest(){PayoutId = affiliatePayoutId});
             return this.ProcessResult(
