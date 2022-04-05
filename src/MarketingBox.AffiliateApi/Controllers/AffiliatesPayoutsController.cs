@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("/api/[controller]")]
     public class AffiliatePayoutsController : ControllerBase
     {

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("/api/countries")]
     public class CountryController : ControllerBase
     {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Reports;
@@ -8,14 +7,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using MarketingBox.Reporting.Service.Domain.Models.Reports.Requests;
-using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
-using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
-using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -44,22 +39,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(
             [FromQuery] Models.Reports.Requests.ReportSearchRequest request)
         {
-            if (request.Limit is < 1 or > 1000)
-            {
-                throw new ApiException(new Error
-                {
-                    ErrorMessage = BadRequestException.DefaultErrorMessage,
-                    ValidationErrors = new List<ValidationError>
-                    {
-                        new ()
-                        {
-                            ErrorMessage = "Should be in the range 1..1000",
-                            ParameterName = nameof(request.Limit)
-                        }
-                    }
-                });
-            }
-
             var tenantId = this.GetTenantId();
             request.TenantId = tenantId;
             var response = await _reportService.SearchAsync(_mapper.Map<ReportSearchRequest>(request));

@@ -22,15 +22,12 @@ using MarketingBox.Registration.Service.Domain.Models.Registrations.Deposit;
 using MarketingBox.Registration.Service.Grpc;
 using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using MarketingBox.Reporting.Service.Domain.Models;
-using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
-using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.Extensions.Logging;
 using IRegistrationService = MarketingBox.Reporting.Service.Grpc.IRegistrationService;
 using RegistrationStatus = MarketingBox.Registration.Service.Domain.Models.Common.RegistrationStatus;
-using ValidationError = MarketingBox.Sdk.Common.Models.ValidationError;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -68,22 +65,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<RegistrationModel, long?>>> SearchAsync(
             [FromQuery] RegistrationSearchRequest request)
         {
-            if (request.Limit is < 1 or > 1000)
-            {
-                throw new ApiException(new Error
-                {
-                    ErrorMessage = BadRequestException.DefaultErrorMessage,
-                    ValidationErrors = new List<ValidationError>
-                    {
-                        new ()
-                        {
-                            ErrorMessage = "Should be in the range 1..1000",
-                            ParameterName = nameof(request.Limit)
-                        }
-                    }
-                });
-            }
-            
             var tenantId = this.GetTenantId();
             var masterAffiliateId = this.GetUserId();
             

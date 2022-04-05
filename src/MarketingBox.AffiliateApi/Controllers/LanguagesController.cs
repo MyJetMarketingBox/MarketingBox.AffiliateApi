@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests;
-using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Language;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;

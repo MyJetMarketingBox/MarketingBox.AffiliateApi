@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -7,12 +6,10 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using System.Linq;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using MarketingBox.Affiliate.Service.Messages.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates.Requests;
 using MarketingBox.Sdk.Common.Extensions;
-using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
