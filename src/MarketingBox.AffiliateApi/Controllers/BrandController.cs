@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("/api/brands")]
     public class BrandController : ControllerBase
@@ -100,7 +100,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<BrandModel>> CreateAsync(
             [FromBody] BrandUpsertRequest request)
         {
-            var tenantId = "default-tenant-id";//this.GetTenantId();
+            var tenantId = this.GetTenantId();
 
             var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Brands.BrandCreateRequest>(request);
             requestGrpc.TenantId = tenantId;

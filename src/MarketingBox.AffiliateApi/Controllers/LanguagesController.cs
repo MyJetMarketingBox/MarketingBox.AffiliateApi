@@ -8,10 +8,13 @@ using MarketingBox.AffiliateApi.Models.Language;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
+    [Authorize]
+    [ApiController]
     [Route("api/[controller]")]
     public class LanguagesController : ControllerBase
     {

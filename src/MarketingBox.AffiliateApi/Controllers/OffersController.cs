@@ -11,7 +11,7 @@ using OfferCreateRequestGRPC = MarketingBox.Affiliate.Service.Grpc.Requests.Offe
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-   // [Authorize]
+    [Authorize]
     [Route("/api/[controller]")]
     public class OffersController : ControllerBase
     {
