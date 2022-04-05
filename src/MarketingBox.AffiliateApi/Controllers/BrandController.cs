@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("/api/brands")]
     public class BrandController : ControllerBase
@@ -57,7 +57,6 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             var tenantId = this.GetTenantId();
-            var status = request.Status?.MapEnum<MarketingBox.Affiliate.Service.Domain.Models.Brands.BrandStatus>();
 
             var response = await _brandService.SearchAsync(new()
             {
@@ -66,7 +65,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 BrandId = request.Id,
                 IntegrationId = request.IntegrationId,
                 Name = request.Name,
-                Status = status,
                 Take = request.Limit,
                 TenantId = tenantId
             });
@@ -88,7 +86,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<BrandModel>> GetAsync(
             [FromRoute, Required] long brandId)
         {
-            var tenantId = this.GetTenantId();
             var response = await _brandService.GetAsync(new() {BrandId = brandId});
 
             return this.ProcessResult(response, _mapper.Map<BrandModel>(response.Data));
@@ -103,8 +100,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<BrandModel>> CreateAsync(
             [FromBody] BrandUpsertRequest request)
         {
-            var tenantId = this.GetTenantId();
-            
+            var tenantId = "default-tenant-id";//this.GetTenantId();
+
             var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Brands.BrandCreateRequest>(request);
             requestGrpc.TenantId = tenantId;
             var response = await _brandService.CreateAsync(requestGrpc);

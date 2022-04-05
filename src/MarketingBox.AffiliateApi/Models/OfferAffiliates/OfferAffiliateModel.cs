@@ -6,5 +6,6 @@ namespace MarketingBox.AffiliateApi.Models.OfferAffiliates
         public long CampaignId { get; set; }
         public long AffiliateId { get; set; }
         public long OfferId { get; set; }
+        public string ProxyLink { get; set; }
     }
 }

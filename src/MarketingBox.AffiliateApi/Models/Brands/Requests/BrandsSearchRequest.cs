@@ -14,8 +14,5 @@ namespace MarketingBox.AffiliateApi.Models.Brands.Requests
 
         [FromQuery(Name = "integrationId")]
         public long? IntegrationId { get; set; }
-
-        [FromQuery(Name = "status")]
-        public BrandStatus? Status { get; set; }
     }
 }

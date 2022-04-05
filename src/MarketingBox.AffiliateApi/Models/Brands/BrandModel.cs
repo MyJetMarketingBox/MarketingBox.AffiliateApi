@@ -13,16 +13,14 @@ namespace MarketingBox.AffiliateApi.Models.Brands
 
         public string Name { get; set; }
 
-        public long? IntegrationId { get; set; }
+        public IntegrationModel Integration { get; set; }
 
         public IntegrationType IntegrationType { get; set; }
-
-        public BrandStatus Status { get; set; }
-
-        public BrandPrivacy Privacy { get; set; }
 
         public List<CampaignRowModel> CampaignRows { get; set; } = new ();
 
         public List<BrandPayoutModel> Payouts { get; set; } = new ();
+        public string Link { get; set; }
+        public LinkParametersModel LinkParameters { get; set; }
     }
 }

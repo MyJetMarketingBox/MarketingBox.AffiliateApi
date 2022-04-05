@@ -1,10 +1,9 @@
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Domain.Models.Offers;
-using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Offers.Requests;
-using OfferCreateRequestAPI = MarketingBox.AffiliateApi.Models.Offers.Requests.OfferCreateRequest;
 using OfferCreateRequestGRPC = MarketingBox.Affiliate.Service.Grpc.Requests.Offers.OfferCreateRequest;
+using OfferUpdateRequestGRPC = MarketingBox.Affiliate.Service.Grpc.Requests.Offers.OfferUpdateRequest;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles
 {
@@ -12,11 +11,9 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public OfferMapperProfile()
         {
-            CreateMap<OfferCreateRequestAPI, OfferCreateRequestGRPC>();
-            CreateMap<OfferSubParameterRequest, OfferSubParameterCreateRequest>();
-
+            CreateMap<OfferUpsertRequest, OfferCreateRequestGRPC>();
+            CreateMap<OfferUpsertRequest, OfferUpdateRequestGRPC>();
             CreateMap<Offer, OfferModel>();
-            CreateMap<OfferSubParameter, OfferSubParameterModel>();
         }
     }
 }
