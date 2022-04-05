@@ -67,7 +67,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(response,
                 response.Data?.Select(_mapper.Map<ReportModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.Id));
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
     }
 }

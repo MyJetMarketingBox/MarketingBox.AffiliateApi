@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("/api/countries")]
     public class CountryController : ControllerBase
     {
@@ -39,7 +39,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<CountryModel>)
                     .ToArray()
-                    .Paginate(paginationRequest, Url, x => x.Id));
+                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }  
     }
 }

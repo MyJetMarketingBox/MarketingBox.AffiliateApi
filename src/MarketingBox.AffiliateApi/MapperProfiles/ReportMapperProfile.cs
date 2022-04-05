@@ -6,7 +6,7 @@ using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles
 {
-    public class ReportMapperProfile: Profile
+    public class ReportMapperProfile : Profile
     {
         public ReportMapperProfile()
         {
@@ -15,9 +15,9 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
                 .ForMember(x => x.TenantId,
                     x => x.MapFrom(z => z.TenantId))
                 .ForMember(x => x.Asc,
-                    x=>x.MapFrom((s,d)=>d.Asc=s.Order==PaginationOrder.Asc))
+                    x => x.MapFrom((s, d) => d.Asc = s.Order == PaginationOrder.Asc))
                 .ForMember(x => x.Take,
-                    x => x.MapFrom(z => z.Limit));
+                    x => x.MapFrom(z => z.Limit ?? default));
         }
     }
 }

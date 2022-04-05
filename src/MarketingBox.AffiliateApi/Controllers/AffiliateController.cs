@@ -52,22 +52,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<AffiliateModel, long?>>> SearchAsync(
             [FromQuery] AffiliateSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
-            {
-                throw new ApiException(new Error
-                {
-                    ErrorMessage = "validation error",
-                    ValidationErrors = new()
-                    {
-                        new()
-                        {
-                            ParameterName = nameof(request.Limit),
-                            ErrorMessage = "Should be in the range 1..1000"
-                        }
-                    }
-                });
-            }
-
             var tenantId = this.GetTenantId();
 
             var response = await _affiliateService.SearchAsync(new()
@@ -86,7 +70,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<AffiliateModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.Id));
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         /// <summary>

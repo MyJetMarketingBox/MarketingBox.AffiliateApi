@@ -4,13 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Brands;
 using MarketingBox.AffiliateApi.Models.Brands.Requests;
 using MarketingBox.Sdk.Common.Extensions;
-using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
@@ -40,22 +38,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<BrandModel, long?>>> SearchAsync(
             [FromQuery] BrandsSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
-            {
-                throw new ApiException(new Error
-                {
-                    ErrorMessage = "validation error",
-                    ValidationErrors = new()
-                    {
-                        new()
-                        {
-                            ParameterName = nameof(request.Limit),
-                            ErrorMessage = "Should be in the range 1..1000"
-                        }
-                    }
-                });
-            }
-
             var tenantId = this.GetTenantId();
 
             var response = await _brandService.SearchAsync(new()
@@ -74,7 +56,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<BrandModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.Id));
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         /// <summary>

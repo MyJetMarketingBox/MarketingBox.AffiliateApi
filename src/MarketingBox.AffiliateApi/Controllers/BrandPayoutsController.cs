@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("/api/[controller]")]
     public class BrandPayoutsController : ControllerBase
     {
@@ -40,7 +40,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(
                 response, response.Data?.Select(_mapper.Map<BrandPayoutModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.Id));
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpGet("{brandPayoutId}")]

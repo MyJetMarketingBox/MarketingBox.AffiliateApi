@@ -41,7 +41,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
-                Take = paginationRequest.Limit,
+                Take = paginationRequest.Limit ?? default,
                 AffiliateId = this.GetUserId()
             };
             var response = await _eventReferenceLogService.GetAsync(request);
@@ -51,7 +51,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<EventReferenceLog>)
                     .ToArray()
-                    .Paginate(paginationRequest, Url, x => x.Id));
+                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
     }
 }

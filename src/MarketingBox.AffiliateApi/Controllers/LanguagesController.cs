@@ -38,7 +38,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<LanguageModel>)
                     .ToArray()
-                    .Paginate(paginationRequest, Url, x => x.Id));
+                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }  
     }
 }

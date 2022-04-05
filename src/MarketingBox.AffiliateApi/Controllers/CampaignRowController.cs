@@ -44,22 +44,6 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<CampaignRowModel, long?>>> SearchAsync(
             [FromQuery] CampaignRowSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
-            {
-                throw new ApiException(new Error
-                {
-                    ErrorMessage = "validation error",
-                    ValidationErrors = new()
-                    {
-                        new()
-                        {
-                            ParameterName = nameof(request.Limit),
-                            ErrorMessage = "Should be in the range 1..1000"
-                        }
-                    }
-                });
-            }
-
             var tenantId = this.GetTenantId();
 
             var response = await _campaignBoxService.SearchAsync(new()
@@ -77,7 +61,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(_mapper.Map<CampaignRowModel>)
                     .ToArray()
-                    .Paginate(request, Url, x => x.CampaignRowId));
+                    .Paginate(request, Url, response.Total ?? default, x => x.CampaignRowId));
         }
 
         /// <summary>

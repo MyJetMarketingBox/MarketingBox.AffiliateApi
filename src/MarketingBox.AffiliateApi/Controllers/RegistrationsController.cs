@@ -91,7 +91,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
-                Take = request.Limit,
+                Take = request.Limit ?? default,
                 TenantId = tenantId,
                 AffiliateId = request.AffiliateId,
                 MasterAffiliateId = masterAffiliateId,
@@ -102,7 +102,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 response.Data?
                     .Select(Map)
                     .ToArray()
-                    .Paginate(request, Url, x => x.RegistrationId));
+                    .Paginate(request, Url, response.Total ?? default, x => x.RegistrationId));
         }
         
         [HttpPost("upload-file")]
