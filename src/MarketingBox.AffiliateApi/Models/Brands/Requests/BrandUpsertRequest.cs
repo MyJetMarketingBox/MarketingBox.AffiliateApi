@@ -14,7 +14,7 @@ namespace MarketingBox.AffiliateApi.Models.Brands.Requests
         [Required]
         public IntegrationType? IntegrationType { get; set; }
 
-        public ICollection<long> BrandPayoutIds { get; set; }
+        public List<long> BrandPayoutIds { get; set; }
         public string Link { get; set; }
         public LinkParametersModel LinkParameters { get; set; }
     }

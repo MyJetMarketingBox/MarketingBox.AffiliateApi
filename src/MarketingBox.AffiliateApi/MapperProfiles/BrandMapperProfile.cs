@@ -11,6 +11,7 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
         {
             CreateMap<BrandUpsertRequest, Affiliate.Service.Grpc.Requests.Brands.BrandCreateRequest>();
             CreateMap<BrandUpsertRequest, Affiliate.Service.Grpc.Requests.Brands.BrandUpdateRequest>();
+            CreateMap<LinkParameters, LinkParametersModel>().ReverseMap();
             CreateMap<Brand, BrandModel>();
         }
     }
