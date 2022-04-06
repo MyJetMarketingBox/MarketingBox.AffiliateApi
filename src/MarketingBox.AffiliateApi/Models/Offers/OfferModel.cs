@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Domain.Models.Offers;
+using MarketingBox.AffiliateApi.Models.Country;
+using MarketingBox.AffiliateApi.Models.Language;
+using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 
 namespace MarketingBox.AffiliateApi.Models.Offers
 {
@@ -9,9 +12,10 @@ namespace MarketingBox.AffiliateApi.Models.Offers
         public long Id { get; set; }
         public string Name { get; set; }
         public string Link { get; set; }
-        public List<int> GeoIds { get; set; }
+        public List<GeoModel> Geos { get; set; }
+        public List<OfferAffiliateModel> OfferAffiliates { get; set; }
         public Currency? Currency { get; set; }
-        public int? LanguageId { get; set; }
+        public LanguageModel Language { get; set; }
         public OfferPrivacy? Privacy { get; set; }
         public OfferState? State { get; set; }
         public long? BrandId { get; set; }

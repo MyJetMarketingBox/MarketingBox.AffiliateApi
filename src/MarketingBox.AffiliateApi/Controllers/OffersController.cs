@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Offers.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -30,6 +31,18 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var response =
                 await _offerService.CreateAsync(_mapper.Map<OfferCreateRequestGRPC>(upsertRequest));
+            return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
+        }
+        
+        [HttpPut("{offerId}")]
+        public async Task<ActionResult<OfferModel>> UpdateAsync(
+            [FromRoute] long offerId,
+            [FromBody] OfferUpsertRequest upsertRequest)
+        {
+            var request = _mapper.Map<OfferUpdateRequest>(upsertRequest);
+            request.OfferId = offerId;
+            var response =
+                await _offerService.UpdateAsync(request);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 
