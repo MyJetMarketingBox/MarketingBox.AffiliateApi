@@ -9,8 +9,8 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
     {
         [Required] public string Username { get; set; }
         [Required] public string Password { get; set; }
-        [Required] public string Email { get; set; }
-        [Required] public string Phone { get; set; }
+        [Required] public string Email { get; set; } 
+        public string Phone { get; set; }
         public string Skype { get; set; }
         public string ZipCode { get; set; }
 
