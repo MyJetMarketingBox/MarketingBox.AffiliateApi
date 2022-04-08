@@ -11,7 +11,6 @@ namespace MarketingBox.AffiliateApi.Models.Offers
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public string Link { get; set; }
         public List<GeoModel> Geos { get; set; }
         public List<OfferAffiliateModel> OfferAffiliates { get; set; }
         public Currency? Currency { get; set; }

@@ -1,5 +1,6 @@
 ﻿
 using MarketingBox.Affiliate.Service.Domain.Models.CampaignRows;
+using MarketingBox.AffiliateApi.Models.Country;
 
 namespace MarketingBox.AffiliateApi.Models.CampaignRows
 {
@@ -15,7 +16,6 @@ namespace MarketingBox.AffiliateApi.Models.CampaignRows
         public ActivityHours[] ActivityHours { get; set; }
         public string Information { get; set; }
         public bool EnableTraffic { get; set; }
-        public int? GeoId { get; set; }
-        public string GeoName { get; set; }
+        public GeoModel Geo { get; set; }
     }
 }
