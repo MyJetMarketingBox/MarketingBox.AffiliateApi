@@ -1,10 +1,14 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Offers.Requests;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfferCreateRequestGRPC = MarketingBox.Affiliate.Service.Grpc.Requests.Offers.OfferCreateRequest;
@@ -59,6 +63,33 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var response = await _offerService.DeleteAsync(new() {Id = offerId});
             return this.ProcessResult(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<Paginated<OfferModel, long?>>> SearchAsync(
+            [FromQuery] Models.Offers.Requests.OfferSearchRequest paginationRequest)
+        {
+            var affiliateId = this.GetUserId();
+            var request = new Affiliate.Service.Grpc.Requests.Offers.OfferSearchRequest
+            {
+                Asc = paginationRequest.Order == PaginationOrder.Asc,
+                Cursor = paginationRequest.Cursor,
+                Take = paginationRequest.Limit,
+                AffiliateId = affiliateId,
+                Currency = paginationRequest.Currency,
+                Privacy = paginationRequest.Privacy,
+                State = paginationRequest.State,
+                BrandId = paginationRequest.BrandId,
+                LanguageId = paginationRequest.LanguageId,
+                OfferName = paginationRequest.OfferName
+            };
+            var response = await _offerService.SearchAsync(request);
+            return this.ProcessResult(
+                response,
+                response.Data?
+                    .Select(_mapper.Map<OfferModel>)
+                    .ToArray()
+                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
     }
 }

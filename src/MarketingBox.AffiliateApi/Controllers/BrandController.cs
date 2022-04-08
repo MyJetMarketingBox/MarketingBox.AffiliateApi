@@ -46,6 +46,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = request.Cursor,
                 BrandId = request.Id,
                 IntegrationId = request.IntegrationId,
+                IntegrationType = request.IntegrationType,
                 Name = request.Name,
                 Take = request.Limit,
                 TenantId = tenantId
