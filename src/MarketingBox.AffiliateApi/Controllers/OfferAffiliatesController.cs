@@ -45,6 +45,19 @@ namespace MarketingBox.AffiliateApi.Controllers
                     .ToArray()
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
+        
+        [HttpGet("{offerAffiliateId}/url")]
+        public async Task<ActionResult<ProxyLinkModel>> GetUrl([FromRoute] long offerAffiliateId)
+        {
+            var url = await _offerAffiliateService.GetUrlAsync(new()
+            {
+                OfferAffiliateId = offerAffiliateId
+            });
+            return this.ProcessResult(url, new ProxyLinkModel
+            {
+                Url = url.Data
+            });
+        }
 
         [HttpPost]
         public async Task<ActionResult<OfferAffiliateModel>> CreateAsync([FromBody] OfferAffiliateUpsertRequest upsertRequest)
