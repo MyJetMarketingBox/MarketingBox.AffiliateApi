@@ -4,6 +4,7 @@ using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests;
 using MarketingBox.Affiliate.Service.Grpc.Requests.OfferAffiliate;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -49,9 +50,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet("{offerAffiliateId}/url")]
         public async Task<ActionResult<ProxyLinkModel>> GetUrl([FromRoute] long offerAffiliateId)
         {
+            var affiliateId = this.GetUserId();
             var url = await _offerAffiliateService.GetUrlAsync(new()
             {
-                OfferAffiliateId = offerAffiliateId
+                OfferAffiliateId = offerAffiliateId,
+                AffiliateId = affiliateId
             });
             return this.ProcessResult(url, new ProxyLinkModel
             {

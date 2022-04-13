@@ -43,8 +43,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] long offerId,
             [FromBody] OfferUpsertRequest upsertRequest)
         {
+            var affiliateId = this.GetUserId();
             var request = _mapper.Map<OfferUpdateRequest>(upsertRequest);
             request.OfferId = offerId;
+            request.AffiliateId = affiliateId;
             var response =
                 await _offerService.UpdateAsync(request);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
@@ -54,14 +56,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<OfferModel>> GetAsync(
             [FromRoute] int offerId)
         {
-            var response = await _offerService.GetAsync(new() {Id = offerId});
+            var affiliateId = this.GetUserId();
+            var response = await _offerService.GetAsync(new() {Id = offerId, AffiliateId = affiliateId});
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 
         [HttpDelete("{offerId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int offerId)
         {
-            var response = await _offerService.DeleteAsync(new() {Id = offerId});
+            var affiliateId = this.GetUserId();
+            var response = await _offerService.DeleteAsync(new() {Id = offerId, AffiliateId = affiliateId});
             return this.ProcessResult(response);
         }
 
