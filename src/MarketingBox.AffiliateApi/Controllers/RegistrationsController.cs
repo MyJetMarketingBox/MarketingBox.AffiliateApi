@@ -134,20 +134,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet("parse-file")]
         public async Task<ActionResult<List<RegistrationFromFile>>> GetRegistrationsFromFileAsync([FromQuery] long fileId)
         {
-            try
+            var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
             {
-                var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
-                {
-                    FileId = fileId
-                });
+                FileId = fileId
+            });
 
-                return this.ProcessResult(result, result?.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
-            }
+            return this.ProcessResult(result, result?.Data);
         }
         
         [HttpPut("update-status")]
