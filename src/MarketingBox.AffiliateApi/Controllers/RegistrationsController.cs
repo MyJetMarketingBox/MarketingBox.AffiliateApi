@@ -118,13 +118,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpGet("files")]
-        public async Task<ActionResult<GetRegistrationFilesResponse>> GetFilesAsync()
+        public async Task<ActionResult<List<RegistrationsFileHttp>>> GetFilesAsync()
         {
             try
             {
                 var result = await _registrationImporter.GetRegistrationFilesAsync();
 
-                return this.ProcessResult(result, _mapper.Map<GetRegistrationFilesResponse>(result.Data));
+                return this.ProcessResult(result, result?.Data?.Files.Select(_mapper.Map<RegistrationsFileHttp>).ToList());
             }
             catch (Exception ex)
             {
