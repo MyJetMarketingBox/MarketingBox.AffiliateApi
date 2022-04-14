@@ -88,7 +88,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpPost("upload-file")]
-        public async Task<ActionResult> UploadFileAsync(IFormFile file)
+        public async Task<ActionResult<ImportResponse>> UploadFileAsync(IFormFile file)
         {
             try
             {
@@ -102,13 +102,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 using var br = new BinaryReader(s);
                 var bytes = br.ReadBytes((int)s.Length);
 
-                await _registrationImporter.ImportAsync(new ImportRequest()
+                var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
                     RegistrationsFile = bytes,
                     UserId = this.GetUserId()
                 });
 
-                return Ok();
+                return this.ProcessResult(response, response?.Data);
             }
             catch (Exception ex)
             {
