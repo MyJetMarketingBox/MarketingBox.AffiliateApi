@@ -91,6 +91,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             try
             {
+                if (!file.FileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
+                    throw new ApiException("Unsupported file type");
+                
                 await using var s = file.OpenReadStream();
                 using var br = new BinaryReader(s);
                 var bytes = br.ReadBytes((int)s.Length);
@@ -148,7 +151,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPut("update-status")]
         public async Task<ActionResult<Deposit>> UpdateStatusAsync(
             [FromQuery] long registrationId,
-            [FromQuery] Registration.Service.Domain.Models.Common.RegistrationStatus newStatus, 
+            [FromQuery] RegistrationStatus newStatus, 
             [FromQuery] string comment)
         {
             try
