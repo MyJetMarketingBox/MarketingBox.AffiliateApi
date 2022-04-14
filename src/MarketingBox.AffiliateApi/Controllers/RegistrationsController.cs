@@ -23,6 +23,7 @@ using MarketingBox.Registration.Service.Grpc;
 using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using MarketingBox.Reporting.Service.Domain.Models;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.Extensions.Logging;
@@ -92,7 +93,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             try
             {
                 if (!file.FileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
-                    throw new ApiException("Unsupported file type");
+                    throw new ApiException(new Error()
+                    {
+                        ErrorMessage = "Unsupported file type"
+                    });
                 
                 await using var s = file.OpenReadStream();
                 using var br = new BinaryReader(s);
@@ -139,7 +143,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     FileId = fileId
                 });
 
-                return this.ProcessResult(result, _mapper.Map<List<RegistrationFromFile>>(result.Data));
+                return this.ProcessResult(result, result?.Data);
             }
             catch (Exception ex)
             {
