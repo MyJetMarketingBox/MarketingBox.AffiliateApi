@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MarketingBox.AffiliateApi.Models.Brands
 {
     public class LinkParametersModel
     {
+        [Required]
         public string ClickId { get; set; }
         public string Language { get; set; }
         public string MPC_1 { get; set; }
