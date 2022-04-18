@@ -22,7 +22,9 @@ using MarketingBox.Registration.Service.Domain.Models.Registrations.Deposit;
 using MarketingBox.Registration.Service.Grpc;
 using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
 using MarketingBox.Reporting.Service.Domain.Models;
+using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.Extensions.Logging;
@@ -87,37 +89,40 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpPost("upload-file")]
-        public async Task<ActionResult> UploadFileAsync(IFormFile file)
+        public async Task<ActionResult<ImportResponse>> UploadFileAsync(IFormFile file)
         {
             try
             {
+                if (!file.FileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
+                    throw new BadRequestException("Unsupported file type");
+
                 await using var s = file.OpenReadStream();
                 using var br = new BinaryReader(s);
                 var bytes = br.ReadBytes((int)s.Length);
 
-                await _registrationImporter.ImportAsync(new ImportRequest()
+                var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
                     RegistrationsFile = bytes,
                     UserId = this.GetUserId()
                 });
 
-                return Ok();
+                return this.ProcessResult(response, response?.Data);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
+                return ex.Failed<ImportResponse>();
             }
         }
         
         [HttpGet("files")]
-        public async Task<ActionResult<GetRegistrationFilesResponse>> GetFilesAsync()
+        public async Task<ActionResult<List<RegistrationsFileHttp>>> GetFilesAsync()
         {
             try
             {
                 var result = await _registrationImporter.GetRegistrationFilesAsync();
 
-                return this.ProcessResult(result, _mapper.Map<GetRegistrationFilesResponse>(result.Data));
+                return this.ProcessResult(result, result?.Data?.Files.Select(_mapper.Map<RegistrationsFileHttp>).ToList());
             }
             catch (Exception ex)
             {
@@ -129,26 +134,18 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet("parse-file")]
         public async Task<ActionResult<List<RegistrationFromFile>>> GetRegistrationsFromFileAsync([FromQuery] long fileId)
         {
-            try
+            var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
             {
-                var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
-                {
-                    FileId = fileId
-                });
+                FileId = fileId
+            });
 
-                return this.ProcessResult(result, _mapper.Map<List<RegistrationFromFile>>(result.Data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
-            }
+            return this.ProcessResult(result, result?.Data);
         }
         
         [HttpPut("update-status")]
         public async Task<ActionResult<Deposit>> UpdateStatusAsync(
             [FromQuery] long registrationId,
-            [FromQuery] Registration.Service.Domain.Models.Common.RegistrationStatus newStatus, 
+            [FromQuery] RegistrationStatus newStatus, 
             [FromQuery] string comment)
         {
             try
