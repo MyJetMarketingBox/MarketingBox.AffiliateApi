@@ -1,19 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Registrations;
+using MarketingBox.AffiliateApi.Models.Postback.Requests;
+using MarketingBox.AffiliateApi.Models.Redistribution;
 using MarketingBox.Redistribution.Service.Domain.Models;
 using MarketingBox.Redistribution.Service.Grpc;
 using MarketingBox.Redistribution.Service.Grpc.Models;
-using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -36,6 +30,24 @@ namespace MarketingBox.AffiliateApi.Controllers
             _logger = logger;
             _mapper = mapper;
         }
-        
+        [HttpPost]
+        public async Task<ActionResult<RedistributionEntity>> CreateAsync(
+            [FromBody] CreateRedistributionRequestHttp request)
+        {
+            var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
+            {
+                CreatedBy = this.GetUserId(),
+                AffiliateId = request.AffiliateId,
+                CampaignId = request.CampaignId,
+                Frequency = request.Frequency,
+                Status = RedistributionState.Disable,
+                PortionLimit = request.PortionLimit,
+                DayLimit = request.DayLimit,
+                RegistrationsIds = request.RegistrationsIds,
+                FilesIds = request.FilesIds,
+                RegistrationSearchRequest = request.RegistrationSearchRequest
+            });
+            return this.ProcessResult(response, response.Data);
+        }
     }
 }

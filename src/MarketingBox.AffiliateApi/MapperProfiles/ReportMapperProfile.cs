@@ -1,7 +1,7 @@
 using AutoMapper;
 using MarketingBox.AffiliateApi.Models.Reports;
 using MarketingBox.Reporting.Service.Domain.Models.Reports;
-using MarketingBox.Reporting.Service.Domain.Models.Reports.Requests;
+using MarketingBox.Reporting.Service.Grpc.Requests.Reports;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles

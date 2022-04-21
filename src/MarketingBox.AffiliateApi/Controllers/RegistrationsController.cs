@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -14,22 +13,16 @@ using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.R
 using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.AffiliateApi.Models.Registrations.Requests;
-using MarketingBox.Redistribution.Service.Domain.Models;
-using MarketingBox.Redistribution.Service.Grpc;
-using MarketingBox.Redistribution.Service.Grpc.Models;
-using MarketingBox.Registration.Service.Domain.Models.Common;
 using MarketingBox.Registration.Service.Domain.Models.Registrations.Deposit;
 using MarketingBox.Registration.Service.Grpc;
 using MarketingBox.Registration.Service.Grpc.Requests.Deposits;
-using MarketingBox.Reporting.Service.Domain.Models;
-using MarketingBox.Sdk.Common.Exceptions;
+using MarketingBox.Reporting.Service.Domain.Models.Registrations;
+using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Extensions;
-using MarketingBox.Sdk.Common.Models;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.Extensions.Logging;
 using IRegistrationService = MarketingBox.Reporting.Service.Grpc.IRegistrationService;
-using RegistrationStatus = MarketingBox.Registration.Service.Domain.Models.Common.RegistrationStatus;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -74,7 +67,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit ?? default,
                 TenantId = tenantId,
                 AffiliateId = request.AffiliateId,
-                MasterAffiliateId = masterAffiliateId,
                 Type = request.Type ?? RegistrationsReportType.All
             });
 
@@ -95,7 +87,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 var response = await _depositService.UpdateDepositStatusAsync(new UpdateDepositStatusRequest()
                 {
-                    Mode = UpdateMode.Manually,
+                    Mode = DepositUpdateMode.Manually,
                     Comment = comment,
                     NewStatus = newStatus,
                     RegistrationId = registrationId,
@@ -115,7 +107,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<List<StatusChangeLog>>> GetStatusLogAsync(
             [FromQuery] long? userId, 
             [FromQuery] long? registrationId, 
-            [FromQuery] UpdateMode? mode)
+            [FromQuery] DepositUpdateMode? mode)
         {
             try
             {
@@ -160,7 +152,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     Email = registrationDetails.Email,
                     CreatedAt = registrationDetails.CreatedAt,
                     ConversionDate = registrationDetails.ConversionDate,
-                    Country = registrationDetails.Country,
+                    Country = registrationDetails.CountryAlfa2Code,
                     FirstName = registrationDetails.FirstName,
                     Ip = registrationDetails.Ip,
                     LastName = registrationDetails.LastName,

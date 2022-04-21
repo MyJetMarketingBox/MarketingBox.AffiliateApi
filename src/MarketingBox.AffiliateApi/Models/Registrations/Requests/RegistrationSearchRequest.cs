@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MarketingBox.Reporting.Service.Domain.Models;
+using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.Models.Registrations.Requests

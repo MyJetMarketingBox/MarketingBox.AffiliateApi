@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using MarketingBox.Reporting.Service.Domain.Models.Reports.Requests;
+using MarketingBox.Reporting.Service.Grpc.Requests.Reports;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -37,7 +37,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Paginated<ReportModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(
-            [FromQuery] Models.Reports.Requests.ReportSearchRequest request)
+            [FromQuery] MarketingBox.AffiliateApi.Models.Reports.Requests.ReportSearchRequest request)
         {
             var tenantId = this.GetTenantId();
             request.TenantId = tenantId;

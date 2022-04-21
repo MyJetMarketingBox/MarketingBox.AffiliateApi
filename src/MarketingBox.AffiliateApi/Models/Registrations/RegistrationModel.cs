@@ -1,4 +1,4 @@
-﻿using MarketingBox.Registration.Service.Domain.Models.Common;
+﻿using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Registrations
 {
