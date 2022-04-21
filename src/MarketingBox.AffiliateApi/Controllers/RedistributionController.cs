@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.AffiliateApi.Models.Redistribution;
 using MarketingBox.Redistribution.Service.Domain.Models;
 using MarketingBox.Redistribution.Service.Grpc;
@@ -30,6 +30,15 @@ namespace MarketingBox.AffiliateApi.Controllers
             _logger = logger;
             _mapper = mapper;
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<RedistributionEntity>>> GetAsync(
+            [FromQuery] GetRedistributionsRequest request)
+        {
+            var result = await _redistributionService.GetRedistributionsAsync(request);
+            return this.ProcessResult(result, result.Data);
+        }
+
         [HttpPost]
         public async Task<ActionResult<RedistributionEntity>> CreateAsync(
             [FromBody] CreateRedistributionRequestHttp request)
@@ -47,6 +56,14 @@ namespace MarketingBox.AffiliateApi.Controllers
                 FilesIds = request.FilesIds,
                 RegistrationSearchRequest = request.RegistrationSearchRequest
             });
+            return this.ProcessResult(response, response.Data);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<RedistributionEntity>> UpdateState(
+            [FromBody] UpdateRedistributionStateRequest request)
+        {
+            var response = await _redistributionService.UpdateRedistributionStateAsync(request);
             return this.ProcessResult(response, response.Data);
         }
     }
