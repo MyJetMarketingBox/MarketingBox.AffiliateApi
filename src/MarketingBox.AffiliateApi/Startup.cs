@@ -44,7 +44,7 @@ namespace MarketingBox.AffiliateApi
                     {
                         builder
                             .AllowAnyOrigin()
-                            .AllowCredentials()
+                            //.AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
