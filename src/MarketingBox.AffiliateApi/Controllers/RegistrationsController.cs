@@ -58,7 +58,6 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromQuery] RegistrationSearchRequest request)
         {
             var tenantId = this.GetTenantId();
-            var masterAffiliateId = this.GetUserId();
             
             var response = await _registrationService.SearchAsync(new()
             {
@@ -67,7 +66,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit ?? default,
                 TenantId = tenantId,
                 AffiliateId = request.AffiliateId,
-                Type = request.Type ?? RegistrationsReportType.All
+                Type = request.Type ?? RegistrationsReportType.All,
+                Country = request.Country,
+                Status = request.Status,
+                CrmStatus = request.CrmStatus,
+                DateFrom = request.DateFrom,
+                DateTo = request.DateTo,
+                RegistrationId = request.RegistrationId
             });
 
             return this.ProcessResult(response,
