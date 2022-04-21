@@ -95,7 +95,7 @@ namespace MarketingBox.AffiliateApi
 
             app.UseRouting();
 
-            app.UseCors(_corsPolicy);
+            //app.UseCors(_corsPolicy);
 
             app.UseAuthentication();
 
