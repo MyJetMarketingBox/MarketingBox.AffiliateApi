@@ -36,7 +36,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromQuery] GetRedistributionsRequest request)
         {
             var result = await _redistributionService.GetRedistributionsAsync(request);
-            return this.ProcessResult(result, result.Data);
+            return this.ProcessResult(result, result.Data ?? new List<RedistributionEntity>());
         }
 
         [HttpPost]
