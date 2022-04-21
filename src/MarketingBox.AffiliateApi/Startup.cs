@@ -37,18 +37,20 @@ namespace MarketingBox.AffiliateApi
         {
             services.BindCodeFirstGrpc();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy(_corsPolicy,
-                    builder =>
-                    {
-                        builder
-                            .AllowAnyOrigin()
-                            //.AllowCredentials()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
+            services.AddCors();
+            
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy(_corsPolicy,
+            //        builder =>
+            //        {
+            //            builder
+            //                .AllowAnyOrigin()
+            //                //.AllowCredentials()
+            //                .AllowAnyHeader()
+            //                .AllowAnyMethod();
+            //        });
+            //});
 
             services.AddAuthorization();
             services.AddControllers();
@@ -95,7 +97,13 @@ namespace MarketingBox.AffiliateApi
 
             app.UseRouting();
 
-            app.UseCors(_corsPolicy);
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(_ => true) // allow any origin
+                .AllowCredentials()); // allow credentials
+            
+            //app.UseCors(_corsPolicy);
 
             app.UseAuthentication();
 
