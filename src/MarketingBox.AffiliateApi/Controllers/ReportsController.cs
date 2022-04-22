@@ -16,7 +16,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("/api/reports")]
+    [Route("/api/[controller]")]
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;
@@ -34,10 +34,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpGet]
+        [HttpPost("search")]
         [ProducesResponseType(typeof(Paginated<ReportModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(
-            [FromQuery] MarketingBox.AffiliateApi.Models.Reports.Requests.ReportSearchRequest request)
+            [FromBody] MarketingBox.AffiliateApi.Models.Reports.Requests.ReportSearchRequest request)
         {
             var tenantId = this.GetTenantId();
             request.TenantId = tenantId;

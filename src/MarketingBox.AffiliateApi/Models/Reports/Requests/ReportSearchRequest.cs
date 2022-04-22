@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MarketingBox.Reporting.Service.Domain.Models;
 using MarketingBox.Reporting.Service.Domain.Models.Reports;
 using MarketingBox.Sdk.Common.Enums;
@@ -13,6 +14,7 @@ namespace MarketingBox.AffiliateApi.Models.Reports.Requests
         public CountryCodeType? CountryCodeType { get; set; }
         public string CountryCode { get; set; }
         public long? BrandId { get; set; }
+        public List<long> BrandBoxIds { get; set; }
         public string Offer { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }

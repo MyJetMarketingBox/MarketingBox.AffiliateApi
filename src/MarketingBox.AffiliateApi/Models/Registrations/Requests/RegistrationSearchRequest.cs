@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -11,6 +12,7 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
         [Required]
         public RegistrationsReportType? Type { get; set; }
         public string? Country { get; set; }
+        public List<long> BrandBoxIds { get; set; }
         public RegistrationStatus? Status { get; set; }
         public CrmStatus? CrmStatus { get; set; }
         public DateTime? DateFrom { get; set; }

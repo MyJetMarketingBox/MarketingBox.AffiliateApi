@@ -28,7 +28,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("/api/registrations")]
+    [Route("/api/[controller]")]
     public class RegistrationsController : ControllerBase
     {
         private readonly ILogger<RegistrationsController> _logger;
@@ -51,11 +51,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpGet]
+        [HttpPost("search")]
         [ProducesResponseType(typeof(Paginated<RegistrationModel, long?>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Paginated<RegistrationModelForAffiliate, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<RegistrationModel, long?>>> SearchAsync(
-            [FromQuery] RegistrationSearchRequest request)
+            [FromBody] RegistrationSearchRequest request)
         {
             var tenantId = this.GetTenantId();
             
@@ -72,7 +72,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 CrmStatus = request.CrmStatus,
                 DateFrom = request.DateFrom,
                 DateTo = request.DateTo,
-                RegistrationId = request.RegistrationId
+                RegistrationId = request.RegistrationId,
+                BrandBoxIds = request.BrandBoxIds
             });
 
             return this.ProcessResult(response,
