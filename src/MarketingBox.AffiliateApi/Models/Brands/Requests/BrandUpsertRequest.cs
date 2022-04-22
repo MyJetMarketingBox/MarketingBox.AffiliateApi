@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Brands.Requests
 {

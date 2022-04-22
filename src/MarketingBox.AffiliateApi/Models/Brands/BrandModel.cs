@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using MarketingBox.Affiliate.Service.Domain.Models.Brands;
-using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
 using MarketingBox.AffiliateApi.Models.CampaignRows;
 using MarketingBox.AffiliateApi.Models.Integrations;
 using MarketingBox.AffiliateApi.Models.Payouts;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Brands
 {

@@ -1,4 +1,4 @@
-﻿using MarketingBox.Affiliate.Service.Domain.Models.Integrations;
+﻿using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
