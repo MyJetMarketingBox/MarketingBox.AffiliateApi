@@ -13,5 +13,6 @@ namespace MarketingBox.AffiliateApi.Models.Payouts.Requests
 
         [Required] public PayoutType? PayoutType { get; set; }
         [Required] public int? GeoId { get; set; }
+        [Required] public string Name { get; set; }
     }
 }
