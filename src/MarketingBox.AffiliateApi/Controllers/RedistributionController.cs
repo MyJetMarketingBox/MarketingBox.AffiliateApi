@@ -52,6 +52,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Status = RedistributionState.Disable,
                 PortionLimit = request.PortionLimit,
                 DayLimit = request.DayLimit,
+                UseAutologin = request.UseAutologin,
                 RegistrationsIds = request.RegistrationsIds,
                 FilesIds = request.FilesIds,
                 RegistrationSearchRequest = request.RegistrationSearchRequest
