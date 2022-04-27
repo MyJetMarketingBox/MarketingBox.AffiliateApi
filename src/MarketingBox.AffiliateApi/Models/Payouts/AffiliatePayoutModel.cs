@@ -8,6 +8,7 @@ namespace MarketingBox.AffiliateApi.Models.Payouts
     {
         public long Id { get; set; }
         public decimal Amount { get; set; }
+        public string Name { get; set; }
         public Currency Currency { get; set; }
         public PayoutType PayoutType { get; set; }
         public DateTime CreatedAt { get; set; }
