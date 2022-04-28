@@ -63,7 +63,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
-                Take = request.Limit ?? default,
+                Take = request.Limit,
                 TenantId = tenantId,
                 AffiliateId = request.AffiliateId,
                 Type = request.Type ?? RegistrationsReportType.All,
