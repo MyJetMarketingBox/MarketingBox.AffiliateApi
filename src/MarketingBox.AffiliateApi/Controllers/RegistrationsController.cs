@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -85,9 +86,9 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpPut("update-status")]
         public async Task<ActionResult<Deposit>> UpdateStatusAsync(
-            [FromQuery] long registrationId,
-            [FromQuery] RegistrationStatus newStatus, 
-            [FromQuery] string comment)
+            [FromQuery][Required] long registrationId,
+            [FromQuery][Required] RegistrationStatus newStatus, 
+            [FromQuery][Required] string comment)
         {
             try
             {
