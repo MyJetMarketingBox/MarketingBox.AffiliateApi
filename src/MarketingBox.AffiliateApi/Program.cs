@@ -61,8 +61,8 @@ namespace MarketingBox.AffiliateApi
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    var httpPort = Environment.GetEnvironmentVariable("HTTP_PORT") ?? "8080";
-                    var grpcPort = Environment.GetEnvironmentVariable("GRPC_PORT") ?? "80";
+                    var httpPort = Environment.GetEnvironmentVariable("HTTP_PORT") ?? "8081";
+                    var grpcPort = Environment.GetEnvironmentVariable("GRPC_PORT") ?? "81";
 
                     Console.WriteLine($"HTTP PORT: {httpPort}");
                     Console.WriteLine($"GRPC PORT: {grpcPort}");

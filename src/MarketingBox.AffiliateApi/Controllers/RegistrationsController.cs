@@ -60,22 +60,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             
-            var response = await _registrationService.SearchAsync(new()
-            {
-                Asc = request.Order == PaginationOrder.Asc,
-                Cursor = request.Cursor,
-                Take = request.Limit,
-                TenantId = tenantId,
-                AffiliateId = request.AffiliateId,
-                Type = request.Type ?? RegistrationsReportType.All,
-                Country = request.Country,
-                Status = request.Status,
-                CrmStatus = request.CrmStatus,
-                DateFrom = request.DateFrom,
-                DateTo = request.DateTo,
-                RegistrationId = request.RegistrationId,
-                BrandBoxIds = request.BrandBoxIds
-            });
+            var response = await _registrationService.SearchAsync(request.GetGrpcModel(tenantId));
 
             return this.ProcessResult(response,
                 response.Data?

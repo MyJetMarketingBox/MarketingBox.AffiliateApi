@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using MarketingBox.AffiliateApi.Models.Registrations.Requests;
 using MarketingBox.Redistribution.Service.Domain.Models;
-using MarketingBox.Reporting.Service.Grpc.Requests.Registrations;
 
 namespace MarketingBox.AffiliateApi.Models.Redistribution
 {

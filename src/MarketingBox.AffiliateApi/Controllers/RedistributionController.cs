@@ -43,6 +43,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<RedistributionEntity>> CreateAsync(
             [FromBody] CreateRedistributionRequestHttp request)
         {
+            var tenantId = this.GetTenantId();
+            
             var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
             {
                 CreatedBy = this.GetUserId(),
@@ -55,7 +57,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 UseAutologin = request.UseAutologin,
                 RegistrationsIds = request.RegistrationsIds,
                 FilesIds = request.FilesIds,
-                RegistrationSearchRequest = request.RegistrationSearchRequest
+                RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
             });
             return this.ProcessResult(response, response.Data);
         }

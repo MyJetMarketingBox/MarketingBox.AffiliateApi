@@ -18,5 +18,25 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
         public long? RegistrationId { get; set; }
+
+        public MarketingBox.Reporting.Service.Grpc.Requests.Registrations.RegistrationSearchRequest GetGrpcModel(string tenantId)
+        {
+            return new MarketingBox.Reporting.Service.Grpc.Requests.Registrations.RegistrationSearchRequest()
+            {
+                Asc = Order == PaginationOrder.Asc,
+                Cursor = Cursor,
+                Take = Limit,
+                TenantId = tenantId,
+                AffiliateId = AffiliateId,
+                Type = Type ?? RegistrationsReportType.All,
+                Country = Country,
+                Status = Status,
+                CrmStatus = CrmStatus,
+                DateFrom = DateFrom,
+                DateTo = DateTo,
+                RegistrationId = RegistrationId,
+                BrandBoxIds = BrandBoxIds
+            };
+        }
     }
 }
