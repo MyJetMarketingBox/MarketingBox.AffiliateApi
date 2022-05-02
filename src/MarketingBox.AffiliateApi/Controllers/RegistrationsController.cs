@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -59,29 +60,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             
-            var response = await _registrationService.SearchAsync(new()
-            {
-                Asc = request.Order == PaginationOrder.Asc,
-                Cursor = request.Cursor,
-                Take = request.Limit,
-                TenantId = tenantId,
-                AffiliateIds = request.AffiliateIds,
-                Type = request.Type ?? RegistrationsReportType.All,
-                CountryIds = request.CountryIds,
-                Statuses = request.Statuses,
-                CrmStatuses = request.CrmStatuses,
-                DateFrom = request.DateFrom,
-                DateTo = request.DateTo,
-                RegistrationIds = request.RegistrationIds,
-                BrandBoxIds = request.BrandBoxIds,
-                Email = request.Email,
-                Phone = request.Phone,
-                BrandIds = request.BrandIds,
-                CampaignIds = request.CampaignIds,
-                FirstName = request.FirstName,
-                IntegrationIds = request.IntegrationIds,
-                LastName = request.LastName
-            });
+            var response = await _registrationService.SearchAsync(request.GetGrpcModel(tenantId));
 
             return this.ProcessResult(response,
                 response.Data?
@@ -92,9 +71,9 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpPut("update-status")]
         public async Task<ActionResult<Deposit>> UpdateStatusAsync(
-            [FromQuery] long registrationId,
-            [FromQuery] RegistrationStatus newStatus, 
-            [FromQuery] string comment)
+            [FromQuery][Required] long registrationId,
+            [FromQuery][Required] RegistrationStatus newStatus, 
+            [FromQuery][Required] string comment)
         {
             try
             {
