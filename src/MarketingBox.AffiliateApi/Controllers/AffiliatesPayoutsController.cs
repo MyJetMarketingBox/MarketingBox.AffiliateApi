@@ -26,9 +26,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             _affiliatePayoutService = affiliatePayoutService;
         }
         
-        [HttpGet]
+        [HttpPost("search")]
         public async Task<ActionResult<Paginated<AffiliatePayoutModel,long?>>> SearchAsync(
-            [FromQuery] AffiliatePayoutSearchRequest request)
+            [FromBody] AffiliatePayoutSearchRequest request)
         {
             var response = await _affiliatePayoutService.SearchAsync(new()
             {
@@ -36,6 +36,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
                 Take = request.Limit,
+                Name = request.Name,
+                GeoIds = request.GeoIds,
+                PayoutTypes = request.PayoutTypes
             });
             return this.ProcessResult(
                 response, response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)

@@ -70,9 +70,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(response);
         }
 
-        [HttpGet]
+        [HttpPost("search")]
         public async Task<ActionResult<Paginated<OfferModel, long?>>> SearchAsync(
-            [FromQuery] Models.Offers.Requests.OfferSearchRequest paginationRequest)
+            [FromBody] Models.Offers.Requests.OfferSearchRequest paginationRequest)
         {
             var affiliateId = this.GetUserId();
             var request = new Affiliate.Service.Grpc.Requests.Offers.OfferSearchRequest
@@ -81,12 +81,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
                 AffiliateId = affiliateId,
-                Currency = paginationRequest.Currency,
-                Privacy = paginationRequest.Privacy,
-                State = paginationRequest.State,
-                BrandId = paginationRequest.BrandId,
-                LanguageId = paginationRequest.LanguageId,
-                OfferName = paginationRequest.OfferName
+                Privacies = paginationRequest.Privacies,
+                States = paginationRequest.States,
+                BrandIds = paginationRequest.BrandIds,
+                LanguageIds = paginationRequest.LanguageIds,
+                OfferName = paginationRequest.OfferName,
+                GeoIds = paginationRequest.GeoIds,
+                OfferId = paginationRequest.OfferId
             };
             var response = await _offerService.SearchAsync(request);
             return this.ProcessResult(

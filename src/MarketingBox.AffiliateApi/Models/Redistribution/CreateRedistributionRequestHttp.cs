@@ -18,8 +18,8 @@ namespace MarketingBox.AffiliateApi.Models.Redistribution
         [Required]
         public int DayLimit { get; set; }
         public bool UseAutologin { get; set; }
-        public List<long>? RegistrationsIds { get; set; }
-        public List<long>? FilesIds { get; set; }
-        public RegistrationSearchRequest? RegistrationSearchRequest { get; set; }
+        public List<long> RegistrationsIds { get; set; }
+        public List<long> FilesIds { get; set; }
+        public RegistrationSearchRequest RegistrationSearchRequest { get; set; }
     }
 }

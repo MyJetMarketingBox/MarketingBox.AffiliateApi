@@ -37,10 +37,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpGet]
+        [HttpPost("search")]
         [ProducesResponseType(typeof(Paginated<CampaignRowModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<CampaignRowModel, long?>>> SearchAsync(
-            [FromQuery] CampaignRowSearchRequest request)
+            [FromBody] CampaignRowSearchRequest request)
         {
             var tenantId = this.GetTenantId();
 
@@ -50,7 +50,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                 BrandId = request.BrandId,
                 Cursor = request.Cursor,
                 CampaignRowId = request.Id,
-                CampaignId = request.CampaignId,
+                CampaignIds = request.CampaignIds,
+                Priority = request.Priority,
+                Weight = request.Weight,
+                CapType = request.CapType,
+                EnableTraffic = request.EnableTraffic,
+                GeoIds = request.GeoIds,
+                DailyCapValue = request.DailyCapValue,
                 Take = request.Limit,
                 TenantId = tenantId
             });

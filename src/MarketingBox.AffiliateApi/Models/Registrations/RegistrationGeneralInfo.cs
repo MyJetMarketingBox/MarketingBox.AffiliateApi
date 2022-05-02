@@ -22,7 +22,7 @@ namespace MarketingBox.AffiliateApi.Models.Registrations
 
         public DateTime CreatedAt { get; set; }
         public DateTime? ConversionDate { get; set; }
-        public string Country { get; set; }
+        public int CountryId { get; set; }
     }
 
     public class RegistrationGeneralInfoForAffiliate

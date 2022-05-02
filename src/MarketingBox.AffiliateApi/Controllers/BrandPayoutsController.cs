@@ -26,9 +26,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             _brandPayoutService = brandPayoutService;
         }
         
-        [HttpGet]
+        [HttpPost("search")]
         public async Task<ActionResult<Paginated<BrandPayoutModel,long?>>> SearchAsync(
-            [FromQuery] BrandPayoutSearchRequest request)
+            [FromBody] BrandPayoutSearchRequest request)
         {
             var response = await _brandPayoutService.SearchAsync(new()
             {
@@ -36,6 +36,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
                 Take = request.Limit,
+                Name = request.Name,
+                GeoIds = request.GeoIds,
+                PayoutTypes = request.PayoutTypes 
             });
             return this.ProcessResult(
                 response, response.Data?.Select(_mapper.Map<BrandPayoutModel>)

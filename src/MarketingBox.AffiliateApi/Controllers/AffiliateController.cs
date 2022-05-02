@@ -60,7 +60,9 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Email = request.Email,
                 Username = request.Username,
                 Take = request.Limit,
-                TenantId = tenantId
+                TenantId = tenantId,
+                Phone = request.Phone,
+                State = request.State
             });
             return this.ProcessResult(
                 response,

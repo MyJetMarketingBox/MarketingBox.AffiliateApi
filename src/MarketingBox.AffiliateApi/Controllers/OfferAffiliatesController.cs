@@ -28,16 +28,17 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<Paginated<OfferAffiliateModel, long?>>> GetAllAsync(
-            [FromQuery] PaginationRequest<long?> paginationRequest)
+        public async Task<ActionResult<Paginated<OfferAffiliateModel, long?>>> SearchAsync(
+            [FromQuery] SearchRequest paginationRequest)
         {
-            var request = new GetAllRequest
+            var request = new OfferAffiliateSearchRequest()
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
-                Take = paginationRequest.Limit
+                Take = paginationRequest.Limit,
+                OfferId = paginationRequest.OfferId
             };
-            var response = await _offerAffiliateService.GetAllAsync(request);
+            var response = await _offerAffiliateService.SearchAsync(request);
             return this.ProcessResult(
                 response,
                 response.Data?
