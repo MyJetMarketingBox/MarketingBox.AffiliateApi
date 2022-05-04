@@ -69,19 +69,18 @@ namespace MarketingBox.AffiliateApi.Controllers
                     .Paginate(request, Url, response.Total ?? default, x => x.RegistrationId));
         }
 
-        [HttpPut("update-status")]
+        [HttpPut("{registrationId}/update-status")]
         public async Task<ActionResult<Deposit>> UpdateStatusAsync(
-            [FromQuery][Required] long registrationId,
-            [FromQuery][Required] RegistrationStatus newStatus, 
-            [FromQuery][Required] string comment)
+            [FromRoute] long registrationId,
+            [FromBody] RegistrationUpdateStatusRequest request)
         {
             try
             {
                 var response = await _depositService.UpdateDepositStatusAsync(new UpdateDepositStatusRequest()
                 {
                     Mode = DepositUpdateMode.Manually,
-                    Comment = comment,
-                    NewStatus = newStatus,
+                    Comment = request.Comment,
+                    NewStatus = request.Status,
                     RegistrationId = registrationId,
                     TenantId = this.GetTenantId(),
                     UserId = this.GetUserId()
