@@ -12,7 +12,7 @@ namespace MarketingBox.AffiliateApi.Models.Redistribution
         [Required]
         public long CampaignId { get; set; }
         [Required]
-        public RedistributionFrequency Frequency { get; set; }
+        public RedistributionFrequency? Frequency { get; set; }
         [Required]
         public int PortionLimit { get; set; }
         [Required]
