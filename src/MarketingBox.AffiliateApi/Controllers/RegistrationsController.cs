@@ -91,7 +91,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
+                return ex.Failed<Deposit>();
             }
         }
         [HttpGet("status-log")]
@@ -153,9 +153,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                 RouteInfo = new RegistrationRouteInfo()
                 {
                     AffiliateId = registrationDetails.AffiliateId,
+                    AffiliateNane = registrationDetails.AffiliateName,
                     CampaignId = registrationDetails.CampaignId,
                     IntegrationIdId = registrationDetails.IntegrationId,
-                    BrandId = registrationDetails.BrandId
+                    IntegrationName = registrationDetails.Integration,
+                    BrandId = registrationDetails.BrandId,
+                    BrandName = registrationDetails.CustomerBrand
                 }
             };
         }
