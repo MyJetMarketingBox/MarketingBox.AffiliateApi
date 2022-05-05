@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Reports;
@@ -44,8 +45,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _reportService.SearchAsync(_mapper.Map<ReportSearchRequest>(request));
 
             return this.ProcessResult(response,
-                response.Data?.Select(_mapper.Map<ReportModel>)
-                    .ToArray()
+                (response.Data?.Select(_mapper.Map<ReportModel>)
+                    .ToArray() ?? Array.Empty<ReportModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
     }

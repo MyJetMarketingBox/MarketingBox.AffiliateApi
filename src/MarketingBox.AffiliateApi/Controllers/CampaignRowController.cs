@@ -1,3 +1,4 @@
+using System;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -37,10 +38,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpPost("search")]
+        [HttpGet]
         [ProducesResponseType(typeof(Paginated<CampaignRowModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<CampaignRowModel, long?>>> SearchAsync(
-            [FromBody] CampaignRowSearchRequest request)
+            [FromQuery] CampaignRowSearchRequest request)
         {
             var tenantId = this.GetTenantId();
 
@@ -50,21 +51,21 @@ namespace MarketingBox.AffiliateApi.Controllers
                 BrandId = request.BrandId,
                 Cursor = request.Cursor,
                 CampaignRowId = request.Id,
-                CampaignIds = request.CampaignIds,
+                CampaignIds = request.CampaignIds.Parse<long>(),
                 Priority = request.Priority,
                 Weight = request.Weight,
                 CapType = request.CapType,
                 EnableTraffic = request.EnableTraffic,
-                GeoIds = request.GeoIds,
+                GeoIds = request.GeoIds.Parse<long>(),
                 DailyCapValue = request.DailyCapValue,
                 Take = request.Limit,
                 TenantId = tenantId
             });
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<CampaignRowModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<CampaignRowModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.CampaignRowId));
         }
 

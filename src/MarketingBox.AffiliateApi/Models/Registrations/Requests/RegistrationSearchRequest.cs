@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
@@ -8,22 +9,21 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
 {
     public class RegistrationSearchRequest : PaginationRequest<long?>
     {
-        public List<long> AffiliateIds { get; set; }
-        [Required]
+        public string AffiliateIds { get; set; }
         public RegistrationsReportType? Type { get; set; }
-        public List<int> CountryIds { get; set; }
-        public List<long> BrandBoxIds { get; set; }
-        public List<RegistrationStatus> Statuses { get; set; }
-        public List<CrmStatus> CrmStatuses { get; set; }
+        public string CountryIds { get; set; }
+        public string BrandBoxIds { get; set; }
+        public string Statuses { get; set; }
+        public string CrmStatuses { get; set; }
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
-        public List<long> RegistrationIds { get; set; }
+        public string RegistrationIds { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public List<long> BrandIds { get; set; }
-        public List<long> CampaignIds { get; set; }
+        public string BrandIds { get; set; }
+        public string CampaignIds { get; set; }
         public string FirstName { get; set; }
-        public List<long> IntegrationIds { get; set; }
+        public string IntegrationIds { get; set; }
         public string LastName { get; set; }
         
         public MarketingBox.Reporting.Service.Grpc.Requests.Registrations.RegistrationSearchRequest GetGrpcModel(string tenantId)
@@ -34,21 +34,21 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
                 Cursor = Cursor,
                 Take = Limit,
                 TenantId = tenantId,
-                AffiliateIds = AffiliateIds,
+                AffiliateIds = AffiliateIds.Parse<long>(),
                 Type = Type ?? RegistrationsReportType.All,
-                CountryIds = CountryIds,
-                Statuses = Statuses,
-                CrmStatuses = CrmStatuses,
+                CountryIds = CountryIds.Parse<int>(),
+                Statuses = Statuses.Parse<RegistrationStatus>(),
+                CrmStatuses = CrmStatuses.Parse<CrmStatus>(),
                 DateFrom = DateFrom,
                 DateTo = DateTo,
-                RegistrationIds = RegistrationIds,
-                BrandBoxIds = BrandBoxIds,
+                RegistrationIds = RegistrationIds.Parse<long>(),
+                BrandBoxIds = BrandBoxIds.Parse<long>(),
                 Email = Email,
                 Phone = Phone,
-                BrandIds = BrandIds,
-                CampaignIds = CampaignIds,
+                BrandIds = BrandIds.Parse<long>(),
+                CampaignIds = CampaignIds.Parse<long>(),
                 FirstName = FirstName,
-                IntegrationIds = IntegrationIds,
+                IntegrationIds = IntegrationIds.Parse<long>(),
                 LastName = LastName
             };
         }

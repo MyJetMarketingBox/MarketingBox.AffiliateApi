@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using AutoMapper;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.Postback.Service.Grpc;
@@ -8,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using MarketingBox.Postback.Service.Domain.Models.Requests;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Reference = MarketingBox.AffiliateApi.Models.Postback.Reference;
 
 namespace MarketingBox.AffiliateApi.Controllers
@@ -39,6 +43,29 @@ namespace MarketingBox.AffiliateApi.Controllers
                 new ByAffiliateIdRequest {AffiliateId = affiliateId});
 
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
+        }
+        
+        [HttpGet("search")]
+        public async Task<ActionResult<Paginated<Reference, long?>>> SearchAsync(
+            [FromQuery] MarketingBox.AffiliateApi.Models.Postback.Requests.SearchReferenceRequest paginationLogsRequest)
+        {
+            var response = await _postbackService.SearchAsync(new() 
+            {
+                Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
+                Cursor = paginationLogsRequest.Cursor,
+                Take = paginationLogsRequest.Limit,
+                
+                AffiliateName = paginationLogsRequest.AffiliateName,
+                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
+                HttpQueryType = paginationLogsRequest.HttpQueryType
+            });
+
+            return this.ProcessResult(
+                response,
+                (response.Data?
+                    .Select(_mapper.Map<Reference>)
+                    .ToArray() ?? Array.Empty<Reference>())
+                    .Paginate(paginationLogsRequest, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpPost]

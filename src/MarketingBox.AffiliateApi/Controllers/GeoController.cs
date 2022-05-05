@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Country;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Country.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -27,9 +29,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("search")]
+        [HttpGet]
         public async Task<ActionResult<Paginated<GeoModel, int?>>> SearchAsync(
-            [FromBody] SearchRequest paginationRequest)
+            [FromQuery] CountrySearchRequest paginationRequest)
         {
             var request = new GeoSearchRequest()
             {
@@ -37,15 +39,15 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
                 Name = paginationRequest.Name,
-                CountryIds = paginationRequest.CountryIds,
+                CountryIds = paginationRequest.CountryIds.Parse<int>(),
                 GeoId = paginationRequest.GeoId
             };
             var response = await _geoService.SearchAllAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<GeoModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<GeoModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
 

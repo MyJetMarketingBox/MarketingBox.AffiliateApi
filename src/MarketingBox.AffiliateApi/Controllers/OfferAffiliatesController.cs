@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfferAffiliateSearchRequest = MarketingBox.AffiliateApi.Models.OfferAffiliates.OfferAffiliateSearchRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -29,9 +31,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         
         [HttpGet]
         public async Task<ActionResult<Paginated<OfferAffiliateModel, long?>>> SearchAsync(
-            [FromQuery] SearchRequest paginationRequest)
+            [FromQuery] OfferAffiliateSearchRequest paginationRequest)
         {
-            var request = new OfferAffiliateSearchRequest()
+            var request = new Affiliate.Service.Grpc.Requests.OfferAffiliate.OfferAffiliateSearchRequest()
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
@@ -41,9 +43,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _offerAffiliateService.SearchAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<OfferAffiliateModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<OfferAffiliateModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
 

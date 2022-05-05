@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -54,9 +55,8 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             return this.ProcessResult(
                 response,
-                response.Data?
-                    .Select(_mapper.Map<BrandModel>)
-                    .ToArray()
+                (response.Data?.Select(_mapper.Map<BrandModel>)
+                    .ToArray() ?? Array.Empty<BrandModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 

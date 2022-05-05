@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -29,16 +30,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<Paginated<CountryModel, long?>>> GetAllAsync(
+        public async Task<ActionResult<Paginated<CountryModel, long?>>> SearchAsync(
             [FromQuery] Models.SearchByNameRequest paginationRequest)
         {
             var request = _mapper.Map<SearchByNameRequest>(paginationRequest);
             var response = await _countryService.SearchAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<CountryModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<CountryModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }  
     }

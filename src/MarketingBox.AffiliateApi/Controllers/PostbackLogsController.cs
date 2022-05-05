@@ -1,11 +1,13 @@
-﻿using AutoMapper;
-using MarketingBox.AffiliateApi.Extensions;
+﻿using System;
+using System.Linq;
+using AutoMapper;
 using MarketingBox.Postback.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Threading.Tasks;
+using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.PostbackLogs.Requests;
 using MarketingBox.Postback.Service.Domain.Models.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -35,23 +37,30 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<Paginated<EventReferenceLog, long?>>> GetLogs(
-            [FromQuery] PaginationRequest<long?> paginationRequest)
+            [FromQuery] SearchPostbackLogsRequest paginationLogsRequest)
         {
-            var request = new ByAffiliateIdPaginatedRequest
+            var request = new FilterLogsRequest()
             {
-                Asc = paginationRequest.Order == PaginationOrder.Asc,
-                Cursor = paginationRequest.Cursor,
-                Take = paginationRequest.Limit ?? default,
-                AffiliateId = this.GetUserId()
+                Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
+                Cursor = paginationLogsRequest.Cursor,
+                Take = paginationLogsRequest.Limit,
+                AffiliateName = paginationLogsRequest.AffiliateName,
+                EventType = paginationLogsRequest.EventType,
+                ToDate = paginationLogsRequest.ToDate,
+                FromDate = paginationLogsRequest.FromDate,
+                HttpQueryType = paginationLogsRequest.HttpQueryType,
+                ResponseStatus = paginationLogsRequest.ResponseStatus,
+                RegistrationUId = paginationLogsRequest.RegistrationUId,
+                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>()
             };
-            var response = await _eventReferenceLogService.GetAsync(request);
+            var response = await _eventReferenceLogService.SearchAsync(request);
             
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<EventReferenceLog>)
-                    .ToArray()
-                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
+                    .ToArray() ?? Array.Empty<EventReferenceLog>())
+                    .Paginate(paginationLogsRequest, Url, response.Total ?? default, x => x.Id));
         }
     }
 }

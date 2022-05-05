@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -26,9 +30,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             _affiliatePayoutService = affiliatePayoutService;
         }
         
-        [HttpPost("search")]
+        [HttpGet]
         public async Task<ActionResult<Paginated<AffiliatePayoutModel,long?>>> SearchAsync(
-            [FromBody] AffiliatePayoutSearchRequest request)
+            [FromQuery] AffiliatePayoutSearchRequest request)
         {
             var response = await _affiliatePayoutService.SearchAsync(new()
             {
@@ -37,12 +41,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = request.Cursor,
                 Take = request.Limit,
                 Name = request.Name,
-                GeoIds = request.GeoIds,
-                PayoutTypes = request.PayoutTypes
+                GeoIds = request.GeoIds.Parse<long>(),
+                PayoutTypes = request.PayoutTypes.Parse<PayoutType>()
             });
             return this.ProcessResult(
-                response, response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)
-                    .ToArray()
+                response, (response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)
+                    .ToArray() ?? Array.Empty<AffiliatePayoutModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 

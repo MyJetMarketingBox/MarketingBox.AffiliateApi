@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -6,15 +7,14 @@ using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using System.Linq;
 using AutoMapper;
-using MarketingBox.Affiliate.Service.Messages.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates.Requests;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
-using MyJetWallet.Sdk.ServiceBus;
 using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Affiliates.Requests.AffiliateSearchRequest;
 
 namespace MarketingBox.AffiliateApi.Controllers
@@ -26,16 +26,13 @@ namespace MarketingBox.AffiliateApi.Controllers
     {
         private readonly ILogger<AffiliateController> _logger;
         private readonly IAffiliateService _affiliateService;
-        private readonly IServiceBusPublisher<AffiliateDeleteMessage> _serviceBusPublisher;
         private readonly IMapper _mapper;
 
         public AffiliateController(IAffiliateService affiliateService,
-            IServiceBusPublisher<AffiliateDeleteMessage> serviceBusPublisher,
             ILogger<AffiliateController> logger,
             IMapper mapper)
         {
             _affiliateService = affiliateService;
-            _serviceBusPublisher = serviceBusPublisher;
             _logger = logger;
             _mapper = mapper;
         }
@@ -66,9 +63,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             });
             return this.ProcessResult(
                 response,
-                response.Data?
-                    .Select(_mapper.Map<AffiliateModel>)
-                    .ToArray()
+                (response.Data?.Select(_mapper.Map<AffiliateModel>)
+                    .ToArray() ?? Array.Empty<AffiliateModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 

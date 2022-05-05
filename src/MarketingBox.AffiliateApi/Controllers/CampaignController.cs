@@ -1,3 +1,4 @@
+using System;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -52,9 +53,9 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<CampaignModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<CampaignModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 

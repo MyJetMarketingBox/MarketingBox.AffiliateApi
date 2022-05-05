@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.Offers;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
 using MarketingBox.AffiliateApi.Extensions;
@@ -70,9 +72,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(response);
         }
 
-        [HttpPost("search")]
+        [HttpGet]
         public async Task<ActionResult<Paginated<OfferModel, long?>>> SearchAsync(
-            [FromBody] Models.Offers.Requests.OfferSearchRequest paginationRequest)
+            [FromQuery] Models.Offers.Requests.OfferSearchRequest paginationRequest)
         {
             var affiliateId = this.GetUserId();
             var request = new Affiliate.Service.Grpc.Requests.Offers.OfferSearchRequest
@@ -81,20 +83,20 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
                 AffiliateId = affiliateId,
-                Privacies = paginationRequest.Privacies,
-                States = paginationRequest.States,
-                BrandIds = paginationRequest.BrandIds,
-                LanguageIds = paginationRequest.LanguageIds,
+                Privacies = paginationRequest.Privacies.Parse<OfferPrivacy>(),
+                States = paginationRequest.States.Parse<OfferState>(),
+                BrandIds = paginationRequest.BrandIds.Parse<long>(),
+                LanguageIds = paginationRequest.LanguageIds.Parse<int>(),
                 OfferName = paginationRequest.OfferName,
-                GeoIds = paginationRequest.GeoIds,
+                GeoIds = paginationRequest.GeoIds.Parse<int>(),
                 OfferId = paginationRequest.OfferId
             };
             var response = await _offerService.SearchAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<OfferModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<OfferModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
                 

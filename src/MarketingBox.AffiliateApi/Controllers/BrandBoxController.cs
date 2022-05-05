@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.BrandBox;
 using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.Affiliates;
 using MarketingBox.AffiliateApi.Models.BrandBox;
 using MarketingBox.AffiliateApi.Models.BrandBox.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -44,9 +46,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _brandBoxService.SearchAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<BrandBoxModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<BrandBoxModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
 

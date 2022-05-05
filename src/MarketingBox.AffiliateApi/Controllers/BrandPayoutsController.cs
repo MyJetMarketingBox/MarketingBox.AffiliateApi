@@ -1,8 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -20,15 +23,16 @@ namespace MarketingBox.AffiliateApi.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IBrandPayoutService _brandPayoutService;
+
         public BrandPayoutsController(IMapper mapper, IBrandPayoutService brandPayoutService)
         {
             _mapper = mapper;
             _brandPayoutService = brandPayoutService;
         }
-        
-        [HttpPost("search")]
-        public async Task<ActionResult<Paginated<BrandPayoutModel,long?>>> SearchAsync(
-            [FromBody] BrandPayoutSearchRequest request)
+
+        [HttpGet]
+        public async Task<ActionResult<Paginated<BrandPayoutModel, long?>>> SearchAsync(
+            [FromQuery] BrandPayoutSearchRequest request)
         {
             var response = await _brandPayoutService.SearchAsync(new()
             {
@@ -37,22 +41,22 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Cursor = request.Cursor,
                 Take = request.Limit,
                 Name = request.Name,
-                GeoIds = request.GeoIds,
-                PayoutTypes = request.PayoutTypes 
+                GeoIds = request.GeoIds.Parse<long>(),
+                PayoutTypes = request.PayoutTypes.Parse<PayoutType>(),
             });
             return this.ProcessResult(
-                response, response.Data?.Select(_mapper.Map<BrandPayoutModel>)
-                    .ToArray()
-                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
+                response, (response.Data?.Select(_mapper.Map<BrandPayoutModel>)
+                    .ToArray() ?? Array.Empty<BrandPayoutModel>())
+                .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpGet("{brandPayoutId}")]
         public async Task<ActionResult<BrandPayoutModel>> GetAsync(
             [FromRoute] long brandPayoutId)
         {
-            var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest(){PayoutId = brandPayoutId});
+            var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest() {PayoutId = brandPayoutId});
             return this.ProcessResult(
-                response,_mapper.Map<BrandPayoutModel>(response.Data));
+                response, _mapper.Map<BrandPayoutModel>(response.Data));
         }
 
         [HttpPost]

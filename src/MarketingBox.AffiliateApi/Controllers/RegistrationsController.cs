@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -37,9 +36,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly IRegistrationService _registrationService;
         private readonly IDepositService _depositService;
 
-        public RegistrationsController(IRegistrationService registrationService, 
-            ILogger<RegistrationsController> logger, 
-            IMapper mapper, 
+        public RegistrationsController(IRegistrationService registrationService,
+            ILogger<RegistrationsController> logger,
+            IMapper mapper,
             IDepositService depositService)
         {
             _registrationService = registrationService;
@@ -52,20 +51,19 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpPost("search")]
+        [HttpGet]
         [ProducesResponseType(typeof(Paginated<RegistrationModel, long?>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Paginated<RegistrationModelForAffiliate, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<RegistrationModel, long?>>> SearchAsync(
-            [FromBody] RegistrationSearchRequest request)
+            [FromQuery] RegistrationSearchRequest request)
         {
             var tenantId = this.GetTenantId();
-            
+
             var response = await _registrationService.SearchAsync(request.GetGrpcModel(tenantId));
 
             return this.ProcessResult(response,
-                response.Data?
+                (response.Data?
                     .Select(Map)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<RegistrationModel>())
                     .Paginate(request, Url, response.Total ?? default, x => x.RegistrationId));
         }
 
@@ -85,7 +83,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     TenantId = this.GetTenantId(),
                     UserId = this.GetUserId()
                 });
-                    
+
                 return this.ProcessResult(response, _mapper.Map<Deposit>(response.Data));
             }
             catch (Exception ex)
@@ -94,10 +92,11 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return ex.Failed<Deposit>();
             }
         }
+
         [HttpGet("status-log")]
         public async Task<ActionResult<List<StatusChangeLog>>> GetStatusLogAsync(
-            [FromQuery] long? userId, 
-            [FromQuery] long? registrationId, 
+            [FromQuery] long? userId,
+            [FromQuery] long? registrationId,
             [FromQuery] DepositUpdateMode? mode)
         {
             try
@@ -108,7 +107,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     RegistrationId = registrationId,
                     UserId = userId
                 });
-                    
+
                 return this.ProcessResult(response, _mapper.Map<List<StatusChangeLog>>(response.Data));
             }
             catch (Exception ex)
@@ -137,7 +136,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     Sub9 = registrationDetails.Sub9,
                     Sub10 = registrationDetails.Sub10
                 },
-                Status = registrationDetails.Status.MapEnum<RegistrationStatus>(),
+                Status = registrationDetails.Status,
                 GeneralInfo = new RegistrationGeneralInfo()
                 {
                     Email = registrationDetails.Email,

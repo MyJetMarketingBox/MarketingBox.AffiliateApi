@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -34,9 +35,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _languageService.SearchAsync(request);
             return this.ProcessResult(
                 response,
-                response.Data?
+                (response.Data?
                     .Select(_mapper.Map<LanguageModel>)
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<LanguageModel>())
                     .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }  
     }
