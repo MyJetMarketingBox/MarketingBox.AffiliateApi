@@ -35,10 +35,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </summary>
         /// <remarks>
         /// </remarks>
-        [HttpPost("search")]
+        [HttpGet]
         [ProducesResponseType(typeof(Paginated<ReportModel, long?>), StatusCodes.Status200OK)]
         public async Task<ActionResult<Paginated<ReportModel, long?>>> SearchAsync(
-            [FromBody] MarketingBox.AffiliateApi.Models.Reports.Requests.ReportSearchRequest request)
+            [FromQuery] MarketingBox.AffiliateApi.Models.Reports.Requests.ReportSearchRequest request)
         {
             var tenantId = this.GetTenantId();
             request.TenantId = tenantId;
