@@ -1,5 +1,6 @@
 ﻿
 using MarketingBox.Affiliate.Service.Domain.Models.CampaignRows;
+using MarketingBox.AffiliateApi.Models.Campaigns;
 using MarketingBox.AffiliateApi.Models.Country;
 
 namespace MarketingBox.AffiliateApi.Models.CampaignRows
@@ -8,7 +9,7 @@ namespace MarketingBox.AffiliateApi.Models.CampaignRows
     {
         public long CampaignRowId { get; set; }
         public long BrandId { get; set; }
-        public long CampaignId { get; set; }
+        public CampaignModel Campaign { get; set; }
         public int Priority { get; set; }
         public int Weight { get; set; }
         public CapType CapType { get; set; }
