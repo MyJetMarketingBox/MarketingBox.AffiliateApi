@@ -108,7 +108,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     UserId = userId
                 });
 
-                return this.ProcessResult(response, _mapper.Map<List<StatusChangeLog>>(response.Data));
+                return this.ProcessResult(response, response.Data ?? new List<StatusChangeLog>());
             }
             catch (Exception ex)
             {

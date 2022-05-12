@@ -13,7 +13,6 @@ using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 using AffiliateSearchRequest = MarketingBox.AffiliateApi.Models.Affiliates.Requests.AffiliateSearchRequest;
 
@@ -117,8 +116,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             requestGrpc.TenantId = tenantId;
             requestGrpc.AffiliateId = affiliateId;
             var response = await _affiliateService.UpdateAsync(requestGrpc);
-
-
+            
             return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
         }
     }
