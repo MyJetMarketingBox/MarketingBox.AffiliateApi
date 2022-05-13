@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
