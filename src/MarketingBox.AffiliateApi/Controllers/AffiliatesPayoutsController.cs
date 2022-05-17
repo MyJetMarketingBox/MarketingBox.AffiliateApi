@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
+using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -34,6 +33,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<AffiliatePayoutModel,long?>>> SearchAsync(
             [FromQuery] AffiliatePayoutSearchRequest request)
         {
+            var tenantId = this.GetTenantId();
             var response = await _affiliatePayoutService.SearchAsync(new()
             {
                 EntityId = request.AffiliateId,
@@ -42,7 +42,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 Name = request.Name,
                 GeoIds = request.GeoIds.Parse<long>(),
-                PayoutTypes = request.PayoutTypes.Parse<PayoutType>()
+                PayoutTypes = request.PayoutTypes.Parse<Plan>(),
+                TenantId = tenantId
             });
             return this.ProcessResult(
                 response, (response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)
@@ -54,7 +55,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<AffiliatePayoutModel>> GetAsync(
             [FromRoute] long affiliatePayoutId)
         {
-            var response = await _affiliatePayoutService.GetAsync(new PayoutByIdRequest(){PayoutId = affiliatePayoutId});
+            var tenantId = this.GetTenantId();
+            var response = await _affiliatePayoutService.GetAsync(new PayoutByIdRequest()
+            {
+                PayoutId = affiliatePayoutId,
+                TenantId = tenantId
+            });
             return this.ProcessResult(
                 response,_mapper.Map<AffiliatePayoutModel>(response.Data));
         }
@@ -62,7 +68,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         public async Task<ActionResult<AffiliatePayoutModel>> CreateAsync([FromBody] PayoutUpsertRequest request)
         {
-            var response = await _affiliatePayoutService.CreateAsync(_mapper.Map<PayoutCreateRequest>(request));
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<PayoutCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            var response = await _affiliatePayoutService.CreateAsync(requestGrpc);
+            
             return this.ProcessResult(response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
 
@@ -71,8 +81,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] int affiliatePayoutId,
             [FromBody] PayoutUpsertRequest request)
         {
+            var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutUpdateRequest>(request);
             requestGrpc.Id = affiliatePayoutId;
+            requestGrpc.TenantId = tenantId;
             var response = await _affiliatePayoutService.UpdateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
@@ -80,7 +92,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpDelete("{affiliatePayoutId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int affiliatePayoutId)
         {
-            var response = await _affiliatePayoutService.DeleteAsync(new PayoutByIdRequest {PayoutId = affiliatePayoutId});
+            var tenantId = this.GetTenantId();
+            var response = await _affiliatePayoutService.DeleteAsync(new PayoutByIdRequest
+                {PayoutId = affiliatePayoutId, TenantId = tenantId});
             return this.ProcessResult(response);
         }
     }

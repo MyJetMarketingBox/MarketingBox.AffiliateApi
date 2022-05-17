@@ -5,6 +5,7 @@ using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests;
 using MarketingBox.Affiliate.Service.Grpc.Requests.OfferAffiliate;
+using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
@@ -33,12 +34,14 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<OfferAffiliateModel, long?>>> SearchAsync(
             [FromQuery] OfferAffiliateSearchRequest paginationRequest)
         {
+            var tenantId = this.GetTenantId();
             var request = new Affiliate.Service.Grpc.Requests.OfferAffiliate.OfferAffiliateSearchRequest()
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
                 Cursor = paginationRequest.Cursor,
                 Take = paginationRequest.Limit,
-                OfferId = paginationRequest.OfferId
+                OfferId = paginationRequest.OfferId,
+                TenantId = tenantId
             };
             var response = await _offerAffiliateService.SearchAsync(request);
             return this.ProcessResult(
@@ -52,7 +55,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         public async Task<ActionResult<OfferAffiliateModel>> CreateAsync([FromBody] OfferAffiliateUpsertRequest upsertRequest)
         {
-            var response = await _offerAffiliateService.CreateAsync(_mapper.Map<OfferAffiliateCreateRequest>(upsertRequest));
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<OfferAffiliateCreateRequest>(upsertRequest);
+            requestGrpc.TenantId = tenantId;
+            var response = await _offerAffiliateService.CreateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<OfferAffiliateModel>(response.Data));
         }
 
@@ -60,14 +66,18 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<OfferAffiliateModel>> GetAsync(
             [FromRoute] int offerAffiliateId)
         {
-            var response = await _offerAffiliateService.GetAsync(new(){OfferAffiliateId = offerAffiliateId});
+            var tenantId = this.GetTenantId();
+            var response =
+                await _offerAffiliateService.GetAsync(new() {OfferAffiliateId = offerAffiliateId, TenantId = tenantId});
             return this.ProcessResult(response, _mapper.Map<OfferAffiliateModel>(response.Data));
         }
 
         [HttpDelete("{offerAffiliateId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int offerAffiliateId)
         {
-            var response = await _offerAffiliateService.DeleteAsync(new () {OfferAffiliateId = offerAffiliateId});
+            var tenantId = this.GetTenantId();
+            var response = await _offerAffiliateService.DeleteAsync(new()
+                {OfferAffiliateId = offerAffiliateId, TenantId = tenantId});
             return this.ProcessResult(response);
         }
     }

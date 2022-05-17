@@ -69,7 +69,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<BrandModel>> GetAsync(
             [FromRoute, Required] long brandId)
         {
-            var response = await _brandService.GetAsync(new() {BrandId = brandId});
+            var tenantId = this.GetTenantId();
+            var response = await _brandService.GetAsync(new() {BrandId = brandId, TenantId = tenantId});
 
             return this.ProcessResult(response, _mapper.Map<BrandModel>(response.Data));
         }
@@ -120,9 +121,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long brandId)
         {
+            var tenantId = this.GetTenantId();
             var response = await _brandService.DeleteAsync(new()
             {
-                BrandId = brandId
+                BrandId = brandId,
+                TenantId = tenantId
             });
             this.ProcessResult(response, true);
             return Ok();

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
-using MarketingBox.Affiliate.Service.Domain.Models.Common;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
@@ -17,7 +17,7 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
         [DefaultValue(MarketingBox.Affiliate.Service.Domain.Models.Affiliates.State.Active)]
         public State? State { get; set; }
 
-        [DefaultValue(MarketingBox.Affiliate.Service.Domain.Models.Common.Currency.USD)]
+        [DefaultValue(Sdk.Common.Enums.Currency.USD)]
         public Currency? Currency { get; set; }
     }
 }

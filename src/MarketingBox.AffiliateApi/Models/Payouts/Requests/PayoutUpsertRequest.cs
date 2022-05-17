@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using MarketingBox.Affiliate.Service.Domain.Models.Common;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Payouts.Requests
 {
@@ -8,10 +8,10 @@ namespace MarketingBox.AffiliateApi.Models.Payouts.Requests
     {
         [Required] public decimal? Amount { get; set; }
 
-        [DefaultValue(Affiliate.Service.Domain.Models.Common.Currency.USD)]
+        [DefaultValue(MarketingBox.Sdk.Common.Enums.Currency.USD)]
         public Currency? Currency { get; set; }
 
-        [Required] public PayoutType? PayoutType { get; set; }
+        [Required] public Plan? PayoutType { get; set; }
         [Required] public int? GeoId { get; set; }
         [Required] public string Name { get; set; }
     }

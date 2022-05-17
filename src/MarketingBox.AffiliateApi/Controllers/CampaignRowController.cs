@@ -79,7 +79,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute, Required] long campaignRowId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.GetAsync(new() {CampaignRowId = campaignRowId});
+            var response =
+                await _campaignBoxService.GetAsync(new() {CampaignRowId = campaignRowId, TenantId = tenantId});
 
             return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
         }
@@ -94,8 +95,9 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] CampaignRowUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
-            var response = await _campaignBoxService.CreateAsync(
-                _mapper.Map<CampaignRowCreateRequest>(request));
+            var requestGrpc = _mapper.Map<CampaignRowCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            var response = await _campaignBoxService.CreateAsync(requestGrpc);
 
             return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
         }
@@ -110,8 +112,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [Required, FromRoute] long campaignRowId,
             [FromBody] CampaignRowUpsertRequest request)
         {
+            var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
             requestGrpc.CampaignRowId = campaignRowId;
+            requestGrpc.TenantId = tenantId;
             var response = await _campaignBoxService.UpdateAsync(requestGrpc);
 
             return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
@@ -126,10 +130,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long campaignRowId)
         {
+            var tenantId = this.GetTenantId();
             var response = await _campaignBoxService.DeleteAsync(
                 new()
                 {
                     CampaignRowId = campaignRowId,
+                    TenantId = tenantId
                 });
 
             this.ProcessResult(response, true);

@@ -68,9 +68,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<CampaignModel>> GetAsync(
             [Required, FromRoute] long campaignId)
         {
+            var tenantId = this.GetTenantId();
             var response = await _campaignService.GetAsync(new()
             {
-                CampaignId = campaignId
+                CampaignId = campaignId,
+                TenantId = tenantId
             });
 
             return this.ProcessResult(response, _mapper.Map<CampaignModel>(response.Data));
@@ -127,6 +129,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _campaignService.DeleteAsync(new()
             {
                 CampaignId = campaignId,
+                TenantId = tenantId
             });
 
             this.ProcessResult(response, true);

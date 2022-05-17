@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Domain.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Language;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
+using MarketingBox.Sdk.Common.Enums;
 
 namespace MarketingBox.AffiliateApi.Models.Offers
 {

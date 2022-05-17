@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Requests.Country;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Geo;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Country.Requests;
@@ -33,6 +33,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<GeoModel, int?>>> SearchAsync(
             [FromQuery] CountrySearchRequest paginationRequest)
         {
+            var tenantId = this.GetTenantId();
             var request = new GeoSearchRequest()
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
@@ -40,7 +41,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = paginationRequest.Limit,
                 Name = paginationRequest.Name,
                 CountryIds = paginationRequest.CountryIds.Parse<int>(),
-                GeoId = paginationRequest.GeoId
+                GeoId = paginationRequest.GeoId,
+                TenantId = tenantId
             };
             var response = await _geoService.SearchAllAsync(request);
             return this.ProcessResult(
@@ -48,13 +50,16 @@ namespace MarketingBox.AffiliateApi.Controllers
                 (response.Data?
                     .Select(_mapper.Map<GeoModel>)
                     .ToArray() ?? Array.Empty<GeoModel>())
-                    .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
+                .Paginate(paginationRequest, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpPost]
         public async Task<ActionResult<GeoModel>> CreateAsync([FromBody] GeoUpsertRequest upsertRequest)
         {
-            var response = await _geoService.CreateAsync(_mapper.Map<GeoCreateRequest>(upsertRequest));
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<GeoCreateRequest>(upsertRequest);
+            requestGrpc.TenantId = tenantId;
+            var response = await _geoService.CreateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<GeoModel>(response.Data));
         }
 
@@ -63,8 +68,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] int geoId,
             [FromBody] GeoUpsertRequest updateUpsertRequest)
         {
+            var tenantId = this.GetTenantId();
             var request = _mapper.Map<GeoUpdateRequest>(updateUpsertRequest);
             request.Id = geoId;
+            request.TenantId = tenantId;
             var response = await _geoService.UpdateAsync(request);
             return this.ProcessResult(response, _mapper.Map<GeoModel>(response.Data));
         }
@@ -72,7 +79,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpDelete("{geoId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int geoId)
         {
-            var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId});
+            var tenantId = this.GetTenantId();
+            var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId, TenantId = tenantId});
             return this.ProcessResult(response);
         }
     }

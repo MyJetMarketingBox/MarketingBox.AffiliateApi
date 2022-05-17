@@ -76,9 +76,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<AffiliateModel>> GetAsync(
             [FromRoute, Required] long affiliateId)
         {
+            var tenantId = this.GetTenantId();
             var response = await _affiliateService.GetAsync(new()
             {
-                AffiliateId = affiliateId
+                AffiliateId = affiliateId,
+                TenantId = tenantId
             });
 
             return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));

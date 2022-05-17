@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MarketingBox.Affiliate.Service.Domain.Models.Common;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
+using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -34,6 +34,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<BrandPayoutModel, long?>>> SearchAsync(
             [FromQuery] BrandPayoutSearchRequest request)
         {
+            var tenantId = this.GetTenantId();
             var response = await _brandPayoutService.SearchAsync(new()
             {
                 EntityId = request.BrandId,
@@ -42,7 +43,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 Name = request.Name,
                 GeoIds = request.GeoIds.Parse<long>(),
-                PayoutTypes = request.PayoutTypes.Parse<PayoutType>(),
+                PayoutTypes = request.PayoutTypes.Parse<Plan>(),
+                TenantId = tenantId
             });
             return this.ProcessResult(
                 response, (response.Data?.Select(_mapper.Map<BrandPayoutModel>)
@@ -54,7 +56,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<BrandPayoutModel>> GetAsync(
             [FromRoute] long brandPayoutId)
         {
-            var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest() {PayoutId = brandPayoutId});
+            var tenantId = this.GetTenantId();
+            var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest()
+                {PayoutId = brandPayoutId, TenantId = tenantId});
             return this.ProcessResult(
                 response, _mapper.Map<BrandPayoutModel>(response.Data));
         }
@@ -62,7 +66,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         public async Task<ActionResult<BrandPayoutModel>> CreateAsync([FromBody] PayoutUpsertRequest request)
         {
-            var response = await _brandPayoutService.CreateAsync(_mapper.Map<PayoutCreateRequest>(request));
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<PayoutCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            var response = await _brandPayoutService.CreateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<BrandPayoutModel>(response.Data));
         }
 
@@ -71,8 +78,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] int brandPayoutId,
             [FromBody] PayoutUpsertRequest request)
         {
+            var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutUpdateRequest>(request);
             requestGrpc.Id = brandPayoutId;
+            requestGrpc.TenantId = tenantId;
             var response = await _brandPayoutService.UpdateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<BrandPayoutModel>(response.Data));
         }
@@ -80,7 +89,9 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpDelete("{brandPayoutId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int brandPayoutId)
         {
-            var response = await _brandPayoutService.DeleteAsync(new PayoutByIdRequest {PayoutId = brandPayoutId});
+            var tenantId = this.GetTenantId();
+            var response = await _brandPayoutService.DeleteAsync(new PayoutByIdRequest
+                {PayoutId = brandPayoutId, TenantId = tenantId});
             return this.ProcessResult(response);
         }
     }

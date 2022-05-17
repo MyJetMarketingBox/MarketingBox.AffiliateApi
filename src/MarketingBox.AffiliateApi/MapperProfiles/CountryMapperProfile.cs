@@ -1,6 +1,6 @@
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Domain.Models.Country;
-using MarketingBox.Affiliate.Service.Grpc.Requests.Country;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Geo;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Country.Requests;
 

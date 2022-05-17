@@ -36,8 +36,10 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<OfferModel>> CreateAsync(
             [FromBody] OfferUpsertRequest upsertRequest)
         {
-            var response =
-                await _offerService.CreateAsync(_mapper.Map<OfferCreateRequestGRPC>(upsertRequest));
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<OfferCreateRequestGRPC>(upsertRequest);
+            requestGrpc.TenantId = tenantId;
+            var response = await _offerService.CreateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
         
@@ -47,9 +49,11 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] OfferUpsertRequest upsertRequest)
         {
             var affiliateId = this.GetUserId();
+            var tenantId = this.GetTenantId();
             var request = _mapper.Map<OfferUpdateRequest>(upsertRequest);
             request.OfferId = offerId;
             request.AffiliateId = affiliateId;
+            request.TenantId = tenantId;
             var response =
                 await _offerService.UpdateAsync(request);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
@@ -59,16 +63,20 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<OfferModel>> GetAsync(
             [FromRoute] int offerId)
         {
+            var tenantId = this.GetTenantId();
             var affiliateId = this.GetUserId();
-            var response = await _offerService.GetAsync(new() {Id = offerId, AffiliateId = affiliateId});
+            var response = await _offerService.GetAsync(new()
+                {Id = offerId, AffiliateId = affiliateId, TenantId = tenantId});
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 
         [HttpDelete("{offerId}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int offerId)
         {
+            var tenantId = this.GetTenantId();
             var affiliateId = this.GetUserId();
-            var response = await _offerService.DeleteAsync(new() {Id = offerId, AffiliateId = affiliateId});
+            var response = await _offerService.DeleteAsync(new()
+                {Id = offerId, AffiliateId = affiliateId, TenantId = tenantId});
             return this.ProcessResult(response);
         }
 
@@ -77,6 +85,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromQuery] Models.Offers.Requests.OfferSearchRequest paginationRequest)
         {
             var affiliateId = this.GetUserId();
+            var tenantId = this.GetTenantId();
             var request = new Affiliate.Service.Grpc.Requests.Offers.OfferSearchRequest
             {
                 Asc = paginationRequest.Order == PaginationOrder.Asc,
@@ -89,7 +98,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 LanguageIds = paginationRequest.LanguageIds.Parse<int>(),
                 OfferName = paginationRequest.OfferName,
                 GeoIds = paginationRequest.GeoIds.Parse<int>(),
-                OfferId = paginationRequest.OfferId
+                OfferId = paginationRequest.OfferId,
+                TenantId = tenantId
             };
             var response = await _offerService.SearchAsync(request);
             return this.ProcessResult(
@@ -104,10 +114,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<ProxyLinkModel>> GetUrl([FromRoute] long offerId)
         {
             var affiliateId = this.GetUserId();
+            var tenantId = this.GetTenantId();
             var url = await _offerService.GetUrlAsync(new()
             {
                 OfferId = offerId,
-                AffiliateId = affiliateId
+                AffiliateId = affiliateId,
+                TenantId = tenantId
             });
             return this.ProcessResult(url, new ProxyLinkModel
             {
