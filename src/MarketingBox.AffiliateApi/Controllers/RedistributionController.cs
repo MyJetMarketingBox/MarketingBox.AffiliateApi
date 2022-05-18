@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Redistribution;
 using MarketingBox.Redistribution.Service.Domain.Models;
@@ -9,7 +8,6 @@ using MarketingBox.Redistribution.Service.Grpc.Models;
 using MarketingBox.Sdk.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
@@ -19,16 +17,10 @@ namespace MarketingBox.AffiliateApi.Controllers
     public class RedistributionController : Controller
     {
         private readonly IRedistributionService _redistributionService;
-        private readonly ILogger<RedistributionController> _logger;
-        private readonly IMapper _mapper;
 
-        public RedistributionController(IRedistributionService redistributionService, 
-            ILogger<RedistributionController> logger, 
-            IMapper mapper)
+        public RedistributionController(IRedistributionService redistributionService)
         {
             _redistributionService = redistributionService;
-            _logger = logger;
-            _mapper = mapper;
         }
         
         [HttpGet]
@@ -57,6 +49,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 UseAutologin = request.UseAutologin,
                 RegistrationsIds = request.RegistrationsIds,
                 FilesIds = request.FilesIds,
+                TenantId = tenantId,
                 RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
             });
             return this.ProcessResult(response, response.Data);
