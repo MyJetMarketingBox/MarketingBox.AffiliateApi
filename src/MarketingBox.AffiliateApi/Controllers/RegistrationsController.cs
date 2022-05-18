@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using RegistrationAdditionalInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationAdditionalInfo;
 using RegistrationGeneralInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationGeneralInfo;
 using RegistrationRouteInfo = MarketingBox.AffiliateApi.Models.Registrations.RegistrationRouteInfo;
@@ -36,7 +35,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly IRegistrationService _registrationService;
         private readonly IDepositService _depositService;
 
-        public RegistrationsController(IRegistrationService registrationService,
+        public RegistrationsController(
+            IRegistrationService registrationService,
             ILogger<RegistrationsController> logger,
             IMapper mapper,
             IDepositService depositService)
@@ -101,11 +101,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             try
             {
+                var tenantId = this.GetTenantId();
                 var response = await _depositService.GetStatusChangeLogAsync(new GetStatusChangeLogRequest()
                 {
                     Mode = mode,
                     RegistrationId = registrationId,
-                    UserId = userId
+                    UserId = userId,
+                    TenantId = tenantId
                 });
 
                 return this.ProcessResult(response, response.Data ?? new List<StatusChangeLog>());
@@ -113,7 +115,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
+                return ex.Failed<List<StatusChangeLog>>();
             }
         }
 
