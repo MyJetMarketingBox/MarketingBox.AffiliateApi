@@ -82,7 +82,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response = await _brandBoxService.DeleteAsync(new BrandBoxByIdRequest
-                {BrandBoxId = brandBoxId, TenantId = tenantId});
+                {BrandBoxId = brandBoxId});
             return this.ProcessResult(response);
         }
 
@@ -91,7 +91,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response = await _brandBoxService.GetAsync(new BrandBoxByIdRequest
-                {BrandBoxId = brandBoxId, TenantId = tenantId});
+                {BrandBoxId = brandBoxId});
             return this.ProcessResult(response, _mapper.Map<BrandBoxModel>(response.Data));
         }
     }

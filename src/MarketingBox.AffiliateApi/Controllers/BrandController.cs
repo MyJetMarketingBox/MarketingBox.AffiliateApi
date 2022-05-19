@@ -70,7 +70,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute, Required] long brandId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _brandService.GetAsync(new() {BrandId = brandId, TenantId = tenantId});
+            var response = await _brandService.GetAsync(new() {BrandId = brandId});
 
             return this.ProcessResult(response, _mapper.Map<BrandModel>(response.Data));
         }
@@ -124,8 +124,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var tenantId = this.GetTenantId();
             var response = await _brandService.DeleteAsync(new()
             {
-                BrandId = brandId,
-                TenantId = tenantId
+                BrandId = brandId
             });
             this.ProcessResult(response, true);
             return Ok();

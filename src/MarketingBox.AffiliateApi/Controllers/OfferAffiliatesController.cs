@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.Affiliate.Service.Grpc.Requests;
 using MarketingBox.Affiliate.Service.Grpc.Requests.OfferAffiliate;
 using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
@@ -68,7 +67,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response =
-                await _offerAffiliateService.GetAsync(new() {OfferAffiliateId = offerAffiliateId, TenantId = tenantId});
+                await _offerAffiliateService.GetAsync(new() {OfferAffiliateId = offerAffiliateId});
             return this.ProcessResult(response, _mapper.Map<OfferAffiliateModel>(response.Data));
         }
 
@@ -77,7 +76,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response = await _offerAffiliateService.DeleteAsync(new()
-                {OfferAffiliateId = offerAffiliateId, TenantId = tenantId});
+                {OfferAffiliateId = offerAffiliateId});
             return this.ProcessResult(response);
         }
     }

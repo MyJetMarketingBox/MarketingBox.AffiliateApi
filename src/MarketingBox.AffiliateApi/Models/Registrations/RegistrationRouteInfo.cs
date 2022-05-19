@@ -3,7 +3,7 @@
     public class RegistrationRouteInfo
     {
         public long AffiliateId { get; set; }
-        public string AffiliateNane { get; set; }
+        public string AffiliateName { get; set; }
 
         public long CampaignId { get; set; }
 

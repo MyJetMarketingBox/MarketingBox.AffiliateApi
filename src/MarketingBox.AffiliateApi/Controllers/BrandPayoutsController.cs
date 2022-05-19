@@ -58,7 +58,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response = await _brandPayoutService.GetAsync(new PayoutByIdRequest()
-                {PayoutId = brandPayoutId, TenantId = tenantId});
+                {PayoutId = brandPayoutId});
             return this.ProcessResult(
                 response, _mapper.Map<BrandPayoutModel>(response.Data));
         }
@@ -91,7 +91,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var response = await _brandPayoutService.DeleteAsync(new PayoutByIdRequest
-                {PayoutId = brandPayoutId, TenantId = tenantId});
+                {PayoutId = brandPayoutId});
             return this.ProcessResult(response);
         }
     }

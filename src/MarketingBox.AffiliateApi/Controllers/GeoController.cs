@@ -80,7 +80,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<IActionResult> DeleteAsync([FromRoute] int geoId)
         {
             var tenantId = this.GetTenantId();
-            var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId, TenantId = tenantId});
+            var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId});
             return this.ProcessResult(response);
         }
     }

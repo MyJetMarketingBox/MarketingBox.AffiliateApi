@@ -65,8 +65,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var tenantId = this.GetTenantId();
             var affiliateId = this.GetUserId();
-            var response = await _offerService.GetAsync(new()
-                {Id = offerId, AffiliateId = affiliateId, TenantId = tenantId});
+            var response = await _offerService.GetByIdWithAccessAsync(new()
+                {Id = offerId, AffiliateId = affiliateId});
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 
@@ -76,7 +76,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var tenantId = this.GetTenantId();
             var affiliateId = this.GetUserId();
             var response = await _offerService.DeleteAsync(new()
-                {Id = offerId, AffiliateId = affiliateId, TenantId = tenantId});
+                {Id = offerId, AffiliateId = affiliateId});
             return this.ProcessResult(response);
         }
 
@@ -118,8 +118,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var url = await _offerService.GetUrlAsync(new()
             {
                 OfferId = offerId,
-                AffiliateId = affiliateId,
-                TenantId = tenantId
+                AffiliateId = affiliateId
             });
             return this.ProcessResult(url, new ProxyLinkModel
             {

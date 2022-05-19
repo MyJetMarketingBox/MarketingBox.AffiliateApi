@@ -68,7 +68,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpPut("{registrationId}/update-status")]
-        public async Task<ActionResult<Deposit>> UpdateStatusAsync(
+        public async Task<ActionResult<RegistrationModel>> UpdateStatusAsync(
             [FromRoute] long registrationId,
             [FromBody] RegistrationUpdateStatusRequest request)
         {
@@ -84,12 +84,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                     UserId = this.GetUserId()
                 });
 
-                return this.ProcessResult(response, _mapper.Map<Deposit>(response.Data));
+                return this.ProcessResult(response, Map(response.Data));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return ex.Failed<Deposit>();
+                return ex.Failed<RegistrationModel>();
             }
         }
 
@@ -143,6 +143,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 {
                     Email = registrationDetails.Email,
                     CreatedAt = registrationDetails.CreatedAt,
+                    DepositDate = registrationDetails.DepositDate,
                     ConversionDate = registrationDetails.ConversionDate,
                     CountryId = registrationDetails.CountryId,
                     FirstName = registrationDetails.FirstName,
@@ -154,12 +155,57 @@ namespace MarketingBox.AffiliateApi.Controllers
                 RouteInfo = new RegistrationRouteInfo()
                 {
                     AffiliateId = registrationDetails.AffiliateId,
-                    AffiliateNane = registrationDetails.AffiliateName,
+                    AffiliateName = registrationDetails.AffiliateName,
                     CampaignId = registrationDetails.CampaignId,
                     IntegrationIdId = registrationDetails.IntegrationId,
                     IntegrationName = registrationDetails.Integration,
                     BrandId = registrationDetails.BrandId,
                     BrandName = registrationDetails.CustomerBrand
+                }
+            };
+        }
+        private static RegistrationModel Map(Registration.Service.Domain.Models.Registrations.Registration registration)
+        {
+            return new RegistrationModel()
+            {
+                AdditionalInfo = new RegistrationAdditionalInfo()
+                {
+                    Funnel = registration.Funnel,
+                    AffCode = registration.AffCode,
+                    Sub1 = registration.Sub1,
+                    Sub2 = registration.Sub2,
+                    Sub3 = registration.Sub3,
+                    Sub4 = registration.Sub4,
+                    Sub5 = registration.Sub5,
+                    Sub6 = registration.Sub6,
+                    Sub7 = registration.Sub7,
+                    Sub8 = registration.Sub8,
+                    Sub9 = registration.Sub9,
+                    Sub10 = registration.Sub10
+                },
+                Status = registration.Status,
+                GeneralInfo = new RegistrationGeneralInfo()
+                {
+                    Email = registration.Email,
+                    CreatedAt = registration.CreatedAt,
+                    DepositDate = registration.DepositDate,
+                    ConversionDate = registration.ConversionDate,
+                    CountryId = registration.CountryId,
+                    FirstName = registration.FirstName,
+                    Ip = registration.Ip,
+                    LastName = registration.LastName,
+                    Phone = registration.Phone
+                },
+                RegistrationId = registration.Id,
+                RouteInfo = new RegistrationRouteInfo()
+                {
+                    AffiliateId = registration.AffiliateId,
+                    AffiliateName = registration.AffiliateName,
+                    CampaignId = registration.CampaignId ?? default,
+                    IntegrationIdId = registration.IntegrationId ?? default,
+                    IntegrationName = registration.Integration,
+                    BrandId = registration.BrandId ?? default,
+                    BrandName = registration.CustomerBrand
                 }
             };
         }
