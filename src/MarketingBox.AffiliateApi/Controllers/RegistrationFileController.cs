@@ -1,17 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoWrapper.Wrappers;
 using MarketingBox.AffiliateApi.Extensions;
+using MarketingBox.AffiliateApi.Models.RegistrationFile;
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.Redistribution.Service.Domain.Models;
 using MarketingBox.Redistribution.Service.Grpc;
 using MarketingBox.Redistribution.Service.Grpc.Models;
 using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,15 +29,15 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly ILogger<RegistrationFileController> _logger;
         private readonly IMapper _mapper;
 
-        public RegistrationFileController(IRegistrationImporter registrationImporter, 
-            ILogger<RegistrationFileController> logger, 
+        public RegistrationFileController(IRegistrationImporter registrationImporter,
+            ILogger<RegistrationFileController> logger,
             IMapper mapper)
         {
             _registrationImporter = registrationImporter;
             _logger = logger;
             _mapper = mapper;
         }
-        
+
         [HttpPost("upload-file")]
         public async Task<ActionResult<ImportResponse>> UploadFileAsync(IFormFile file)
         {
@@ -47,7 +48,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 
                 await using var s = file.OpenReadStream();
                 using var br = new BinaryReader(s);
-                var bytes = br.ReadBytes((int)s.Length);
+                var bytes = br.ReadBytes((int) s.Length);
 
                 var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
@@ -63,32 +64,42 @@ namespace MarketingBox.AffiliateApi.Controllers
                 return ex.Failed<ImportResponse>();
             }
         }
-        
-        [HttpGet("files")]
-        public async Task<ActionResult<List<RegistrationsFileHttp>>> GetFilesAsync()
-        {
-            try
-            {
-                var result = await _registrationImporter.GetRegistrationFilesAsync();
 
-                return this.ProcessResult(result, result?.Data?.Files.Select(_mapper.Map<RegistrationsFileHttp>).ToList());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                throw new ApiException(ex.Message);
-            }
-        }
-        
-        [HttpGet("parse-file")]
-        public async Task<ActionResult<List<RegistrationFromFile>>> GetRegistrationsFromFileAsync([FromQuery] long fileId)
+        [HttpGet("files")]
+        public async Task<ActionResult<Paginated<RegistrationsFileHttp, long?>>> GetFilesAsync(
+            [FromQuery] GetFilesRequestHttp request)
         {
-            var result = await _registrationImporter.GetRegistrationsFromFileAsync(new GetRegistrationsFromFileRequest()
+            var response = await _registrationImporter.GetRegistrationFilesAsync(new GetFilesRequest
             {
-                FileId = fileId
+                Asc = request.Order == PaginationOrder.Asc,
+                Cursor = request.Cursor,
+                Take = request.Limit
             });
 
-            return this.ProcessResult(result, result?.Data);
+            return this.ProcessResult(
+                response,
+                (response.Data?.Select(_mapper.Map<RegistrationsFileHttp>)
+                    .ToArray() ?? Array.Empty<RegistrationsFileHttp>())
+                .Paginate(request, Url, response.Total ?? default, x => x.Id));
+        }
+
+        [HttpGet("parse-file")]
+        public async Task<ActionResult<Paginated<RegistrationFromFile, long?>>> GetRegistrationsFromFileAsync(
+            [FromQuery] GetRegistrationsFromFileRequestHttp request)
+        {
+            var response = await _registrationImporter.GetRegistrationsFromFileAsync(
+                new GetRegistrationsFromFileRequest()
+            {                
+                Asc = request.Order == PaginationOrder.Asc,
+                Cursor = request.Cursor,
+                Take = request.Limit,
+                FileId = request.FileId,
+            });
+
+            return this.ProcessResult(
+                response,
+                (response.Data ?? Array.Empty<RegistrationFromFile>())
+                .Paginate(request, Url, response.Total ?? default, x => x.Index));
         }
     }
 }
