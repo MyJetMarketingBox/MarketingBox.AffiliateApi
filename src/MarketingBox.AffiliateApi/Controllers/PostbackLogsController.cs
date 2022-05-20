@@ -39,6 +39,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<EventReferenceLog, long?>>> GetLogs(
             [FromQuery] SearchPostbackLogsRequest paginationLogsRequest)
         {
+            var tenantId = this.GetTenantId();
             var request = new FilterLogsRequest()
             {
                 Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
@@ -51,7 +52,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 HttpQueryType = paginationLogsRequest.HttpQueryType,
                 ResponseStatus = paginationLogsRequest.ResponseStatus,
                 RegistrationUId = paginationLogsRequest.RegistrationUId,
-                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>()
+                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
+                TenantId = tenantId
             };
             var response = await _eventReferenceLogService.SearchAsync(request);
             

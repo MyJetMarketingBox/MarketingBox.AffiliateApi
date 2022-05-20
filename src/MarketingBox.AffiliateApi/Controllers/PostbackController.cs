@@ -49,6 +49,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<Reference, long?>>> SearchAsync(
             [FromQuery] MarketingBox.AffiliateApi.Models.Postback.Requests.SearchReferenceRequest paginationLogsRequest)
         {
+            var tenantId = this.GetTenantId();
             var response = await _postbackService.SearchAsync(new() 
             {
                 Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
@@ -57,7 +58,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 
                 AffiliateName = paginationLogsRequest.AffiliateName,
                 AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
-                HttpQueryType = paginationLogsRequest.HttpQueryType
+                HttpQueryType = paginationLogsRequest.HttpQueryType,
+                TenantId = tenantId
             });
 
             return this.ProcessResult(
@@ -72,9 +74,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Reference>> CreateAsync(
             [FromBody] ReferenceRequest request)
         {
-            request.AffiliateId = this.GetUserId();
-            var result = await _postbackService.CreateAsync(
-                _mapper.Map<CreateOrUpdateReferenceRequest>(request));
+            var grpcRequest =
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
+            grpcRequest.AffiliateId = this.GetUserId();
+            grpcRequest.TenantId = this.GetTenantId();
+            var result = await _postbackService.CreateAsync(grpcRequest);
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
@@ -82,9 +86,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Reference>> UpdateAsync(
             [FromBody] ReferenceRequest request)
         {
-            request.AffiliateId = this.GetUserId();
-            var result = await _postbackService.UpdateAsync(
-                _mapper.Map<CreateOrUpdateReferenceRequest>(request));
+            var grpcRequest =
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
+            grpcRequest.AffiliateId = this.GetUserId();
+            grpcRequest.TenantId = this.GetTenantId();
+            var result = await _postbackService.UpdateAsync(grpcRequest);
 
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
