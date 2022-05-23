@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MarketingBox.Affiliate.Service.Domain.Models.CampaignRows;
+using MarketingBox.Sdk.Common.Models;
 
 namespace MarketingBox.AffiliateApi.Models.CampaignRows.Requests
 {
-    public class CampaignRowUpsertRequest
+    public class CampaignRowUpsertRequest : ValidatableEntity
     {
         [Required]
         public long? BrandId { get; set; }

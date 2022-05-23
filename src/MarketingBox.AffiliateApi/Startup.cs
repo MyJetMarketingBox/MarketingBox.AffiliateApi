@@ -44,8 +44,9 @@ namespace MarketingBox.AffiliateApi
                     builder =>
                     {
                         builder
-                            .WithOrigins("http://localhost:3001", 
-                                "http://localhost:3002", 
+                            .WithOrigins(
+                                "http://localhost:3001",
+                                "http://localhost:3002",
                                 "http://localhost:3000",
                                 "http://marketing-box-frontend.marketing-box.svc.cluster.local:3000")
                             .AllowCredentials()
@@ -66,12 +67,9 @@ namespace MarketingBox.AffiliateApi
 
             services.BindTelemetry("AffiliateApi", "MB-", Program.Settings.JaegerUrl);
 
-            services.AddAutoMapper(typeof(Startup));     
-            
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+            services.AddAutoMapper(typeof(Startup));
+
+            services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
         }
 
         protected virtual void ConfigureJwtBearerOptions(JwtBearerOptions options)
@@ -111,11 +109,11 @@ namespace MarketingBox.AffiliateApi
             app.UseAuthorization();
 
             app.UseApiResponseAndExceptionWrapper<ApiResponseMap>(
-               new AutoWrapperOptions
-               {
-                   UseCustomSchema = true,
-                   IgnoreWrapForOkRequests = true
-               });
+                new AutoWrapperOptions
+                {
+                    UseCustomSchema = true,
+                    IgnoreWrapForOkRequests = true
+                });
 
             app.UseMetricServer();
 

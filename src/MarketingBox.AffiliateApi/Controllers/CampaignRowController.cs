@@ -11,6 +11,7 @@ using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc.Requests.CampaignRows;
 using MarketingBox.AffiliateApi.Models.CampaignRows;
 using MarketingBox.AffiliateApi.Models.CampaignRows.Requests;
+using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -27,7 +28,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly ICampaignRowService _campaignBoxService;
         private readonly IMapper _mapper;
 
-        public CampaignRowController(ICampaignRowService campaignBoxService, 
+        public CampaignRowController(ICampaignRowService campaignBoxService,
             IMapper mapper)
         {
             _campaignBoxService = campaignBoxService;
@@ -66,7 +67,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 (response.Data?
                     .Select(_mapper.Map<CampaignRowModel>)
                     .ToArray() ?? Array.Empty<CampaignRowModel>())
-                    .Paginate(request, Url, response.Total ?? default, x => x.CampaignRowId));
+                .Paginate(request, Url, response.Total ?? default, x => x.CampaignRowId));
         }
 
         /// <summary>
@@ -92,14 +93,28 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CampaignRowModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<CampaignRowModel>> CreateAsync(
-            [FromBody] CampaignRowUpsertRequest request)
+            [FromBody, Required] CampaignRowUpsertRequest request)
         {
-            var tenantId = this.GetTenantId();
-            var requestGrpc = _mapper.Map<CampaignRowCreateRequest>(request);
-            requestGrpc.TenantId = tenantId;
-            var response = await _campaignBoxService.CreateAsync(requestGrpc);
+            try
+            {
+                if (request is null)
+                {
+                    throw new BadRequestException("Request has invalid format");
+                }
 
-            return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+                request.ValidateEntity();
+
+                var tenantId = this.GetTenantId();
+                var requestGrpc = _mapper.Map<CampaignRowCreateRequest>(request);
+                requestGrpc.TenantId = tenantId;
+                var response = await _campaignBoxService.CreateAsync(requestGrpc);
+
+                return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+            }
+            catch (Exception e)
+            {
+                return e.Failed<CampaignRowModel>();
+            }
         }
 
         /// <summary>
@@ -112,13 +127,26 @@ namespace MarketingBox.AffiliateApi.Controllers
             [Required, FromRoute] long campaignRowId,
             [FromBody] CampaignRowUpsertRequest request)
         {
-            var tenantId = this.GetTenantId();
-            var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
-            requestGrpc.CampaignRowId = campaignRowId;
-            requestGrpc.TenantId = tenantId;
-            var response = await _campaignBoxService.UpdateAsync(requestGrpc);
+            try
+            {
+                if (request is null)
+                {
+                    throw new BadRequestException("Request has invalid format");
+                }
 
-            return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+                request.ValidateEntity();
+                var tenantId = this.GetTenantId();
+                var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
+                requestGrpc.CampaignRowId = campaignRowId;
+                requestGrpc.TenantId = tenantId;
+                var response = await _campaignBoxService.UpdateAsync(requestGrpc);
+
+                return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+            }
+            catch (Exception e)
+            {
+                return e.Failed<CampaignRowModel>();
+            }
         }
 
         /// <summary>
