@@ -90,6 +90,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 
             var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Campaigns.CampaignCreateRequest>(request);
             requestGrpc.TenantId = tenantId;
+            requestGrpc.CreatedById = this.GetUserId();
             var response = await _campaignService.CreateAsync(requestGrpc);
 
             return this.ProcessResult(response, _mapper.Map<CampaignModel>(response.Data));
