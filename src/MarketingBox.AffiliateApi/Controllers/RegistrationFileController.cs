@@ -53,7 +53,8 @@ namespace MarketingBox.AffiliateApi.Controllers
                 var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
                     RegistrationsFile = bytes,
-                    UserId = this.GetUserId()
+                    UserId = this.GetUserId(),
+                    TenantId = this.GetTenantId()
                 });
 
                 return this.ProcessResult(response, response?.Data);
