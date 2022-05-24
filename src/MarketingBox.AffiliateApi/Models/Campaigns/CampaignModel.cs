@@ -8,6 +8,6 @@ namespace MarketingBox.AffiliateApi.Models.Campaigns
 
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime LastActiveAt { get; set; }
+        public DateTime? LastActiveAt { get; set; }
     }
 }
