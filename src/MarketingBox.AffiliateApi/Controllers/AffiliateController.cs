@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Extensions;
 using System.Linq;
 using AutoMapper;
 using MarketingBox.AffiliateApi.Models.Affiliates;
