@@ -43,7 +43,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             try
             {
-                if (!file.FileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
+                var fileName = file.FileName;
+                if (!fileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
                     throw new BadRequestException("Unsupported file type");
 
                 await using var s = file.OpenReadStream();
@@ -52,6 +53,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 
                 var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
+                    FileName = fileName,
                     RegistrationsFile = bytes,
                     UserId = this.GetUserId(),
                     TenantId = this.GetTenantId()
@@ -74,7 +76,8 @@ namespace MarketingBox.AffiliateApi.Controllers
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 Cursor = request.Cursor,
-                Take = request.Limit
+                Take = request.Limit,
+                FileName = request.FileName
             });
 
             return this.ProcessResult(

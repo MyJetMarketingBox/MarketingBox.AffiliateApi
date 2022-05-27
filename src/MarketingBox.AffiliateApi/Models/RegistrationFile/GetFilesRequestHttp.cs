@@ -4,5 +4,6 @@ namespace MarketingBox.AffiliateApi.Models.RegistrationFile
 {
     public class GetFilesRequestHttp : PaginationRequest<long?>
     {
+        public string FileName { get; set; }
     }
 }

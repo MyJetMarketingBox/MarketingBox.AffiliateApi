@@ -39,6 +39,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                     AffiliateId = request.AffiliateId,
                     CampaignId = request.CampaignId,
                     CreatedBy = request.CreatedBy,
+                    Name = request.Name,
                     TenantId = tenantId
                 });
             return this.ProcessResult(
@@ -52,11 +53,14 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<RedistributionEntity>> CreateAsync(
             [FromBody] CreateRedistributionRequestHttp request)
         {
+            request.ValidateEntity();
+            
             var tenantId = this.GetTenantId();
             
             var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
             {
                 CreatedBy = this.GetUserId(),
+                Name = request.Name,
                 AffiliateId = request.AffiliateId,
                 CampaignId = request.CampaignId,
                 Frequency = request.Frequency,
