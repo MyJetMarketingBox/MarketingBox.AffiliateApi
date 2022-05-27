@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
 using MarketingBox.Affiliate.Service.Domain.Models.OfferAffiliates;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
@@ -9,6 +10,8 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
     public class AffiliateModel
     {
         public long Id { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
 
         public AffiliateGeneralInfo GeneralInfo { get; set; }
 
