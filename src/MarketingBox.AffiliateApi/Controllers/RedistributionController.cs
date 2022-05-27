@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MarketingBox.AffiliateApi.Extensions;
@@ -53,27 +54,34 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<RedistributionEntity>> CreateAsync(
             [FromBody] CreateRedistributionRequestHttp request)
         {
-            request.ValidateEntity();
-            
-            var tenantId = this.GetTenantId();
-            
-            var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
+            try
             {
-                CreatedBy = this.GetUserId(),
-                Name = request.Name,
-                AffiliateId = request.AffiliateId,
-                CampaignId = request.CampaignId,
-                Frequency = request.Frequency,
-                Status = RedistributionState.Disable,
-                PortionLimit = request.PortionLimit,
-                DayLimit = request.DayLimit,
-                UseAutologin = request.UseAutologin,
-                RegistrationsIds = request.RegistrationsIds,
-                FilesIds = request.FilesIds,
-                TenantId = tenantId,
-                RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
-            });
-            return this.ProcessResult(response, response.Data);
+                request.ValidateEntity();
+
+                var tenantId = this.GetTenantId();
+
+                var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
+                {
+                    CreatedBy = this.GetUserId(),
+                    Name = request.Name,
+                    AffiliateId = request.AffiliateId,
+                    CampaignId = request.CampaignId,
+                    Frequency = request.Frequency,
+                    Status = RedistributionState.Disable,
+                    PortionLimit = request.PortionLimit,
+                    DayLimit = request.DayLimit,
+                    UseAutologin = request.UseAutologin,
+                    RegistrationsIds = request.RegistrationsIds,
+                    FilesIds = request.FilesIds,
+                    TenantId = tenantId,
+                    RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
+                });
+                return this.ProcessResult(response, response.Data);
+            }
+            catch(Exception e)
+            {
+                return e.Failed<RedistributionEntity>();
+            }
         }
 
         [HttpPut]
