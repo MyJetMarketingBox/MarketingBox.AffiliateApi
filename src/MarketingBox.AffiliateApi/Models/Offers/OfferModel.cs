@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MarketingBox.Affiliate.Service.Domain.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Country;
@@ -18,5 +19,6 @@ namespace MarketingBox.AffiliateApi.Models.Offers
         public OfferPrivacy? Privacy { get; set; }
         public OfferState? State { get; set; }
         public long? BrandId { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

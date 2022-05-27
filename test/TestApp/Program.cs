@@ -6,6 +6,7 @@ namespace TestApp
     {
         static async Task Main(string[] args)
         {
+            await Task.CompletedTask;
         }
     }
 }

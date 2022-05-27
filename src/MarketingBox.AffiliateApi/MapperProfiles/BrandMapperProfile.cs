@@ -5,7 +5,7 @@ using MarketingBox.AffiliateApi.Models.Brands.Requests;
 
 namespace MarketingBox.AffiliateApi.MapperProfiles
 {
-    public class BrandMapperProfile :Profile
+    public class BrandMapperProfile : Profile
     {
         public BrandMapperProfile()
         {
