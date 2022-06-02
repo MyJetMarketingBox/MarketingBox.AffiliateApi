@@ -13,7 +13,7 @@ namespace MarketingBox.AffiliateApi.Models.Affiliates
         
         public DateTime CreatedAt { get; set; }
 
-        public AffiliateGeneralInfoBase GeneralInfoBase { get; set; }
+        public AffiliateGeneralInfoBase GeneralInfo { get; set; }
 
         public AffiliateCompany Company { get; set; }
 

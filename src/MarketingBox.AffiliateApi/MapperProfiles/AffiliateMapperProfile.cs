@@ -19,7 +19,7 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
             CreateMap<AffiliateGeneralInfoCreate, GeneralInfoRequest>();
 
             CreateMap<Affiliate.Service.Domain.Models.Affiliates.Affiliate, AffiliateModel>()
-                .ForMember(x => x.GeneralInfoBase, x => x.MapFrom(z => z));
+                .ForMember(x => x.GeneralInfo, x => x.MapFrom(z => z));
             CreateMap<Bank, AffiliateBank>();
             CreateMap<Company, AffiliateCompany>();
             CreateMap<Affiliate.Service.Domain.Models.Affiliates.Affiliate, AffiliateGeneralInfoBase>();
