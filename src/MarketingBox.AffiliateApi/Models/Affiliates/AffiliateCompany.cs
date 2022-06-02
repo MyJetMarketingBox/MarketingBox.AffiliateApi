@@ -1,13 +1,16 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Affiliates
+﻿using System.ComponentModel.DataAnnotations;
+using MarketingBox.Sdk.Common.Models;
+
+namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
-    public class AffiliateCompany
+    public class AffiliateCompany : ValidatableEntity
     {
-        public string Name { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Name { get; set; }
 
-        public string Address { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Address { get; set; }
 
-        public string RegNumber { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string RegNumber { get; set; }
 
-        public string VatId { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string VatId { get; set; }
     }
 }

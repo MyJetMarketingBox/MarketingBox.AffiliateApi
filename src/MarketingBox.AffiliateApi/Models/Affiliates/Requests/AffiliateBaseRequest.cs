@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using MarketingBox.Sdk.Common.Models;
 
 namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
 {
-    public class AffiliateUpsertRequest
+    public class AffiliateBaseRequest : ValidatableEntity
     {
-        [Required]
-        public AffiliateGeneralInfo GeneralInfo { get; set; }
-
         public AffiliateCompany Company { get; set; }
 
         public AffiliateBank Bank { get; set; }

@@ -1,19 +1,22 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Affiliates
+﻿using System.ComponentModel.DataAnnotations;
+using MarketingBox.Sdk.Common.Models;
+
+namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
-    public class AffiliateBank
+    public class AffiliateBank : ValidatableEntity
     {
-        public string BeneficiaryName { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string BeneficiaryName { get; set; }
 
-        public string BeneficiaryAddress { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string BeneficiaryAddress { get; set; }
 
-        public string Name { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Name { get; set; }
 
-        public string Address { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Address { get; set; }
 
-        public string AccountNumber { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string AccountNumber { get; set; }
 
-        public string Swift { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Swift { get; set; }
 
-        public string Iban { get; set; }
+        [StringLength(128, MinimumLength = 1)] public string Iban { get; set; }
     }
 }

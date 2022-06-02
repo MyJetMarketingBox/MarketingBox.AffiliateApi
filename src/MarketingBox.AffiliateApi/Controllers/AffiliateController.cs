@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MarketingBox.Affiliate.Service.Grpc;
 using System.Linq;
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Grpc.Requests.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates;
 using MarketingBox.AffiliateApi.Models.Affiliates.Requests;
 using MarketingBox.Sdk.Common.Extensions;
@@ -91,14 +92,23 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> CreateAsync(
-            [FromBody] AffiliateUpsertRequest request)
+            [FromBody] AffiliateCreateRequestHttp requestHttp)
         {
-            var tenantId = this.GetTenantId();
-            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Affiliates.AffiliateCreateRequest>(request);
-            requestGrpc.TenantId = tenantId;
-            var response = await _affiliateService.CreateAsync(requestGrpc);
+            try
+            {
+                requestHttp.ValidateEntity();
+            
+                var tenantId = this.GetTenantId();
+                var requestGrpc = _mapper.Map<AffiliateCreateRequest>(requestHttp);
+                requestGrpc.TenantId = tenantId;
+                var response = await _affiliateService.CreateAsync(requestGrpc);
 
-            return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
+                return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
+            }
+            catch (Exception e)
+            {
+                return e.Failed<AffiliateModel>();
+            }
         }
 
         /// <summary>
@@ -109,15 +119,24 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(AffiliateModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<AffiliateModel>> UpdateAsync(
             [Required, FromRoute] long affiliateId,
-            [FromBody] AffiliateUpsertRequest request)
+            [FromBody] AffiliateUpdateRequestHttp requestHttp)
         {
-            var tenantId = this.GetTenantId();
-            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Affiliates.AffiliateUpdateRequest>(request);
-            requestGrpc.TenantId = tenantId;
-            requestGrpc.AffiliateId = affiliateId;
-            var response = await _affiliateService.UpdateAsync(requestGrpc);
+            try
+            {
+                requestHttp.ValidateEntity();
+                
+                var tenantId = this.GetTenantId();
+                var requestGrpc = _mapper.Map<AffiliateUpdateRequest>(requestHttp);
+                requestGrpc.TenantId = tenantId;
+                requestGrpc.AffiliateId = affiliateId;
+                var response = await _affiliateService.UpdateAsync(requestGrpc);
             
-            return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
+                return this.ProcessResult(response, _mapper.Map<AffiliateModel>(response.Data));
+            }
+            catch (Exception e)
+            {
+                return e.Failed<AffiliateModel>();
+            }
         }
     }
 }
