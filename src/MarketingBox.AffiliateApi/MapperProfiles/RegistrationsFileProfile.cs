@@ -10,7 +10,9 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public RegistrationsFileProfile()
         {
-            CreateMap<RegistrationsFile, RegistrationsFileHttp>();
+            CreateMap<RegistrationsFile, RegistrationsFileHttp>()
+                .ForMember(x => x.CreatedByUserId, x => x.MapFrom(z => z.CreatedBy))
+                .ForMember(x => x.CreatedByUserName, x => x.MapFrom("Some user"));
         }
     }
 }
