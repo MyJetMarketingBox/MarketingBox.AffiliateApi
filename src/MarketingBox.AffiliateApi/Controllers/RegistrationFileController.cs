@@ -38,7 +38,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpPost("upload-file")]
-        public async Task<ActionResult<ImportResponse>> UploadFileAsync(IFormFile file)
+        public async Task<ActionResult<RegistrationsFileHttp>> UploadFileAsync(IFormFile file)
         {
             var fileName = file.FileName;
             if (!fileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
@@ -56,7 +56,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = this.GetTenantId()
             });
 
-            return this.ProcessResult(response, response?.Data);
+            return this.ProcessResult(response, _mapper.Map<RegistrationsFileHttp>(response?.Data));
         }
 
         [HttpGet("files")]
