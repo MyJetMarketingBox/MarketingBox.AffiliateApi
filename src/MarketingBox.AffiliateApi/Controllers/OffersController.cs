@@ -5,7 +5,6 @@ using AutoMapper;
 using MarketingBox.Affiliate.Service.Domain.Models.Offers;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Offers;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.OfferAffiliates;
 using MarketingBox.AffiliateApi.Models.Offers;
 using MarketingBox.AffiliateApi.Models.Offers.Requests;

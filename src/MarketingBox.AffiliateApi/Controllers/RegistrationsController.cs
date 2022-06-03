@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +63,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 (response.Data?
                     .Select(Map)
                     .ToArray() ?? Array.Empty<RegistrationModel>())
-                    .Paginate(request, Url, response.Total ?? default, x => x.RegistrationId));
+                .Paginate(request, Url, response.Total ?? default, x => x.RegistrationId));
         }
 
         [HttpPut("{registrationId}/update-status")]
@@ -72,25 +71,17 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] long registrationId,
             [FromBody] RegistrationUpdateStatusRequest request)
         {
-            try
+            var response = await _depositService.UpdateDepositStatusAsync(new UpdateDepositStatusRequest()
             {
-                var response = await _depositService.UpdateDepositStatusAsync(new UpdateDepositStatusRequest()
-                {
-                    Mode = DepositUpdateMode.Manually,
-                    Comment = request.Comment,
-                    NewStatus = request.Status,
-                    RegistrationId = registrationId,
-                    TenantId = this.GetTenantId(),
-                    UserId = this.GetUserId()
-                });
+                Mode = DepositUpdateMode.Manually,
+                Comment = request.Comment,
+                NewStatus = request.Status,
+                RegistrationId = registrationId,
+                TenantId = this.GetTenantId(),
+                UserId = this.GetUserId()
+            });
 
-                return this.ProcessResult(response, Map(response.Data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return ex.Failed<RegistrationModel>();
-            }
+            return this.ProcessResult(response, Map(response.Data));
         }
 
         [HttpGet("status-log")]
@@ -99,24 +90,16 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromQuery] long? registrationId,
             [FromQuery] DepositUpdateMode? mode)
         {
-            try
+            var tenantId = this.GetTenantId();
+            var response = await _depositService.GetStatusChangeLogAsync(new GetStatusChangeLogRequest()
             {
-                var tenantId = this.GetTenantId();
-                var response = await _depositService.GetStatusChangeLogAsync(new GetStatusChangeLogRequest()
-                {
-                    Mode = mode,
-                    RegistrationId = registrationId,
-                    UserId = userId,
-                    TenantId = tenantId
-                });
+                Mode = mode,
+                RegistrationId = registrationId,
+                UserId = userId,
+                TenantId = tenantId
+            });
 
-                return this.ProcessResult(response, response.Data ?? new List<StatusChangeLog>());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return ex.Failed<List<StatusChangeLog>>();
-            }
+            return this.ProcessResult(response, response.Data ?? new List<StatusChangeLog>());
         }
 
         private static RegistrationModel Map(RegistrationDetails registrationDetails)
@@ -164,6 +147,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 }
             };
         }
+
         private static RegistrationModel Map(Registration.Service.Domain.Models.Registrations.Registration registration)
         {
             return new RegistrationModel()

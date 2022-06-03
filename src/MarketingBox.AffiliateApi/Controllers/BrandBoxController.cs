@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.BrandBox;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.BrandBox;
 using MarketingBox.AffiliateApi.Models.BrandBox.Requests;
 using MarketingBox.Sdk.Common.Extensions;

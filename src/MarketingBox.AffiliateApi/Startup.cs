@@ -4,6 +4,7 @@ using System.Text;
 using Autofac;
 using AutoWrapper;
 using MarketingBox.AffiliateApi.Modules;
+using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -115,6 +116,8 @@ namespace MarketingBox.AffiliateApi
                     IgnoreWrapForOkRequests = true
                 });
 
+            app.UseExceptions();
+            
             app.UseMetricServer();
 
             app.BindServicesTree(Assembly.GetExecutingAssembly());

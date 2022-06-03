@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Geo;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Country;
 using MarketingBox.AffiliateApi.Models.Country.Requests;
 using MarketingBox.Sdk.Common.Extensions;

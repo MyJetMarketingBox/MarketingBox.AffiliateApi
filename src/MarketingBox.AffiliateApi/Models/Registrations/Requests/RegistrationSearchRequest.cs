@@ -1,6 +1,6 @@
 ﻿using System;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.Sdk.Common.Enums;
+using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.Models.Registrations.Requests

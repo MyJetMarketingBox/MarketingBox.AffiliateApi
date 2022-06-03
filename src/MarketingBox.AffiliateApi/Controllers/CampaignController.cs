@@ -1,6 +1,5 @@
 using System;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

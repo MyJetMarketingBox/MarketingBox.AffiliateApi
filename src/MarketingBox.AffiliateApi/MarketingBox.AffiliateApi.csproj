@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>179abb27-f37b-4a02-b529-17c2c43e46b5</UserSecretsId>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,12 +13,12 @@
     <PackageReference Include="Destructurama.Attributed" Version="3.0.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.46.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
-    <PackageReference Include="MarketingBox.Affiliate.Service.Client" Version="2.3.12" />
+    <PackageReference Include="MarketingBox.Affiliate.Service.Client" Version="2.3.13" />
     <PackageReference Include="MarketingBox.Postback.Service.Client" Version="1.0.21" />
     <PackageReference Include="MarketingBox.Redistribution.Service.Client" Version="1.0.12" />
     <PackageReference Include="MarketingBox.Registration.Service.Client" Version="3.4.5" />
     <PackageReference Include="MarketingBox.Reporting.Service.Client" Version="3.3.23" />
-    <PackageReference Include="MarketingBox.Sdk.Common" Version="1.0.16" />
+    <PackageReference Include="MarketingBox.Sdk.Common" Version="1.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
@@ -27,7 +27,7 @@
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.2.3" />
     <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="2.2.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.16.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.16.1" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageReference Include="protobuf-net.Grpc.AspNetCore" Version="1.0.152" />
     <PackageReference Include="SimpleTrading.BaseMetrics" Version="1.0.3" />

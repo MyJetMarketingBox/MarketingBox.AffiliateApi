@@ -1,6 +1,5 @@
 using System;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -95,26 +94,19 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<CampaignRowModel>> CreateAsync(
             [FromBody, Required] CampaignRowUpsertRequest request)
         {
-            try
+            if (request is null)
             {
-                if (request is null)
-                {
-                    throw new BadRequestException("Request has invalid format");
-                }
-
-                request.ValidateEntity();
-
-                var tenantId = this.GetTenantId();
-                var requestGrpc = _mapper.Map<CampaignRowCreateRequest>(request);
-                requestGrpc.TenantId = tenantId;
-                var response = await _campaignBoxService.CreateAsync(requestGrpc);
-
-                return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+                throw new BadRequestException("Request has invalid format");
             }
-            catch (Exception e)
-            {
-                return e.Failed<CampaignRowModel>();
-            }
+
+            request.ValidateEntity();
+
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<CampaignRowCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            var response = await _campaignBoxService.CreateAsync(requestGrpc);
+
+            return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
         }
 
         /// <summary>
@@ -127,26 +119,19 @@ namespace MarketingBox.AffiliateApi.Controllers
             [Required, FromRoute] long campaignRowId,
             [FromBody] CampaignRowUpsertRequest request)
         {
-            try
+            if (request is null)
             {
-                if (request is null)
-                {
-                    throw new BadRequestException("Request has invalid format");
-                }
-
-                request.ValidateEntity();
-                var tenantId = this.GetTenantId();
-                var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
-                requestGrpc.CampaignRowId = campaignRowId;
-                requestGrpc.TenantId = tenantId;
-                var response = await _campaignBoxService.UpdateAsync(requestGrpc);
-
-                return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
+                throw new BadRequestException("Request has invalid format");
             }
-            catch (Exception e)
-            {
-                return e.Failed<CampaignRowModel>();
-            }
+
+            request.ValidateEntity();
+            var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
+            requestGrpc.CampaignRowId = campaignRowId;
+            requestGrpc.TenantId = tenantId;
+            var response = await _campaignBoxService.UpdateAsync(requestGrpc);
+
+            return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
         }
 
         /// <summary>

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.RegistrationFile;
 using MarketingBox.AffiliateApi.Models.Registrations;
 using MarketingBox.Redistribution.Service.Domain.Models;
@@ -41,31 +40,23 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost("upload-file")]
         public async Task<ActionResult<ImportResponse>> UploadFileAsync(IFormFile file)
         {
-            try
+            var fileName = file.FileName;
+            if (!fileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
+                throw new BadRequestException("Unsupported file type");
+
+            await using var s = file.OpenReadStream();
+            using var br = new BinaryReader(s);
+            var bytes = br.ReadBytes((int) s.Length);
+
+            var response = await _registrationImporter.ImportAsync(new ImportRequest()
             {
-                var fileName = file.FileName;
-                if (!fileName.Contains(".csv", StringComparison.InvariantCultureIgnoreCase))
-                    throw new BadRequestException("Unsupported file type");
+                FileName = fileName.Replace(".csv", ""),
+                RegistrationsFile = bytes,
+                UserId = this.GetUserId(),
+                TenantId = this.GetTenantId()
+            });
 
-                await using var s = file.OpenReadStream();
-                using var br = new BinaryReader(s);
-                var bytes = br.ReadBytes((int) s.Length);
-
-                var response = await _registrationImporter.ImportAsync(new ImportRequest()
-                {
-                    FileName = fileName.Replace(".csv",""),
-                    RegistrationsFile = bytes,
-                    UserId = this.GetUserId(),
-                    TenantId = this.GetTenantId()
-                });
-
-                return this.ProcessResult(response, response?.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return ex.Failed<ImportResponse>();
-            }
+            return this.ProcessResult(response, response?.Data);
         }
 
         [HttpGet("files")]
@@ -93,12 +84,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         {
             var response = await _registrationImporter.GetRegistrationsFromFileAsync(
                 new GetRegistrationsFromFileRequest()
-            {                
-                Asc = request.Order == PaginationOrder.Asc,
-                Cursor = request.Cursor,
-                Take = request.Limit,
-                FileId = request.FileId,
-            });
+                {
+                    Asc = request.Order == PaginationOrder.Asc,
+                    Cursor = request.Cursor,
+                    Take = request.Limit,
+                    FileId = request.FileId,
+                });
 
             return this.ProcessResult(
                 response,

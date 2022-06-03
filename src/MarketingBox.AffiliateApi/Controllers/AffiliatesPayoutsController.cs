@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Enums;

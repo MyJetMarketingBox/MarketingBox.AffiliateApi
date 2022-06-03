@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Reports;
 using MarketingBox.Reporting.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;

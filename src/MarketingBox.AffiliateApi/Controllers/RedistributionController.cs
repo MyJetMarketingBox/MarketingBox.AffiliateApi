@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Redistribution;
 using MarketingBox.Redistribution.Service.Domain.Models;
 using MarketingBox.Redistribution.Service.Grpc;
@@ -34,7 +32,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             var response = await _redistributionService.GetRedistributionsAsync(
                 new GetRedistributionsRequest
                 {
-                    Asc = request.Order==PaginationOrder.Asc,
+                    Asc = request.Order == PaginationOrder.Asc,
                     Cursor = request.Cursor,
                     Take = request.Limit,
                     AffiliateId = request.AffiliateId,
@@ -54,34 +52,27 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<RedistributionEntity>> CreateAsync(
             [FromBody] CreateRedistributionRequestHttp request)
         {
-            try
-            {
-                request.ValidateEntity();
+            request.ValidateEntity();
 
-                var tenantId = this.GetTenantId();
+            var tenantId = this.GetTenantId();
 
-                var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
-                {
-                    CreatedBy = this.GetUserId(),
-                    Name = request.Name,
-                    AffiliateId = request.AffiliateId,
-                    CampaignId = request.CampaignId,
-                    Frequency = request.Frequency,
-                    Status = RedistributionState.Disable,
-                    PortionLimit = request.PortionLimit,
-                    DayLimit = request.DayLimit,
-                    UseAutologin = request.UseAutologin,
-                    RegistrationsIds = request.RegistrationsIds,
-                    FilesIds = request.FilesIds,
-                    TenantId = tenantId,
-                    RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
-                });
-                return this.ProcessResult(response, response.Data);
-            }
-            catch(Exception e)
+            var response = await _redistributionService.CreateRedistributionAsync(new CreateRedistributionRequest()
             {
-                return e.Failed<RedistributionEntity>();
-            }
+                CreatedBy = this.GetUserId(),
+                Name = request.Name,
+                AffiliateId = request.AffiliateId,
+                CampaignId = request.CampaignId,
+                Frequency = request.Frequency,
+                Status = RedistributionState.Disable,
+                PortionLimit = request.PortionLimit,
+                DayLimit = request.DayLimit,
+                UseAutologin = request.UseAutologin,
+                RegistrationsIds = request.RegistrationsIds,
+                FilesIds = request.FilesIds,
+                TenantId = tenantId,
+                RegistrationSearchRequest = request.RegistrationSearchRequest?.GetGrpcModel(tenantId)
+            });
+            return this.ProcessResult(response, response.Data);
         }
 
         [HttpPut]

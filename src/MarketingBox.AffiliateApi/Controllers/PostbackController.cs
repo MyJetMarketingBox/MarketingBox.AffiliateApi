@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
-using MarketingBox.AffiliateApi.Extensions;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.Postback.Service.Grpc;
 using Microsoft.AspNetCore.Authorization;
