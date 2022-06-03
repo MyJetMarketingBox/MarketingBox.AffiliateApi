@@ -53,7 +53,7 @@ namespace MarketingBox.AffiliateApi.Controllers
 
                 var response = await _registrationImporter.ImportAsync(new ImportRequest()
                 {
-                    FileName = fileName,
+                    FileName = fileName.Replace(".csv",""),
                     RegistrationsFile = bytes,
                     UserId = this.GetUserId(),
                     TenantId = this.GetTenantId()
