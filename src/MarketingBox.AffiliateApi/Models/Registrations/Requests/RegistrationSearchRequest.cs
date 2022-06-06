@@ -1,4 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
+using MarketingBox.Reporting.Service.Grpc.Requests.Registrations;
+using MarketingBox.Sdk.Common.Attributes;
 using MarketingBox.Sdk.Common.Enums;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -8,7 +11,11 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
     public class RegistrationSearchRequest : PaginationRequest<long?>
     {
         public string AffiliateIds { get; set; }
+        
+        [IsEnum]
         public RegistrationsReportType? Type { get; set; }
+        [DefaultValue(DateTimeType.RegistrationDate)]
+        public DateTimeType? DateType { get; set; }
         public string CountryIds { get; set; }
         public string BrandBoxIds { get; set; }
         public string Statuses { get; set; }
@@ -23,6 +30,7 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
         public string FirstName { get; set; }
         public string IntegrationIds { get; set; }
         public string LastName { get; set; }
+        public string OfferIds { get; set; }
         
         public MarketingBox.Reporting.Service.Grpc.Requests.Registrations.RegistrationSearchRequest GetGrpcModel(string tenantId)
         {
@@ -47,8 +55,11 @@ namespace MarketingBox.AffiliateApi.Models.Registrations.Requests
                 CampaignIds = CampaignIds.Parse<long>(),
                 FirstName = FirstName,
                 IntegrationIds = IntegrationIds.Parse<long>(),
-                LastName = LastName
+                OfferIds = OfferIds.Parse<long>(),
+                LastName = LastName,
+                DateType = DateType ?? DateTimeType.RegistrationDate
             };
         }
+
     }
 }

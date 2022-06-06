@@ -45,6 +45,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<AffiliateModel, long?>>> SearchAsync(
             [FromQuery] AffiliateSearchRequest request)
         {
+            request.ValidateEntity();
+            
             var tenantId = this.GetTenantId();
 
             var response = await _affiliateService.SearchAsync(new()

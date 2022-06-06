@@ -55,6 +55,8 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<Paginated<RegistrationModel, long?>>> SearchAsync(
             [FromQuery] RegistrationSearchRequest request)
         {
+            request.ValidateEntity();
+            
             var tenantId = this.GetTenantId();
 
             var response = await _registrationService.SearchAsync(request.GetGrpcModel(tenantId));
@@ -140,10 +142,13 @@ namespace MarketingBox.AffiliateApi.Controllers
                     AffiliateId = registrationDetails.AffiliateId,
                     AffiliateName = registrationDetails.AffiliateName,
                     CampaignId = registrationDetails.CampaignId,
-                    IntegrationIdId = registrationDetails.IntegrationId,
+                    CampaignName = registrationDetails.CampaignName,
+                    IntegrationId = registrationDetails.IntegrationId,
                     IntegrationName = registrationDetails.Integration,
                     BrandId = registrationDetails.BrandId,
-                    BrandName = registrationDetails.CustomerBrand
+                    BrandName = registrationDetails.CustomerBrand,
+                    OfferId = registrationDetails.OfferId,
+                    OfferName = registrationDetails.OfferName
                 }
             };
         }
@@ -185,11 +190,14 @@ namespace MarketingBox.AffiliateApi.Controllers
                 {
                     AffiliateId = registration.AffiliateId,
                     AffiliateName = registration.AffiliateName,
-                    CampaignId = registration.CampaignId ?? default,
-                    IntegrationIdId = registration.IntegrationId ?? default,
+                    CampaignId = registration.CampaignId,
+                    CampaignName = registration.CampaignName,
+                    IntegrationId = registration.IntegrationId,
                     IntegrationName = registration.Integration,
-                    BrandId = registration.BrandId ?? default,
-                    BrandName = registration.CustomerBrand
+                    BrandId = registration.BrandId,
+                    BrandName = registration.CustomerBrand,
+                    OfferId = registration.OfferId,
+                    OfferName = registration.OfferName
                 }
             };
         }
