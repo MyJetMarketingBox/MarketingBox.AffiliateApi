@@ -49,7 +49,6 @@ namespace MarketingBox.AffiliateApi.Controllers
                 ToDate = paginationLogsRequest.ToDate,
                 FromDate = paginationLogsRequest.FromDate,
                 HttpQueryType = paginationLogsRequest.HttpQueryType,
-                ResponseStatus = paginationLogsRequest.ResponseStatus,
                 RegistrationUId = paginationLogsRequest.RegistrationUId,
                 AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
                 TenantId = tenantId
