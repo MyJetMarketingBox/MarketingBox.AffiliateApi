@@ -12,7 +12,6 @@ namespace MarketingBox.AffiliateApi.Models.PostbackLogs.Requests
         public HttpQueryType? HttpQueryType { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-        public PostbackResponseStatus? ResponseStatus { get; set; }
         public string RegistrationUId { get; set; }
     }
 }
