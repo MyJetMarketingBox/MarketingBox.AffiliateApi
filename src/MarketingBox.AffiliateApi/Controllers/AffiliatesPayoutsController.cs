@@ -7,6 +7,7 @@ using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Enums;
+using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -22,14 +23,15 @@ namespace MarketingBox.AffiliateApi.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IAffiliatePayoutService _affiliatePayoutService;
+
         public AffiliatePayoutsController(IMapper mapper, IAffiliatePayoutService affiliatePayoutService)
         {
             _mapper = mapper;
             _affiliatePayoutService = affiliatePayoutService;
         }
-        
+
         [HttpGet]
-        public async Task<ActionResult<Paginated<AffiliatePayoutModel,long?>>> SearchAsync(
+        public async Task<ActionResult<Paginated<AffiliatePayoutModel, long?>>> SearchAsync(
             [FromQuery] AffiliatePayoutSearchRequest request)
         {
             var tenantId = this.GetTenantId();
@@ -47,7 +49,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(
                 response, (response.Data?.Select(_mapper.Map<AffiliatePayoutModel>)
                     .ToArray() ?? Array.Empty<AffiliatePayoutModel>())
-                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
+                .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpGet("{affiliatePayoutId}")]
@@ -60,17 +62,24 @@ namespace MarketingBox.AffiliateApi.Controllers
                 PayoutId = affiliatePayoutId
             });
             return this.ProcessResult(
-                response,_mapper.Map<AffiliatePayoutModel>(response.Data));
+                response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
 
         [HttpPost]
         public async Task<ActionResult<AffiliatePayoutModel>> CreateAsync([FromBody] PayoutUpsertRequest request)
         {
+            if (request is null)
+            {
+                throw new BadRequestException("Request has invalid format");
+            }
+
+            request.ValidateEntity();
+
             var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutCreateRequest>(request);
             requestGrpc.TenantId = tenantId;
             var response = await _affiliatePayoutService.CreateAsync(requestGrpc);
-            
+
             return this.ProcessResult(response, _mapper.Map<AffiliatePayoutModel>(response.Data));
         }
 
@@ -79,6 +88,13 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] int affiliatePayoutId,
             [FromBody] PayoutUpsertRequest request)
         {
+            if (request is null)
+            {
+                throw new BadRequestException("Request has invalid format");
+            }
+
+            request.ValidateEntity();
+
             var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutUpdateRequest>(request);
             requestGrpc.Id = affiliatePayoutId;

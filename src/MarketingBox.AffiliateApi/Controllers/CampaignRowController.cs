@@ -125,6 +125,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             }
 
             request.ValidateEntity();
+            
             var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<CampaignRowUpdateRequest>(request);
             requestGrpc.CampaignRowId = campaignRowId;
