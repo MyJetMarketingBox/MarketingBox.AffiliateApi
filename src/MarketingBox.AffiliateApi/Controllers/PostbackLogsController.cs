@@ -1,20 +1,21 @@
-﻿using AutoMapper;
-using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Extensions;
+﻿using System;
+using System.Linq;
+using AutoMapper;
 using MarketingBox.Postback.Service.Grpc;
-using MarketingBox.Postback.Service.Grpc.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Helpers;
+using MarketingBox.AffiliateApi.Models.PostbackLogs.Requests;
+using MarketingBox.Postback.Service.Domain.Models.Requests;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using EventReferenceLog = MarketingBox.AffiliateApi.Models.PostbackLogs.EventReferenceLog;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
+    [Authorize]
     [ApiController]
     [Route("/api/[controller]/")]
     public class PostbackLogsController : ControllerBase
@@ -34,27 +35,32 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Models.PostbackLogs.EventReferenceLog>>> GetLogs()
+        public async Task<ActionResult<Paginated<EventReferenceLog, long?>>> GetLogs(
+            [FromQuery] SearchPostbackLogsRequest paginationLogsRequest)
         {
-            try
+            var tenantId = this.GetTenantId();
+            var request = new FilterLogsRequest()
             {
-                var affiliateId = this.GetAffiliateId();
-                var response = await _eventReferenceLogService.GetLogsAsync(
-                    new ByAffiliateIdRequest
-                    {
-                        AffiliateId = affiliateId
-                    });
-                return this.ProcessResult(
-                    response,
-                    response.Data is null
-                        ? Enumerable.Empty<Models.PostbackLogs.EventReferenceLog>()
-                        : response.Data.Select(_mapper.Map<Models.PostbackLogs.EventReferenceLog>));
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500);
-            }
+                Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
+                Cursor = paginationLogsRequest.Cursor,
+                Take = paginationLogsRequest.Limit,
+                AffiliateName = paginationLogsRequest.AffiliateName,
+                EventType = paginationLogsRequest.EventType,
+                ToDate = paginationLogsRequest.ToDate,
+                FromDate = paginationLogsRequest.FromDate,
+                HttpQueryType = paginationLogsRequest.HttpQueryType,
+                RegistrationUId = paginationLogsRequest.RegistrationUId,
+                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
+                TenantId = tenantId
+            };
+            var response = await _eventReferenceLogService.SearchAsync(request);
+            
+            return this.ProcessResult(
+                response,
+                (response.Data?
+                    .Select(_mapper.Map<EventReferenceLog>)
+                    .ToArray() ?? Array.Empty<EventReferenceLog>())
+                    .Paginate(paginationLogsRequest, Url, response.Total ?? default, x => x.Id));
         }
     }
 }

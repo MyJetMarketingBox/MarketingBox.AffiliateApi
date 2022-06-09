@@ -1,18 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
+using MarketingBox.Affiliate.Service.Domain.Models.OfferAffiliates;
+using MarketingBox.AffiliateApi.Models.OfferAffiliates;
+using MarketingBox.AffiliateApi.Models.Payouts;
 
-namespace MarketingBox.AffiliateApi.Models.Partners
+namespace MarketingBox.AffiliateApi.Models.Affiliates
 {
     public class AffiliateModel
     {
-        public long AffiliateId { get; set; }
+        public long Id { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
 
-        public AffiliateGeneralInfo GeneralInfo { get; set; }
+        public AffiliateGeneralInfoBase GeneralInfo { get; set; }
 
         public AffiliateCompany Company { get; set; }
 
         public AffiliateBank Bank { get; set; }
-        public long Sequence { get; set; }
+        
+        public List<AffiliatePayoutModel> Payouts { get; set; } = new ();
+
+        public List<OfferAffiliateModel> OfferAffiliates { get; set; } = new ();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using MarketingBox.AffiliateApi.Grpc;
 using MyJetWallet.Sdk.Grpc;
 
 namespace MarketingBox.AffiliateApi.Client
@@ -10,7 +9,5 @@ namespace MarketingBox.AffiliateApi.Client
         public AffiliateApiClientFactory(string grpcServiceUrl) : base(grpcServiceUrl)
         {
         }
-
-        public IHelloService GetHelloService() => CreateGrpcService<IHelloService>();
     }
 }

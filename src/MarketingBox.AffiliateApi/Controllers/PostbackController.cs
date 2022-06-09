@@ -1,20 +1,21 @@
-﻿using AutoMapper;
-using MarketingBox.AffiliateApi.Authorization;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Postback;
+﻿using System;
+using System.Linq;
+using AutoMapper;
 using MarketingBox.AffiliateApi.Models.Postback.Requests;
 using MarketingBox.Postback.Service.Grpc;
-using MarketingBox.Postback.Service.Grpc.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Helpers;
+using MarketingBox.Postback.Service.Domain.Models.Requests;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
+using Reference = MarketingBox.AffiliateApi.Models.Postback.Reference;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AffiliateAndHigher)]
+    [Authorize]
     [ApiController]
     [Route("/api/postback/")]
     public class PostbackController : ControllerBase
@@ -22,7 +23,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         private readonly IPostbackService _postbackService;
         private readonly IMapper _mapper;
         private readonly ILogger<PostbackController> _logger;
-        
+
         public PostbackController(
             IPostbackService postbackService,
             IMapper mapper,
@@ -34,88 +35,73 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Reference>> GetReferenceAsync()
+        public async Task<ActionResult<Reference>> GetAsync()
         {
-            try
+            var affiliateId = this.GetUserId();
+            var result = await _postbackService.GetAsync(
+                new ByAffiliateIdRequest {AffiliateId = affiliateId});
+
+            return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
+        }
+        
+        [HttpGet("search")]
+        public async Task<ActionResult<Paginated<Reference, long?>>> SearchAsync(
+            [FromQuery] MarketingBox.AffiliateApi.Models.Postback.Requests.SearchReferenceRequest paginationLogsRequest)
+        {
+            var tenantId = this.GetTenantId();
+            var response = await _postbackService.SearchAsync(new() 
             {
-                var affiliateId = this.GetAffiliateId();
-                var result = await _postbackService.GetReferenceAsync(
-                    new ByAffiliateIdRequest { AffiliateId = affiliateId });
-                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500);
-            }
+                Asc = paginationLogsRequest.Order == PaginationOrder.Asc,
+                Cursor = paginationLogsRequest.Cursor,
+                Take = paginationLogsRequest.Limit,
+                
+                AffiliateName = paginationLogsRequest.AffiliateName,
+                AffiliateIds = paginationLogsRequest.AffiliateIds.Parse<long>(),
+                HttpQueryType = paginationLogsRequest.HttpQueryType,
+                TenantId = tenantId
+            });
+
+            return this.ProcessResult(
+                response,
+                (response.Data?
+                    .Select(_mapper.Map<Reference>)
+                    .ToArray() ?? Array.Empty<Reference>())
+                    .Paginate(paginationLogsRequest, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Reference>> CreateReferenceAsync(
+        public async Task<ActionResult<Reference>> CreateAsync(
             [FromBody] ReferenceRequest request)
         {
-            try
-            {
-                request.AffiliateId = this.GetAffiliateId();
-                var result = await _postbackService.CreateReferenceAsync(
-                    _mapper.Map<FullReferenceRequest>(request));
-                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500);
-            }
+            var grpcRequest =
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
+            grpcRequest.AffiliateId = this.GetUserId();
+            grpcRequest.TenantId = this.GetTenantId();
+            var result = await _postbackService.CreateAsync(grpcRequest);
+            return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
         [HttpPut]
-        public async Task<ActionResult<Reference>> UpdateReferenceAsync(
+        public async Task<ActionResult<Reference>> UpdateAsync(
             [FromBody] ReferenceRequest request)
         {
-            try
-            {
-                request.AffiliateId = this.GetAffiliateId();
-                var result = await _postbackService.UpdateReferenceAsync(
-                    _mapper.Map<FullReferenceRequest>(request));
-                return this.ProcessResult(result,_mapper.Map<Reference>(result.Data));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500);
-            }
+            var grpcRequest =
+                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
+            grpcRequest.AffiliateId = this.GetUserId();
+            grpcRequest.TenantId = this.GetTenantId();
+            var result = await _postbackService.UpdateAsync(grpcRequest);
 
+            return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteReferenceAsync()
+        public async Task<ActionResult> DeleteAsync()
         {
-            try
-            {
-                var affiliateId = this.GetAffiliateId();
-                var result = await _postbackService.DeleteReferenceAsync(
-                    new ByAffiliateIdRequest { AffiliateId = affiliateId });
-                switch (result.StatusCode)
-                {
-                    case Postback.Service.Grpc.Models.StatusCode.Ok:
-                        return Ok();
-                    case Postback.Service.Grpc.Models.StatusCode.NotFound:
-                        ModelState.AddModelError("Error", result.ErrorMessage);
-                        return NotFound(ModelState);
-                    case Postback.Service.Grpc.Models.StatusCode.BadRequest:
-                        ModelState.AddModelError("Error", result.ErrorMessage);
-                        return BadRequest(ModelState);
-                    case Postback.Service.Grpc.Models.StatusCode.InternalError:
-                        return StatusCode(500);
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500);
-            }
+            var affiliateId = this.GetUserId();
+            var result = await _postbackService.DeleteAsync(
+                new ByAffiliateIdRequest {AffiliateId = affiliateId});
+            this.ProcessResult(result, true);
+            return Ok();
         }
     }
 }

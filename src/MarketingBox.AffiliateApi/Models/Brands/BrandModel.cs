@@ -1,4 +1,10 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Campaigns
+﻿using System.Collections.Generic;
+using MarketingBox.AffiliateApi.Models.CampaignRows;
+using MarketingBox.AffiliateApi.Models.Integrations;
+using MarketingBox.AffiliateApi.Models.Payouts;
+using MarketingBox.Sdk.Common.Enums;
+
+namespace MarketingBox.AffiliateApi.Models.Brands
 {
     public class BrandModel
     {
@@ -6,16 +12,14 @@
 
         public string Name { get; set; }
 
-        public long IntegrationId { get; set; }
+        public IntegrationModel Integration { get; set; }
 
-        public Payout Payout { get; set; }
+        public IntegrationType IntegrationType { get; set; }
 
-        public Revenue Revenue { get; set; }
+        public List<CampaignRowModel> CampaignRows { get; set; } = new ();
 
-        public BrandStatus Status { get; set; }
-
-        public BrandPrivacy Privacy { get; set; }
-
-        public long Sequence { get; set; }
+        public List<BrandPayoutModel> Payouts { get; set; } = new ();
+        public string Link { get; set; }
+        public LinkParametersModel LinkParameters { get; set; }
     }
 }

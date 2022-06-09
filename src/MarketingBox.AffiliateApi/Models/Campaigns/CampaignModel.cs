@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenTelemetry.Context.Propagation;
 
-namespace MarketingBox.AffiliateApi.Models.Boxes
+namespace MarketingBox.AffiliateApi.Models.Campaigns
 {
     public class CampaignModel
     {
         public long Id { get; set; }
 
         public string Name { get; set; }
-
-        public long Sequence { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? LastActiveAt { get; set; }
     }
 }

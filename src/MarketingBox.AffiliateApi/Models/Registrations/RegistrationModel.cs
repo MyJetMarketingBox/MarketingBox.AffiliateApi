@@ -1,4 +1,6 @@
-﻿namespace MarketingBox.AffiliateApi.Models.Registrations
+﻿using MarketingBox.Sdk.Common.Enums;
+
+namespace MarketingBox.AffiliateApi.Models.Registrations
 {
     public class RegistrationModel
     {

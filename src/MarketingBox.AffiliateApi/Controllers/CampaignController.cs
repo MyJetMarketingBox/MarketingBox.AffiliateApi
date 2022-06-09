@@ -1,29 +1,32 @@
+using System;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Boxes;
-using MarketingBox.AffiliateApi.Models.Boxes.Requests;
-using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Authorization;
+using AutoMapper;
+using MarketingBox.AffiliateApi.Models.Campaigns;
 using MarketingBox.AffiliateApi.Models.Campaigns.Requests;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/campaigns")]
     public class CampaignController : ControllerBase
     {
         private readonly ICampaignService _campaignService;
+        private readonly IMapper _mapper;
 
-        public CampaignController(ICampaignService campaignService)
+        public CampaignController(ICampaignService campaignService, IMapper mapper)
         {
             _campaignService = campaignService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -31,21 +34,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<CampaignModel, long>), StatusCodes.Status200OK)]
-
-        public async Task<ActionResult<Paginated<CampaignModel, long>>> SearchAsync(
+        [ProducesResponseType(typeof(Paginated<CampaignModel, long?>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<Paginated<CampaignModel, long?>>> SearchAsync(
             [FromQuery] CampaignSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
-            {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should be in the range 1..1000");
-
-                return BadRequest();
-            }
-
             var tenantId = this.GetTenantId();
 
-            var response = await _campaignService.SearchAsync(new ()
+            var response = await _campaignService.SearchAsync(new()
             {
                 Asc = request.Order == PaginationOrder.Asc,
                 CampaignId = request.Id,
@@ -55,12 +50,12 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = tenantId
             });
 
-            if (response.Boxes != null && response.Boxes.Any())
-                return Ok(response.Boxes.Select(Map)
-                    .ToArray()
-                    .Paginate(request, Url, x => x.Id));
-            
-            return NotFound();
+            return this.ProcessResult(
+                response,
+                (response.Data?
+                    .Select(_mapper.Map<CampaignModel>)
+                    .ToArray() ?? Array.Empty<CampaignModel>())
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         /// <summary>
@@ -69,16 +64,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpGet("{campaignId}")]
         [ProducesResponseType(typeof(CampaignModel), StatusCodes.Status200OK)]
-
-        public async Task<ActionResult<Paginated<CampaignModel, long>>> SearchAsync(
+        public async Task<ActionResult<CampaignModel>> GetAsync(
             [Required, FromRoute] long campaignId)
         {
-            var response = await _campaignService.GetAsync(new ()
+            var tenantId = this.GetTenantId();
+            var response = await _campaignService.GetAsync(new()
             {
                 CampaignId = campaignId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<CampaignModel>(response.Data));
         }
 
         /// <summary>
@@ -88,17 +83,16 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CampaignModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<CampaignModel>> CreateAsync(
-            [FromBody] CampaignCreateRequest request)
+            [FromBody] CampaignUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
 
-            var response = await _campaignService.CreateAsync(new ()
-            {
-                Name = request.Name,
-                TenantId = tenantId
-            });
+            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Campaigns.CampaignCreateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            requestGrpc.CreatedById = this.GetUserId();
+            var response = await _campaignService.CreateAsync(requestGrpc);
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<CampaignModel>(response.Data));
         }
 
         /// <summary>
@@ -109,19 +103,15 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(CampaignModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<CampaignModel>> UpdateAsync(
             [Required, FromRoute] long campaignId,
-            [FromBody] CampaignUpdateRequest request)
+            [FromBody] CampaignUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
+            var requestGrpc = _mapper.Map<Affiliate.Service.Grpc.Requests.Campaigns.CampaignUpdateRequest>(request);
+            requestGrpc.TenantId = tenantId;
+            requestGrpc.CampaignId = campaignId;
+            var response = await _campaignService.UpdateAsync(requestGrpc);
 
-            var response = await _campaignService.UpdateAsync(new ()
-            {
-                Name = request.Name,
-                TenantId = tenantId,
-                CampaignId = campaignId,
-                Sequence = request.Sequence
-            });
-
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<CampaignModel>(response.Data));
         }
 
         /// <summary>
@@ -130,53 +120,17 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// </remarks>
         [HttpDelete("{campaignId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<ActionResult> UpdateAsync(
+        public async Task<ActionResult> DeleteAsync(
             [Required, FromRoute] long campaignId)
         {
             var tenantId = this.GetTenantId();
 
-            var response = await _campaignService.DeleteAsync(new ()
+            var response = await _campaignService.DeleteAsync(new()
             {
-                CampaignId = campaignId,
+                CampaignId = campaignId
             });
 
-            return MapToResponseEmpty(response);
-        }
-
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.Campaigns.CampaignResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            if (response.Campaign == null)
-                return NotFound();
-
-            return Ok(Map(response.Campaign));
-        }
-
-        private static CampaignModel Map(MarketingBox.Affiliate.Service.Grpc.Models.Campaigns.Campaign campaign)
-        {
-            return new CampaignModel()
-            {
-                Sequence = campaign.Sequence,
-                Name = campaign.Name,
-                Id = campaign.Id
-            };
-        }
-
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.Campaigns.CampaignResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
+            this.ProcessResult(response, true);
             return Ok();
         }
     }

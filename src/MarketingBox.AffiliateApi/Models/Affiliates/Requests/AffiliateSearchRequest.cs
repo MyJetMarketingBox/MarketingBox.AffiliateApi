@@ -1,25 +1,19 @@
 ﻿using System;
-using MarketingBox.AffiliateApi.Models.Partners;
-using MarketingBox.AffiliateApi.Pagination;
-using Microsoft.AspNetCore.Mvc;
+using MarketingBox.Affiliate.Service.Domain.Models.Affiliates;
+using MarketingBox.Sdk.Common.Attributes;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 
 namespace MarketingBox.AffiliateApi.Models.Affiliates.Requests
 {
     public class AffiliateSearchRequest : PaginationRequest<long?>
     {
-        [FromQuery(Name = "id")]
+        [AdvancedCompare(ComparisonType.GreaterThan, 0)]
         public long? Id { get; set; }
 
-        [FromQuery(Name = "username")]
         public string Username { get; set; }
-
-        [FromQuery(Name = "role")]
-        public AffiliateRole? Role { get; set; }
-
-        [FromQuery(Name = "email")]
         public string Email { get; set; }
-
-        [FromQuery(Name = "createdAt")]
-        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public string Phone { get; set; }
+        public State? State { get; set; }
     }
 }

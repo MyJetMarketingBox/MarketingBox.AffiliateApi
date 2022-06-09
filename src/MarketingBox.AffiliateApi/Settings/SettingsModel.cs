@@ -37,5 +37,8 @@ namespace MarketingBox.AffiliateApi.Settings
 
         [YamlProperty("MarketingBoxAffiliateApi.PostbackServiceUrl")]
         public string PostbackServiceUrl { get; internal set; }
+
+        [YamlProperty("MarketingBoxAffiliateApi.RedistributionServiceUrl")]
+        public string RedistributionServiceUrl { get; set; }
     }
 }

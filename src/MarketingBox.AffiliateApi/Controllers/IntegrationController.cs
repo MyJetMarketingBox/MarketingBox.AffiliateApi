@@ -1,28 +1,32 @@
+using System;
 using MarketingBox.Affiliate.Service.Grpc;
-using MarketingBox.AffiliateApi.Extensions;
-using MarketingBox.AffiliateApi.Models.Brands;
-using MarketingBox.AffiliateApi.Models.Brands.Requests;
-using MarketingBox.AffiliateApi.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using MarketingBox.AffiliateApi.Authorization;
+using AutoMapper;
+using MarketingBox.AffiliateApi.Models.Integrations;
+using MarketingBox.AffiliateApi.Models.Integrations.Requests;
+using MarketingBox.Sdk.Common.Extensions;
+using MarketingBox.Sdk.Common.Models.RestApi;
+using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MarketingBox.AffiliateApi.Controllers
 {
-    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    [Authorize]
     [ApiController]
     [Route("/api/integrations")]
     public class IntegrationController : ControllerBase
     {
         private readonly IIntegrationService _integrationService;
+        private readonly IMapper _mapper;
 
-        public IntegrationController(IIntegrationService integrationService)
+        public IntegrationController(IIntegrationService integrationService, IMapper mapper)
         {
             _integrationService = integrationService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,18 +34,11 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(typeof(Paginated<IntegrationModel, long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Paginated<IntegrationModel, long?>), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<IntegrationModel, long>>> SearchAsync(
+        public async Task<ActionResult<Paginated<IntegrationModel, long?>>> SearchAsync(
             [FromQuery] IntegrationsSearchRequest request)
         {
-            if (request.Limit < 1 || request.Limit > 1000)
-            {
-                ModelState.AddModelError($"{nameof(request.Limit)}", "Should not be in the range 1..1000");
-
-                return BadRequest();
-            }
-
             var tenantId = this.GetTenantId();
 
             var response = await _integrationService.SearchAsync(new ()
@@ -53,25 +50,27 @@ namespace MarketingBox.AffiliateApi.Controllers
                 Take = request.Limit,
                 TenantId = tenantId
             });
-
-            return Ok(
-                response.Integrations.Select(Map)
-                    .ToArray()
-                    .Paginate(request, Url, x => x.Id));
+            return this.ProcessResult(
+                response,
+                (response.Data?
+                    .Select(_mapper.Map<IntegrationModel>)
+                    .ToArray() ?? Array.Empty<IntegrationModel>())
+                    .Paginate(request, Url, response.Total ?? default, x => x.Id));
         }
 
         [HttpGet("{integrationId}")]
         [ProducesResponseType(typeof(IntegrationModel), StatusCodes.Status200OK)]
 
-        public async Task<ActionResult<Paginated<IntegrationModel, long>>> GetAsync(
+        public async Task<ActionResult<IntegrationModel>> GetAsync(
             [FromRoute] long integrationId)
         {
+            var tenantId = this.GetTenantId();
             var response = await _integrationService.GetAsync(new ()
             {
                  IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         [ProducesResponseType(typeof(IntegrationModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<IntegrationModel>> CreateAsync(
             
-            [FromBody] IntegrationCreateRequest request)
+            [FromBody] IntegrationUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
             var response = await _integrationService.CreateAsync(new ()
@@ -91,7 +90,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 TenantId = tenantId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -103,18 +102,17 @@ namespace MarketingBox.AffiliateApi.Controllers
         public async Task<ActionResult<IntegrationModel>> UpdateAsync(
             
             [Required, FromRoute] long integrationId,
-            [FromBody] IntegrationUpdateRequest request)
+            [FromBody] IntegrationUpsertRequest request)
         {
             var tenantId = this.GetTenantId();
             var response = await _integrationService.UpdateAsync(new ()
             {
                 Name = request.Name,
                 TenantId = tenantId,
-                Sequence = request.Sequence,
                 IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
+            return this.ProcessResult(response, _mapper.Map<IntegrationModel>(response.Data));
         }
 
         /// <summary>
@@ -133,43 +131,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 IntegrationId = integrationId
             });
 
-            return MapToResponse(response);
-        }
-
-        private ActionResult MapToResponse(Affiliate.Service.Grpc.Models.Integrations.IntegrationResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
-            if (response.Integration == null)
-                return NotFound();
-            
-            return Ok(Map(response.Integration));
-        }
-
-        private static IntegrationModel Map(Affiliate.Service.Grpc.Models.Integrations.Integration integration)
-        {
-            return new()
-            {
-                Sequence = integration.Sequence,
-                Name = integration.Name,
-                Id = integration.Id
-            };
-        }
-
-        private ActionResult MapToResponseEmpty(Affiliate.Service.Grpc.Models.Brands.BrandResponse response)
-        {
-            if (response.Error != null)
-            {
-                ModelState.AddModelError("", response.Error.Message);
-
-                return BadRequest(ModelState);
-            }
-
+            this.ProcessResult(response, true);
             return Ok();
         }
     }
