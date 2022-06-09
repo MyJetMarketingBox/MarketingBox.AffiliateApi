@@ -7,6 +7,7 @@ using MarketingBox.Affiliate.Service.Grpc.Requests.Payout;
 using MarketingBox.AffiliateApi.Models.Payouts;
 using MarketingBox.AffiliateApi.Models.Payouts.Requests;
 using MarketingBox.Sdk.Common.Enums;
+using MarketingBox.Sdk.Common.Exceptions;
 using MarketingBox.Sdk.Common.Extensions;
 using MarketingBox.Sdk.Common.Models.RestApi;
 using MarketingBox.Sdk.Common.Models.RestApi.Pagination;
@@ -65,6 +66,12 @@ namespace MarketingBox.AffiliateApi.Controllers
         [HttpPost]
         public async Task<ActionResult<BrandPayoutModel>> CreateAsync([FromBody] PayoutUpsertRequest request)
         {
+            if (request is null)
+            {
+                throw new BadRequestException("Request has invalid format");
+            }
+
+            request.ValidateEntity();
             var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutCreateRequest>(request);
             requestGrpc.TenantId = tenantId;
@@ -77,6 +84,12 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromRoute] int brandPayoutId,
             [FromBody] PayoutUpsertRequest request)
         {
+            if (request is null)
+            {
+                throw new BadRequestException("Request has invalid format");
+            }
+
+            request.ValidateEntity();
             var tenantId = this.GetTenantId();
             var requestGrpc = _mapper.Map<PayoutUpdateRequest>(request);
             requestGrpc.Id = brandPayoutId;
