@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MarketingBox.AffiliateApi.Controllers;
 
+[Route("/api/[controller]")]
 [Authorize]
 public class DashboardController : ControllerBase
 {
@@ -71,7 +72,7 @@ public class DashboardController : ControllerBase
         }).ToList();
     }
 
-    [HttpGet("[controller]")]
+    [HttpGet]
     public async Task<ActionResult<Dashboard>> GetDashboard(
         [FromQuery] DateTime? fromDate,
         [FromQuery] DateTime? toDate)
@@ -81,7 +82,7 @@ public class DashboardController : ControllerBase
         return await Task.FromResult(_dashboard);
     }
 
-    [HttpGet("[controller]/map")]
+    [HttpGet("map")]
     public async Task<ActionResult<DashboardMap>> GetDashboardMap(
         [FromQuery] DateTime? fromDate,
         [FromQuery] DateTime? toDate)
