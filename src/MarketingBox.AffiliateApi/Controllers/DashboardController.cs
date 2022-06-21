@@ -57,7 +57,7 @@ public class DashboardController : ControllerBase
         };
 
         var rnd = new Random();
-        return Enumerable.Range(0, 1).Select(x =>
+        return Enumerable.Range(0, rnd.Next(1,3)).Select(x =>
         {
             var countryId = countries.Keys.ToList()[rnd.Next(0, 4)];
             return new CountryDashboard
