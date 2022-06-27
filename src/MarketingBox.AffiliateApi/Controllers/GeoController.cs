@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MarketingBox.Affiliate.Service.Domain.Models.Country;
 using MarketingBox.Affiliate.Service.Grpc;
 using MarketingBox.Affiliate.Service.Grpc.Requests.Geo;
 using MarketingBox.AffiliateApi.Models.Country;
@@ -76,11 +78,13 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpDelete("{geoId}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int geoId)
+        public async Task<OkObjectResult> DeleteAsync(
+            [FromRoute] int geoId)
         {
             var tenantId = this.GetTenantId();
             var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId});
-            return this.ProcessResult(response);
+            var campaigns = response.Process() ?? new List<GeoRemoveResponse>();
+            return Ok(campaigns);
         }
     }
 }
