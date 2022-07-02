@@ -78,13 +78,18 @@ namespace MarketingBox.AffiliateApi.Controllers
         }
 
         [HttpDelete("{geoId}")]
-        public async Task<OkObjectResult> DeleteAsync(
+        public async Task<ActionResult<GeoDeleteResponse>> DeleteAsync(
             [FromRoute] int geoId)
         {
             var tenantId = this.GetTenantId();
             var response = await _geoService.DeleteAsync(new GeoByIdRequest {GeoId = geoId});
             var campaigns = response.Process() ?? new List<GeoRemoveResponse>();
-            return Ok(campaigns);
+            var result = new GeoDeleteResponse
+            {
+                IsOk = !campaigns.Any(),
+                Items = campaigns
+            };
+            return Ok(result);
         }
     }
 }
