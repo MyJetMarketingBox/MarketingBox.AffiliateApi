@@ -17,29 +17,35 @@ namespace MarketingBox.AffiliateApi.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("/api/postback/")]
-    public class PostbackController : ControllerBase
+    [Route("/api/[controller]")]
+    public class PostbacksController : ControllerBase
     {
         private readonly IPostbackService _postbackService;
         private readonly IMapper _mapper;
-        private readonly ILogger<PostbackController> _logger;
+        private readonly ILogger<PostbacksController> _logger;
 
-        public PostbackController(
+        public PostbacksController(
             IPostbackService postbackService,
             IMapper mapper,
-            ILogger<PostbackController> logger)
+            ILogger<PostbacksController> logger)
         {
             _postbackService = postbackService;
             _mapper = mapper;
             _logger = logger;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<Reference>> GetAsync()
+        [HttpGet("{postbackId}")]
+        public async Task<ActionResult<Reference>> GetAsync([FromRoute] long postbackId)
         {
             var affiliateId = this.GetUserId();
+            var tenant = this.GetTenantId();
             var result = await _postbackService.GetAsync(
-                new ByAffiliateIdRequest {AffiliateId = affiliateId});
+                new ByIdRequest()
+                {
+                    PostbackId = postbackId,
+                    RequestedBy = affiliateId,
+                    TenantId = tenant
+                });
 
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
@@ -71,35 +77,46 @@ namespace MarketingBox.AffiliateApi.Controllers
 
         [HttpPost]
         public async Task<ActionResult<Reference>> CreateAsync(
-            [FromBody] ReferenceRequest request)
+            [FromBody] ReferenceCreateRequest request)
         {
             var grpcRequest =
-                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
-            grpcRequest.AffiliateId = this.GetUserId();
+                _mapper.Map<CreateReferenceRequest>(request);
+            var userId = this.GetUserId();
+            
             grpcRequest.TenantId = this.GetTenantId();
+            grpcRequest.CreatedBy = userId;
+            grpcRequest.AffiliateId ??= userId;
             var result = await _postbackService.CreateAsync(grpcRequest);
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
-        [HttpPut]
+        [HttpPut("{postbackId}")]
         public async Task<ActionResult<Reference>> UpdateAsync(
-            [FromBody] ReferenceRequest request)
+            [FromRoute] long postbackId,
+            [FromBody] ReferenceUpdateRequest request)
         {
             var grpcRequest =
-                _mapper.Map<CreateOrUpdateReferenceRequest>(request);
-            grpcRequest.AffiliateId = this.GetUserId();
+                _mapper.Map<UpdateReferenceRequest>(request);
+            grpcRequest.PostbackId = postbackId;
+            grpcRequest.RequestedBy = this.GetUserId();
             grpcRequest.TenantId = this.GetTenantId();
             var result = await _postbackService.UpdateAsync(grpcRequest);
 
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
 
-        [HttpDelete]
-        public async Task<ActionResult> DeleteAsync()
+        [HttpDelete("{postbackId}")]
+        public async Task<ActionResult> DeleteAsync([FromRoute] long postbackId)
         {
             var affiliateId = this.GetUserId();
+            var tenant = this.GetTenantId();
             var result = await _postbackService.DeleteAsync(
-                new ByAffiliateIdRequest {AffiliateId = affiliateId});
+                new ByIdRequest()
+                {
+                    PostbackId = postbackId,
+                    RequestedBy = affiliateId,
+                    TenantId = tenant
+                });
             this.ProcessResult(result, true);
             return Ok();
         }

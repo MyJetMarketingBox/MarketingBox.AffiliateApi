@@ -9,10 +9,8 @@ namespace MarketingBox.AffiliateApi.MapperProfiles
     {
         public PostbackReferenceProfile()
         {
-            CreateMap<ReferenceRequest, CreateOrUpdateReferenceRequest>()
-                .ForMember(
-                    x => x.AffiliateId,
-                    o => o.MapFrom(p => p.AffiliateId));
+            CreateMap<ReferenceUpdateRequest, UpdateReferenceRequest>();
+            CreateMap<ReferenceCreateRequest, CreateReferenceRequest>();
             CreateMap<Reference, MarketingBox.Postback.Service.Domain.Models.Reference>()
                 .ReverseMap()
                 .ForMember(
