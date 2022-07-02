@@ -50,7 +50,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             return this.ProcessResult(result, _mapper.Map<Reference>(result.Data));
         }
         
-        [HttpGet("search")]
+        [HttpGet]
         public async Task<ActionResult<Paginated<Reference, long?>>> SearchAsync(
             [FromQuery] MarketingBox.AffiliateApi.Models.Postback.Requests.SearchReferenceRequest paginationLogsRequest)
         {
