@@ -140,7 +140,7 @@ namespace MarketingBox.AffiliateApi.Controllers
         /// <remarks>
         /// </remarks>
         [HttpPut("{campaignRowId}/enableTraffic")]
-        public async Task<IActionResult> EnableTrafficAsync(
+        public async Task<ActionResult<CampaignRowModel>> EnableTrafficAsync(
             [Required, FromRoute] long campaignRowId,
             [FromBody, Required] UpdateTrafficRequestHttp request)
         {
@@ -151,8 +151,7 @@ namespace MarketingBox.AffiliateApi.Controllers
                 CampaignRowId = campaignRowId
             };
             var response = await _campaignBoxService.UpdateTrafficAsync(requestGrpc);
-            response.Process();
-            return Ok();
+            return this.ProcessResult(response, _mapper.Map<CampaignRowModel>(response.Data));
         }
 
         /// <summary>
