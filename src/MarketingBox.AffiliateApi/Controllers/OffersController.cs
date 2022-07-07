@@ -22,8 +22,8 @@ namespace MarketingBox.AffiliateApi.Controllers
     [Route("/api/[controller]")]
     public class OffersController : ControllerBase
     {
-        private IOfferService _offerService;
-        private IMapper _mapper;
+        private readonly IOfferService _offerService;
+        private readonly IMapper _mapper;
 
         public OffersController(IOfferService offerService, IMapper mapper)
         {
@@ -36,8 +36,10 @@ namespace MarketingBox.AffiliateApi.Controllers
             [FromBody] OfferUpsertRequest upsertRequest)
         {
             var tenantId = this.GetTenantId();
+            var userId = this.GetUserId();
             var requestGrpc = _mapper.Map<OfferCreateRequestGRPC>(upsertRequest);
             requestGrpc.TenantId = tenantId;
+            requestGrpc.CreatedByUserId = userId;
             var response = await _offerService.CreateAsync(requestGrpc);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
@@ -53,8 +55,7 @@ namespace MarketingBox.AffiliateApi.Controllers
             request.OfferId = offerId;
             request.AffiliateId = affiliateId;
             request.TenantId = tenantId;
-            var response =
-                await _offerService.UpdateAsync(request);
+            var response = await _offerService.UpdateAsync(request);
             return this.ProcessResult(response, _mapper.Map<OfferModel>(response.Data));
         }
 
