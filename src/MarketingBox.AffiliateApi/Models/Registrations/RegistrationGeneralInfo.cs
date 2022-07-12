@@ -24,6 +24,7 @@ namespace MarketingBox.AffiliateApi.Models.Registrations
         public DateTime? ConversionDate { get; set; }
         public DateTime? DepositDate { get; set; }
         public int CountryId { get; set; }
+        public string CountryCode { get; set; }
     }
 
     public class RegistrationGeneralInfoForAffiliate
